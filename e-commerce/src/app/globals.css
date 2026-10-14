@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+/*
+ * Token architecture: brand constants never change between themes; semantic
+ * tokens do. The storefront is light/dark capable (system preference, or an
+ * explicit data-theme override); the admin shell is intentionally always
+ * dark-sidebar/light-canvas regardless of theme — that's a dashboard
+ * convention, not a thing that should flip with the user's OS setting.
+ */
+
+:root {
+  /* ---- brand constants ---- */
+  --ink: #15131a;
+  --paper: #faf9f7;
+  --accent: #7c5cfc;
+  --accent-soft: #f1ecfd;
+  --accent-ink: #4c1d95;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  /* ---- semantic — light (default) ---- */
+  --bg: #faf9f7;
+  --bg-raised: #ffffff;
+  --bg-sunken: #f1ede8;
+  --border: #e7e3dd;
+  --text: #15131a;
+  --text-muted: #6b6572;
+
+  /* "Inverse" surface — for the primary button and active pills: always the
+   * opposite end of the scale from --bg, so it stays high-contrast in both
+   * themes. --ink itself is a FIXED brand constant and must never be used
+   * for this — a near-black button on a near-black dark-mode page is
+   * invisible, which is exactly the bug this pair exists to prevent. */
+  --inverse: #15131a;
+  --inverse-text: #faf9f7;
+
+  /* ---- admin shell — constant across themes ---- */
+  --admin-sidebar: #0b0e14;
+  --admin-sidebar-ink: #aeb2bd;
+  --admin-sidebar-active: #171b24;
+  --admin-accent: #22c55e;
+  --admin-canvas: #eef1f5;
+  --admin-card: #ffffff;
+
+  /* ---- status pastels (order/payment badges, dashboard stat cards) ---- */
+  --stat-green-bg: #e7f8ee;
+  --stat-green-ink: #15803d;
+  --stat-amber-bg: #fdf3e2;
+  --stat-amber-ink: #b45309;
+  --stat-blue-bg: #e8f1fd;
+  --stat-blue-ink: #1d4ed8;
+  --stat-rose-bg: #fdeaea;
+  --stat-rose-ink: #be123c;
+  --stat-violet-bg: #f1ecfd;
+  --stat-violet-ink: #6d28d9;
+  --stat-gray-bg: #eef0f3;
+  --stat-gray-ink: #475569;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121014;
+    --bg-raised: #1b1820;
+    --bg-sunken: #0d0c10;
+    --border: #2b2730;
+    --text: #f2f0f5;
+    --text-muted: #a7a1af;
+    --inverse: #f2f0f5;
+    --inverse-text: #15131a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121014;
+  --bg-raised: #1b1820;
+  --bg-sunken: #0d0c10;
+  --border: #2b2730;
+  --text: #f2f0f5;
+  --text-muted: #a7a1af;
+  --inverse: #f2f0f5;
+  --inverse-text: #15131a;
+}
+
+/*
+ * NOT scoped to :root — this is a per-subtree override. The admin shell
+ * (app/admin/layout.tsx) sets data-theme="light" on its own wrapper, not on
+ * <html>, because the dashboard's light-canvas/dark-sidebar look is a fixed
+ * dashboard convention, independent of the visitor's OS dark-mode setting —
+ * unlike the storefront, which is genuinely theme-reactive. CSS custom
+ * properties resolve to the nearest ancestor (including self) that sets
+ * them, so everything inside that wrapper sees these values regardless of
+ * what :root resolved to.
+ */
+[data-theme="light"] {
+  --bg: #faf9f7;
+  --bg-raised: #ffffff;
+  --bg-sunken: #f1ede8;
+  --border: #e7e3dd;
+  --text: #15131a;
+  --text-muted: #6b6572;
+  --inverse: #15131a;
+  --inverse-text: #faf9f7;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-inverse: var(--inverse);
+  --color-inverse-text: var(--inverse-text);
+
+  --color-admin-sidebar: var(--admin-sidebar);
+  --color-admin-sidebar-ink: var(--admin-sidebar-ink);
+  --color-admin-sidebar-active: var(--admin-sidebar-active);
+  --color-admin-accent: var(--admin-accent);
+  --color-admin-canvas: var(--admin-canvas);
+  --color-admin-card: var(--admin-card);
+
+  --color-stat-green-bg: var(--stat-green-bg);
+  --color-stat-green-ink: var(--stat-green-ink);
+  --color-stat-amber-bg: var(--stat-amber-bg);
+  --color-stat-amber-ink: var(--stat-amber-ink);
+  --color-stat-blue-bg: var(--stat-blue-bg);
+  --color-stat-blue-ink: var(--stat-blue-ink);
+  --color-stat-rose-bg: var(--stat-rose-bg);
+  --color-stat-rose-ink: var(--stat-rose-ink);
+  --color-stat-violet-bg: var(--stat-violet-bg);
+  --color-stat-violet-ink: var(--stat-violet-ink);
+  --color-stat-gray-bg: var(--stat-gray-bg);
+  --color-stat-gray-ink: var(--stat-gray-ink);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
