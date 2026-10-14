@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { djangoFetch, toQuery } from "@/lib/django";
 import type { Category, Paginated, Product } from "@/lib/types";
 import { ProductGrid } from "@/components/storefront/ProductGrid";
+import { MpesaBadge } from "@/components/storefront/MpesaBadge";
 
 export default async function HomePage() {
   const [products, categories] = await Promise.all([
@@ -29,13 +30,16 @@ export default async function HomePage() {
           <p className="mt-4 max-w-md text-base text-text-muted">
             A small, honest catalog. Server-priced, always in stock when it says so.
           </p>
-          <Link
-            href="/shop"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-inverse px-6 py-3 text-sm font-medium text-inverse-text hover:opacity-85"
-          >
-            Browse the shop
-            <ArrowRight className="size-4" />
-          </Link>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 rounded-full bg-inverse px-6 py-3 text-sm font-medium text-inverse-text hover:opacity-85"
+            >
+              Browse the shop
+              <ArrowRight className="size-4" />
+            </Link>
+            <MpesaBadge />
+          </div>
         </div>
       </section>
 
@@ -62,7 +66,7 @@ export default async function HomePage() {
             View all
           </Link>
         </div>
-        <ProductGrid products={products.results} />
+        <ProductGrid products={products.results} categories={categories.results} />
       </section>
     </div>
   );

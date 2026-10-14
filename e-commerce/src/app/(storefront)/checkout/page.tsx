@@ -3,6 +3,7 @@ import { djangoFetch } from "@/lib/django";
 import { getCurrentUser } from "@/lib/session";
 import type { Address, Cart } from "@/lib/types";
 import { CheckoutForm } from "@/components/storefront/checkout/CheckoutForm";
+import { MpesaBadge } from "@/components/storefront/MpesaBadge";
 import { formatMoney } from "@/lib/format";
 
 export default async function CheckoutPage() {
@@ -24,7 +25,10 @@ export default async function CheckoutPage() {
         <CheckoutForm addresses={addresses.results} defaultPhone={user.phone_number} />
 
         <div className="h-fit rounded-2xl border border-border p-5">
-          <h2 className="mb-4 text-sm font-semibold text-text">Order summary</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-text">Order summary</h2>
+            <MpesaBadge />
+          </div>
           <div className="flex flex-col gap-2 text-sm">
             {cart.items.map((item) => (
               <div key={item.id} className="flex justify-between">

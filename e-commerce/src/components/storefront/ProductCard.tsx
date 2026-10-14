@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ImageOff } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatMoney } from "@/lib/format";
 import { AddToCartButton } from "./AddToCartButton";
+import { CategoryIllustration } from "./illustrations/CategoryIllustration";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, categoryName }: { product: Product; categoryName?: string }) {
   const cover = product.images[0];
   const outOfStock = product.status !== "published";
 
@@ -24,9 +24,10 @@ export function ProductCard({ product }: { product: Product }) {
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-text-muted">
-            <ImageOff className="size-8" strokeWidth={1.5} />
-          </div>
+          <CategoryIllustration
+            categoryName={categoryName}
+            className="h-full w-full transition-transform duration-300 group-hover:scale-105"
+          />
         )}
       </Link>
       <div className="mt-3 flex items-start justify-between gap-2">

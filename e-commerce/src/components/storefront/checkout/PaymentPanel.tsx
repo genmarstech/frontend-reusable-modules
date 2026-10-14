@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/format";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/providers/ToastProvider";
+import { MpesaBadge } from "@/components/storefront/MpesaBadge";
 import { readableErrorMessage } from "@/lib/errors";
 
 const PAYABLE_STATUSES = new Set(["awaiting_payment", "payment_failed"]);
@@ -73,36 +74,43 @@ export function PaymentPanel({ initialOrder }: { initialOrder: Order }) {
   }
 
   return (
-    <div className="rounded-2xl border border-border p-8">
-      <p className="text-sm text-text-muted">Order {initialOrder.reference}</p>
-      <p className="mt-1 text-3xl font-semibold text-text">{formatMoney(initialOrder.total, initialOrder.currency)}</p>
+    <div className="overflow-hidden rounded-2xl border border-border">
+      <div className="flex items-center justify-between bg-mpesa-soft px-8 py-3">
+        <MpesaBadge label="M-Pesa Checkout" />
+      </div>
 
-      {status === "payment_failed" && (
-        <p className="mt-4 flex items-center gap-2 rounded-lg bg-stat-rose-bg px-3 py-2 text-sm text-stat-rose-ink">
-          <XCircle className="size-4 shrink-0" /> The last attempt failed or was cancelled. Try again below.
-        </p>
-      )}
+      <div className="p-8">
+        <p className="text-sm text-text-muted">Order {initialOrder.reference}</p>
+        <p className="mt-1 text-3xl font-semibold text-text">{formatMoney(initialOrder.total, initialOrder.currency)}</p>
 
-      {prompted && PAYABLE_STATUSES.has(status) ? (
-        <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
-          <Smartphone className="size-8 animate-pulse text-accent" />
-          <p className="font-medium text-text">Check your phone</p>
-          <p className="text-sm text-text-muted">Enter your M-Pesa PIN to complete the payment.</p>
-        </div>
-      ) : (
-        <div className="mt-6 flex flex-col gap-3">
-          <Input
-            id="phone"
-            label="M-Pesa phone number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="0712345678"
-          />
-          <Button onClick={initiatePayment} loading={initiating} size="lg">
-            Pay with M-Pesa
-          </Button>
-        </div>
-      )}
+        {status === "payment_failed" && (
+          <p className="mt-4 flex items-center gap-2 rounded-lg bg-stat-rose-bg px-3 py-2 text-sm text-stat-rose-ink">
+            <XCircle className="size-4 shrink-0" /> The last attempt failed or was cancelled. Try again below.
+          </p>
+        )}
+
+        {prompted && PAYABLE_STATUSES.has(status) ? (
+          <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
+            <Smartphone className="size-8 animate-pulse text-mpesa" />
+            <p className="font-medium text-text">Check your phone</p>
+            <p className="text-sm text-text-muted">Enter your M-Pesa PIN to complete the payment.</p>
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-col gap-3">
+            <Input
+              id="phone"
+              label="M-Pesa phone number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="0712345678"
+            />
+            <Button variant="mpesa" onClick={initiatePayment} loading={initiating} size="lg">
+              <Smartphone className="size-4" />
+              Pay with M-Pesa
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

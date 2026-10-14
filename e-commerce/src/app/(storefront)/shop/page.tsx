@@ -76,7 +76,7 @@ export default async function ShopPage({
         </aside>
 
         <div className="flex-1">
-          <ProductGrid products={products.results} />
+          <ProductGrid products={products.results} categories={categories.results} />
           <Pagination page={page} pageSize={PAGE_SIZE} count={products.count} basePath={basePath} />
         </div>
       </div>

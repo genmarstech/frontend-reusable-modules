@@ -22,6 +22,7 @@ export default async function CartPage() {
       {cart.items.length === 0 ? (
         <EmptyState
           icon={ShoppingBag}
+          tone="violet"
           title="Your cart is empty"
           description="Find something you like in the shop."
           action={

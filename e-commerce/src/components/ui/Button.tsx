@@ -2,7 +2,7 @@ import { type ButtonHTMLAttributes, forwardRef } from "react";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "mpesa";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -16,6 +16,10 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   secondary: "bg-bg-raised text-text border border-border hover:bg-bg-sunken",
   ghost: "text-text hover:bg-bg-sunken",
   danger: "bg-danger text-white hover:bg-danger/85 disabled:bg-danger/40",
+  // The one payment method this store takes — its own brand colour, not
+  // the generic primary/inverse button, so "pay now" always reads as
+  // distinctly the M-Pesa action.
+  mpesa: "bg-mpesa text-white hover:bg-mpesa/85 disabled:bg-mpesa/40",
 };
 
 const SIZE_CLASSES: Record<Size, string> = {

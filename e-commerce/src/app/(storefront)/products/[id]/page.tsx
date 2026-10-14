@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ImageOff } from "lucide-react";
 import { djangoFetch, ApiRequestError } from "@/lib/django";
-import type { Product } from "@/lib/types";
+import type { Category, Paginated, Product } from "@/lib/types";
 import { ProductDetailActions } from "@/components/storefront/ProductDetailActions";
+import { CategoryIllustration } from "@/components/storefront/illustrations/CategoryIllustration";
 
 async function getProduct(id: string): Promise<Product> {
   try {
@@ -16,9 +16,13 @@ async function getProduct(id: string): Promise<Product> {
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = await getProduct(id);
+  const [product, categories] = await Promise.all([
+    getProduct(id),
+    djangoFetch<Paginated<Category>>("/api/categories/", { anonymous: true, next: { revalidate: 300 } }),
+  ]);
   const cover = product.images[0];
   const outOfStock = product.status !== "published";
+  const categoryName = categories.results.find((c) => c.id === product.category)?.name;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -27,9 +31,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           {cover ? (
             <Image src={cover.image} alt={product.name} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" priority />
           ) : (
-            <div className="flex h-full items-center justify-center text-text-muted">
-              <ImageOff className="size-12" strokeWidth={1.5} />
-            </div>
+            <CategoryIllustration categoryName={categoryName} className="h-full w-full" />
           )}
         </div>
 

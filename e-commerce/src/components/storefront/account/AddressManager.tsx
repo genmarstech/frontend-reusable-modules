@@ -57,7 +57,7 @@ export function AddressManager({ addresses }: { addresses: Address[] }) {
       </div>
 
       {addresses.length === 0 ? (
-        <EmptyState icon={MapPin} title="No saved addresses" description="Add one to speed up checkout." />
+        <EmptyState icon={MapPin} tone="violet" title="No saved addresses" description="Add one to speed up checkout." />
       ) : (
         <div className="flex flex-col gap-3">
           {addresses.map((address) => (

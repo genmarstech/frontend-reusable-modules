@@ -31,7 +31,7 @@ export default async function OrdersPage({
       <h1 className="text-3xl font-semibold tracking-tight text-text">Your orders</h1>
 
       {orders.results.length === 0 ? (
-        <EmptyState icon={Receipt} title="No orders yet" description="Your order history will show up here." className="mt-8" />
+        <EmptyState icon={Receipt} tone="blue" title="No orders yet" description="Your order history will show up here." className="mt-8" />
       ) : (
         <div className="mt-8">
           <div className="flex flex-col gap-3">

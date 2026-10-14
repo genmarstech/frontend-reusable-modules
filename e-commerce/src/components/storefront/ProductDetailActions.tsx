@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Input";
 import { useToast } from "@/components/providers/ToastProvider";
+import { MpesaBadge } from "@/components/storefront/MpesaBadge";
 import { readableErrorMessage } from "@/lib/errors";
 
 export function ProductDetailActions({
@@ -102,6 +103,8 @@ export function ProductDetailActions({
           {outOfStock ? "Unavailable" : "Add to cart"}
         </Button>
       </div>
+
+      <MpesaBadge className="self-start" />
     </div>
   );
 }

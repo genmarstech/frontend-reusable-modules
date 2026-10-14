@@ -19,6 +19,14 @@
   --warning: #d97706;
   --danger: #dc2626;
 
+  /* M-Pesa's own brand green — the site's one payment method, so it gets
+   * its own fixed accent rather than reusing --success (which flexes for
+   * any "good" state, not specifically "pay with M-Pesa"). Fixed across
+   * themes, like --accent. */
+  --mpesa: #00a651;
+  --mpesa-soft: #e3f8ec;
+  --mpesa-ink: #046a35;
+
   /* ---- semantic — light (default) ---- */
   --bg: #faf9f7;
   --bg-raised: #ffffff;
@@ -112,6 +120,9 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-mpesa: var(--mpesa);
+  --color-mpesa-soft: var(--mpesa-soft);
+  --color-mpesa-ink: var(--mpesa-ink);
 
   --color-bg: var(--bg);
   --color-bg-raised: var(--bg-raised);
