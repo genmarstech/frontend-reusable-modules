@@ -1,0 +1,68 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Genmars commerce platform — storefront, on the shared Hetzner host.
+#
+#   docker compose -f compose.hetzner.yaml build --build-arg API_BASE_URL=<the real API origin>
+#   docker compose -f compose.hetzner.yaml up -d
+#
+# NOT deployed anywhere by this review — see the backend repo's
+# docs/HETZNER_DEPLOYMENT.md for the open decisions this file does not
+# resolve (subdomains, ports, Caddy).
+#
+# This is its own, independent compose project — it does not share a network
+# with the backend's. It reaches the API over the API's public HTTPS origin,
+# through Caddy, same as a browser would, same as it would on Railway. See
+# docs/HETZNER_DEPLOYMENT.md for why, not an oversight.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: genmars-commerce-web
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Must be the real, public API origin — this is also what gets
+        # baked into images.remotePatterns at build time (next.config.ts).
+        API_BASE_URL: ${API_BASE_URL:?API_BASE_URL must be set to the real API origin, e.g. https://commerce-api.genmars.co.ke}
+    image: genmars-commerce-web:latest
+    container_name: genmars-commerce-web
+
+    restart: unless-stopped
+
+    env_file:
+      - ./.env.production
+
+    environment:
+      # Runtime value for every server-side fetch — kept identical to the
+      # build arg above on purpose (see Dockerfile's banner comment).
+      API_BASE_URL: ${API_BASE_URL}
+
+    # Loopback only — the host's own Caddy terminates TLS and proxies in.
+    # Port is a placeholder; confirm it's free on the real host first (not
+    # gen-portal's 3010, which already owns that port on this same box).
+    ports:
+      - "127.0.0.1:${COMMERCE_WEB_PORT:-3140}:3040"
+
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777,noexec,nosuid,nodev
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 384M
+        reservations:
+          memory: 96M
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
