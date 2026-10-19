@@ -69,3 +69,19 @@ export function createProduct(
     body: data,
   });
 }
+
+/**
+ * POST /api/<business_slug>/categories/ — owner/manager only
+ * (catalog/views.py::CategoryViewSet, `IsBusinessManagerOrReadOnly`).
+ * `slug` is read-only (auto-derived from `name`); `name` is unique per
+ * business on the backend (CategorySerializer.validate_name), so a
+ * clashing name comes back as a normal field error, not a 500.
+ */
+export function createCategory(accessToken: string, businessSlug: string, data: { name: string; parent?: number | null }) {
+  return apiFetch<Category>("categories/", {
+    businessSlug,
+    accessToken,
+    method: "POST",
+    body: data,
+  });
+}
