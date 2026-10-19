@@ -149,14 +149,54 @@ export function NewProductForm({ storeSlug, categories }: { storeSlug: string; c
           </div>
         </div>
 
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label htmlFor="material" className="block text-xs text-neutral-500">
+              🧵 Material
+            </label>
+            <input
+              id="material"
+              name="material"
+              type="text"
+              placeholder="100% Cotton"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+            />
+          </div>
+          <div>
+            <label htmlFor="fit" className="block text-xs text-neutral-500">
+              📏 Fit
+            </label>
+            <input
+              id="fit"
+              name="fit"
+              type="text"
+              placeholder="Regular fit"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+            />
+          </div>
+          <div>
+            <label htmlFor="care" className="block text-xs text-neutral-500">
+              🧺 Care
+            </label>
+            <input
+              id="care"
+              name="care"
+              type="text"
+              placeholder="Machine wash cold"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+            />
+          </div>
+        </div>
+
         <div>
-          <label htmlFor="description" className="block text-xs text-neutral-500">
+          <label htmlFor="notes" className="block text-xs text-neutral-500">
             Description (optional)
           </label>
           <textarea
-            id="description"
-            name="description"
+            id="notes"
+            name="notes"
             rows={3}
+            placeholder="Anything else a customer should know."
             className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
           />
         </div>

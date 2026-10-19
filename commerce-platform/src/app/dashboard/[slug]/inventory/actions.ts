@@ -3,10 +3,29 @@
 import { revalidatePath } from "next/cache";
 
 import { ApiError, NetworkError } from "@/lib/api/client";
-import { createCategory, createProduct, deleteProductImage, updateProduct, uploadProductImage } from "@/lib/api/catalog";
+import {
+  createCategory,
+  createProduct,
+  createVariant,
+  deleteProductImage,
+  deleteVariant,
+  updateProduct,
+  uploadProductImage,
+} from "@/lib/api/catalog";
 import { adjustInventory, createInventoryRecord, updateInventoryThreshold } from "@/lib/api/inventory";
 import { requireAccessToken } from "@/lib/auth/requireAccessToken";
+import { composeDescription } from "@/lib/products/descriptionFields";
 import type { Category } from "@/lib/api/types";
+
+/** Shared by createProductAction and updateProductAction — both forms submit the same four description fields. */
+function descriptionFromFormData(formData: FormData): string {
+  return composeDescription({
+    material: String(formData.get("material") ?? "").trim(),
+    fit: String(formData.get("fit") ?? "").trim(),
+    care: String(formData.get("care") ?? "").trim(),
+    notes: String(formData.get("notes") ?? "").trim(),
+  });
+}
 
 export interface InventoryActionResult {
   error?: string;
@@ -19,6 +38,11 @@ export interface CategoryActionResult {
 }
 
 export interface ImageActionResult {
+  error?: string;
+  success?: boolean;
+}
+
+export interface VariantActionResult {
   error?: string;
   success?: boolean;
 }
@@ -60,6 +84,59 @@ export async function deleteProductImageAction(storeSlug: string, imageId: numbe
   const returnPath = `/dashboard/${storeSlug}/inventory`;
   const accessToken = await requireAccessToken(returnPath);
   await deleteProductImage(accessToken, storeSlug, imageId);
+  revalidatePath(returnPath);
+}
+
+/**
+ * Size, Colour, or any other dimension a business wants to sell by —
+ * `name` is free text all the way down to catalog/models.py, not an enum,
+ * so a fashion business isn't limited to a fixed list the way `care`/
+ * `fit`/`material` above intentionally are not either.
+ */
+export async function createVariantAction(
+  _previousState: VariantActionResult,
+  formData: FormData
+): Promise<VariantActionResult> {
+  const storeSlug = String(formData.get("storeSlug"));
+  const returnPath = `/dashboard/${storeSlug}/inventory`;
+  const accessToken = await requireAccessToken(returnPath);
+
+  const productId = Number(formData.get("productId"));
+  const name = String(formData.get("name") ?? "").trim();
+  const value = String(formData.get("value") ?? "").trim();
+  const sku = String(formData.get("sku") ?? "").trim();
+  const priceOverrideRaw = String(formData.get("priceOverride") ?? "").trim();
+
+  if (!Number.isFinite(productId) || productId <= 0) return { error: "Missing product." };
+  if (!name) return { error: "Enter a dimension — Size, Colour, or your own." };
+  if (!value) return { error: "Enter a value, e.g. M or Red." };
+  if (!sku) return { error: "Enter a SKU for this option." };
+  if (priceOverrideRaw && (Number.isNaN(Number(priceOverrideRaw)) || Number(priceOverrideRaw) <= 0)) {
+    return { error: "Price override must be greater than zero." };
+  }
+
+  try {
+    await createVariant(accessToken, storeSlug, {
+      product: productId,
+      name,
+      value,
+      sku,
+      price_override: priceOverrideRaw || null,
+    });
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message };
+    if (error instanceof NetworkError) return { error: error.message };
+    throw error;
+  }
+
+  revalidatePath(returnPath);
+  return { success: true };
+}
+
+export async function deleteVariantAction(storeSlug: string, variantId: number) {
+  const returnPath = `/dashboard/${storeSlug}/inventory`;
+  const accessToken = await requireAccessToken(returnPath);
+  await deleteVariant(accessToken, storeSlug, variantId);
   revalidatePath(returnPath);
 }
 
@@ -155,7 +232,7 @@ export async function createProductAction(
   const name = String(formData.get("name") ?? "").trim();
   const sku = String(formData.get("sku") ?? "").trim();
   const price = String(formData.get("price") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const description = descriptionFromFormData(formData);
   const categoryRaw = String(formData.get("category") ?? "");
   const category = categoryRaw ? Number(categoryRaw) : null;
   const publish = formData.get("publish") === "on";
@@ -236,7 +313,7 @@ export async function updateProductAction(
   const name = String(formData.get("name") ?? "").trim();
   const sku = String(formData.get("sku") ?? "").trim();
   const price = String(formData.get("price") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const description = descriptionFromFormData(formData);
   const categoryRaw = String(formData.get("category") ?? "");
   const category = categoryRaw ? Number(categoryRaw) : null;
   const publish = formData.get("publish") === "on";

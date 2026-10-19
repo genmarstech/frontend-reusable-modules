@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getProduct, listCategories, listProducts, updateProduct } from "./catalog";
+import { createVariant, deleteVariant, getProduct, listCategories, listProducts, updateProduct } from "./catalog";
 
 /**
  * Asserts the exact URL each call builds, mocking `fetch` directly rather
@@ -73,6 +73,31 @@ describe("updateProduct", () => {
     expect(requestedUrl.toString()).toBe("http://localhost:8010/api/genmars-store/products/42/");
     expect(init.method).toBe("PATCH");
     expect(JSON.parse(init.body as string)).toEqual({ description: "Now with a real description." });
+  });
+});
+
+describe("createVariant", () => {
+  it("posts to the business-scoped product-variants endpoint with the given dimension and value", async () => {
+    const fetchMock = mockFetchOnce({ id: 9 });
+    await createVariant("token", "acme-fashion", { product: 3, name: "Size", value: "M", sku: "SHIRT-M" });
+
+    const requestedUrl = fetchMock.mock.calls[0][0] as URL;
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(requestedUrl.toString()).toBe("http://localhost:8010/api/acme-fashion/product-variants/");
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string)).toEqual({ product: 3, name: "Size", value: "M", sku: "SHIRT-M" });
+  });
+});
+
+describe("deleteVariant", () => {
+  it("sends a DELETE to the business-scoped variant-detail endpoint", async () => {
+    const fetchMock = mockFetchOnce(null);
+    await deleteVariant("token", "acme-fashion", 9);
+
+    const requestedUrl = fetchMock.mock.calls[0][0] as URL;
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(requestedUrl.toString()).toBe("http://localhost:8010/api/acme-fashion/product-variants/9/");
+    expect(init.method).toBe("DELETE");
   });
 });
 

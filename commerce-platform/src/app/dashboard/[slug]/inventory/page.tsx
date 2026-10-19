@@ -7,6 +7,7 @@ import { AdjustStockForm } from "./AdjustStockForm";
 import { EditProductForm } from "./EditProductForm";
 import { NewProductForm } from "./NewProductForm";
 import { ProductImageManager } from "./ProductImageManager";
+import { VariantManager } from "./VariantManager";
 import { updateThresholdAction } from "./actions";
 
 export const instant = false;
@@ -108,6 +109,7 @@ export default async function OpsInventoryPage({
                    ProductVariant (catalog/models.py::ProductImage) — a
                    variant-only row has nothing to manage here. */}
                 {product && <EditProductForm storeSlug={slug} product={product} categories={categories.results} />}
+                {product && <VariantManager storeSlug={slug} product={product} />}
                 {product && <ProductImageManager storeSlug={slug} product={product} />}
                 <form
                   action={updateThresholdAction.bind(null, slug, record.id)}
