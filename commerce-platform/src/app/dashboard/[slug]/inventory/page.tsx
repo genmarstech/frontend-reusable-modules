@@ -5,6 +5,7 @@ import { getAccessToken } from "@/lib/auth/session";
 import { EmptyState, ErrorState } from "@/components/ui/States";
 import { AdjustStockForm } from "./AdjustStockForm";
 import { NewProductForm } from "./NewProductForm";
+import { ProductImageManager } from "./ProductImageManager";
 import { updateThresholdAction } from "./actions";
 
 export const instant = false;
@@ -44,8 +45,10 @@ export default async function OpsInventoryPage({
   // product beyond that page falls back to showing its bare id below.
   const productNames = new Map<number, string>();
   const variantNames = new Map<number, string>();
+  const productsById = new Map<number, (typeof products.results)[number]>();
   for (const product of products.results) {
     productNames.set(product.id, product.name);
+    productsById.set(product.id, product);
     for (const variant of product.variants) {
       variantNames.set(variant.id, `${product.name} (${variant.value})`);
     }
@@ -77,7 +80,10 @@ export default async function OpsInventoryPage({
           {records.results.map((record) => {
             const name = record.variant
               ? variantNames.get(record.variant) ?? `Variant #${record.variant}`
-              : productNames.get(record.product) ?? `Product #${record.product}`;
+              : record.product !== null
+                ? productNames.get(record.product) ?? `Product #${record.product}`
+                : "Unknown product";
+            const product = record.product !== null ? productsById.get(record.product) : undefined;
             return (
               <div
                 key={record.id}
@@ -97,6 +103,10 @@ export default async function OpsInventoryPage({
                 <div className="mt-3">
                   <AdjustStockForm storeSlug={slug} recordId={record.id} />
                 </div>
+                {/* Images attach to a Product, never a ProductVariant
+                   (catalog/models.py::ProductImage) — a variant-only row
+                   has nothing to manage here. */}
+                {product && <ProductImageManager storeSlug={slug} product={product} />}
                 <form
                   action={updateThresholdAction.bind(null, slug, record.id)}
                   className="mt-2 flex items-center gap-2 text-xs text-neutral-500"

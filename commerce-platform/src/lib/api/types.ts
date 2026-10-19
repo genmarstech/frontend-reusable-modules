@@ -267,10 +267,13 @@ export interface BusinessMembership {
   created_at: string;
 }
 
-// inventory/serializers.py::InventoryRecordSerializer
+// inventory/serializers.py::InventoryRecordSerializer — exactly one of
+// product/variant is set (inventory/models.py's own CheckConstraint);
+// `product: number` here was wrong for a variant-backed record, where the
+// backend actually returns `product: null`.
 export interface InventoryRecord {
   id: number;
-  product: number;
+  product: number | null;
   variant: number | null;
   quantity: number;
   low_stock_threshold: number | null;

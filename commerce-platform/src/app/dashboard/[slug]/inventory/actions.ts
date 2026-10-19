@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { ApiError, NetworkError } from "@/lib/api/client";
-import { createCategory, createProduct } from "@/lib/api/catalog";
+import { createCategory, createProduct, deleteProductImage, uploadProductImage } from "@/lib/api/catalog";
 import { adjustInventory, createInventoryRecord, updateInventoryThreshold } from "@/lib/api/inventory";
 import { requireAccessToken } from "@/lib/auth/requireAccessToken";
 import type { Category } from "@/lib/api/types";
@@ -16,6 +16,51 @@ export interface InventoryActionResult {
 export interface CategoryActionResult {
   error?: string;
   category?: Category;
+}
+
+export interface ImageActionResult {
+  error?: string;
+  success?: boolean;
+}
+
+/**
+ * One file per submission, deliberately — the backend's own endpoint
+ * (POST /product-images/) takes one `image` per request too (it's a
+ * single ImageField, not a list), so a multi-file picker here would just
+ * mean looping client-side; simpler to let a manager upload one, see it
+ * land, upload the next.
+ */
+export async function uploadProductImageAction(
+  _previousState: ImageActionResult,
+  formData: FormData
+): Promise<ImageActionResult> {
+  const storeSlug = String(formData.get("storeSlug"));
+  const returnPath = `/dashboard/${storeSlug}/inventory`;
+  const accessToken = await requireAccessToken(returnPath);
+
+  const productId = Number(formData.get("productId"));
+  const image = formData.get("image");
+
+  if (!Number.isFinite(productId) || productId <= 0) return { error: "Missing product." };
+  if (!(image instanceof File) || image.size === 0) return { error: "Choose an image file." };
+
+  try {
+    await uploadProductImage(accessToken, storeSlug, productId, image);
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message };
+    if (error instanceof NetworkError) return { error: error.message };
+    throw error;
+  }
+
+  revalidatePath(returnPath);
+  return { success: true };
+}
+
+export async function deleteProductImageAction(storeSlug: string, imageId: number) {
+  const returnPath = `/dashboard/${storeSlug}/inventory`;
+  const accessToken = await requireAccessToken(returnPath);
+  await deleteProductImage(accessToken, storeSlug, imageId);
+  revalidatePath(returnPath);
 }
 
 /**

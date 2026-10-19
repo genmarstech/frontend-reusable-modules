@@ -54,6 +54,8 @@ function apiErrorMessage(body: ApiErrorBody): string {
 export interface ApiFetchOptions extends Omit<RequestInit, "body"> {
   /** A business's own endpoints live at /api/<slug>/..., /api/ops/<slug>/... */
   businessSlug?: string;
+  /** A plain object is JSON-encoded. A `FormData` (a real file upload —
+   * see catalog.ts::uploadProductImage) is sent as-is; see below for why. */
   body?: unknown;
   accessToken?: string;
 }
@@ -71,16 +73,23 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     apiBaseUrl()
   );
 
+  // A FormData body (a file upload) must never be JSON.stringify'd, and
+  // must never get an explicit Content-Type set — fetch needs to generate
+  // its own `multipart/form-data; boundary=...` from the FormData instance
+  // itself; a forced `application/json` here would make the backend reject
+  // the request before DRF's parser even looks at the body.
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+
   let response: Response;
   try {
     response = await fetch(url, {
       ...rest,
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...headers,
       },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: isFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch (cause) {
     throw new NetworkError(cause);
