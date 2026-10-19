@@ -3,13 +3,51 @@
 import { revalidatePath } from "next/cache";
 
 import { ApiError, NetworkError } from "@/lib/api/client";
-import { createProduct } from "@/lib/api/catalog";
+import { createCategory, createProduct } from "@/lib/api/catalog";
 import { adjustInventory, createInventoryRecord, updateInventoryThreshold } from "@/lib/api/inventory";
 import { requireAccessToken } from "@/lib/auth/requireAccessToken";
+import type { Category } from "@/lib/api/types";
 
 export interface InventoryActionResult {
   error?: string;
   success?: boolean;
+}
+
+export interface CategoryActionResult {
+  error?: string;
+  category?: Category;
+}
+
+/**
+ * Lets a business's own manager create a category on the spot — same
+ * "sandboxed, self-serve" reasoning as createProductAction below, since
+ * before this a new category needed Django admin too, same gap as
+ * products. Returns the created row (rather than just revalidating) so
+ * the quick-add control next to the product form's category picker can
+ * select it immediately, without waiting on a page re-render.
+ */
+export async function createCategoryAction(
+  _previousState: CategoryActionResult,
+  formData: FormData
+): Promise<CategoryActionResult> {
+  const storeSlug = String(formData.get("storeSlug"));
+  const returnPath = `/dashboard/${storeSlug}/inventory`;
+  const accessToken = await requireAccessToken(returnPath);
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Enter a category name." };
+
+  let category: Category;
+  try {
+    category = await createCategory(accessToken, storeSlug, { name });
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message };
+    if (error instanceof NetworkError) return { error: error.message };
+    throw error;
+  }
+
+  revalidatePath(returnPath);
+  return { category };
 }
 
 /**
