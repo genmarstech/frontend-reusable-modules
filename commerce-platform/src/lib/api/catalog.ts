@@ -1,7 +1,7 @@
 import "server-only";
 
 import { apiFetch } from "./client";
-import type { Category, Paginated, Product } from "./types";
+import type { Category, Paginated, Product, ProductImage } from "./types";
 
 /**
  * GET /api/<business_slug>/products/ — anonymous-readable, published-only
@@ -84,4 +84,35 @@ export function createCategory(accessToken: string, businessSlug: string, data: 
     method: "POST",
     body: data,
   });
+}
+
+/**
+ * POST /api/<business_slug>/product-images/ — owner/manager only
+ * (catalog/views.py::ProductImageViewSet). Multipart, not JSON — `image`
+ * is a real file, so this is built as `FormData`; apiFetch() skips its
+ * usual JSON content-type/stringify step for that case so fetch can set
+ * its own multipart boundary (see client.ts's own comment on why).
+ */
+export function uploadProductImage(
+  accessToken: string,
+  businessSlug: string,
+  productId: number,
+  image: File,
+  sortOrder?: number
+) {
+  const form = new FormData();
+  form.append("product", String(productId));
+  form.append("image", image);
+  if (sortOrder !== undefined) form.append("sort_order", String(sortOrder));
+  return apiFetch<ProductImage>("product-images/", {
+    businessSlug,
+    accessToken,
+    method: "POST",
+    body: form,
+  });
+}
+
+/** DELETE /api/<business_slug>/product-images/{id}/ — owner/manager only. */
+export function deleteProductImage(accessToken: string, businessSlug: string, id: number | string) {
+  return apiFetch<void>(`product-images/${id}/`, { businessSlug, accessToken, method: "DELETE" });
 }
