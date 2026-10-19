@@ -71,6 +71,36 @@ export function createProduct(
 }
 
 /**
+ * PATCH /api/<business_slug>/products/{id}/ — owner/manager only, a
+ * partial update (ModelViewSet's default PATCH behavior): only the fields
+ * given in `data` are touched, everything else on the row is untouched.
+ * `slug` stays read-only and re-derives from `name` on the backend
+ * regardless of what's sent. The only way to add a description, change
+ * the price, or move a product to a different category once it already
+ * exists — EditProductForm is the one caller.
+ */
+export function updateProduct(
+  accessToken: string,
+  businessSlug: string,
+  id: number | string,
+  data: Partial<{
+    name: string;
+    sku: string;
+    price: string;
+    description: string;
+    category: number | null;
+    status: "draft" | "published" | "archived";
+  }>
+) {
+  return apiFetch<Product>(`products/${id}/`, {
+    businessSlug,
+    accessToken,
+    method: "PATCH",
+    body: data,
+  });
+}
+
+/**
  * POST /api/<business_slug>/categories/ — owner/manager only
  * (catalog/views.py::CategoryViewSet, `IsBusinessManagerOrReadOnly`).
  * `slug` is read-only (auto-derived from `name`); `name` is unique per

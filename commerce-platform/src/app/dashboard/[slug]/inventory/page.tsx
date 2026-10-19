@@ -4,6 +4,7 @@ import { listCategories, listProducts } from "@/lib/api/catalog";
 import { getAccessToken } from "@/lib/auth/session";
 import { EmptyState, ErrorState } from "@/components/ui/States";
 import { AdjustStockForm } from "./AdjustStockForm";
+import { EditProductForm } from "./EditProductForm";
 import { NewProductForm } from "./NewProductForm";
 import { ProductImageManager } from "./ProductImageManager";
 import { updateThresholdAction } from "./actions";
@@ -103,9 +104,10 @@ export default async function OpsInventoryPage({
                 <div className="mt-3">
                   <AdjustStockForm storeSlug={slug} recordId={record.id} />
                 </div>
-                {/* Images attach to a Product, never a ProductVariant
-                   (catalog/models.py::ProductImage) — a variant-only row
-                   has nothing to manage here. */}
+                {/* Images and editable details attach to a Product, never a
+                   ProductVariant (catalog/models.py::ProductImage) — a
+                   variant-only row has nothing to manage here. */}
+                {product && <EditProductForm storeSlug={slug} product={product} categories={categories.results} />}
                 {product && <ProductImageManager storeSlug={slug} product={product} />}
                 <form
                   action={updateThresholdAction.bind(null, slug, record.id)}
