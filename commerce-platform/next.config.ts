@@ -43,6 +43,20 @@ const nextConfig: NextConfig = {
   output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    serverActions: {
+      // Next's own default (1 MB) refuses a real product photo before the
+      // request even reaches uploadProductImageAction — confirmed live as
+      // "Body exceeded 1 MB limit." on the dashboard's image upload. Set
+      // just past the backend's own cap (PRODUCT_IMAGE_MAX_BYTES, 5MB, plus
+      // headroom for the surrounding multipart body — see that repo's
+      // config/settings.py) rather than far past it: the point is to let a
+      // request through to the backend's own validator, which explains a
+      // genuinely-too-large image, instead of this limit silently eating
+      // it first with no application-level message at all.
+      bodySizeLimit: "8mb",
+    },
+  },
   images: {
     // ProductImage.image serializes as an absolute URL on the Django
     // host (confirmed live, see docs/API_CONTRACT.md) — never this
