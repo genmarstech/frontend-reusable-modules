@@ -5,8 +5,7 @@ import { ApiError, NetworkError } from "@/lib/api/client";
 import { getStoreInfo } from "@/lib/api/store";
 import { getThemeConfig } from "@/lib/themes/registry";
 import { resolveStoreTheme } from "@/lib/themes/types";
-import { ProductGallery } from "@/components/storefront/ProductGallery";
-import { ProductBuyBox } from "@/components/storefront/ProductBuyBox";
+import { ProductDetailLayout } from "@/components/storefront/ProductDetailLayout";
 import { ErrorState } from "@/components/ui/States";
 
 /**
@@ -60,23 +59,12 @@ export default async function ProductDetailPage({
   const themeConfig = getThemeConfig(resolveStoreTheme(storeInfo.theme));
 
   return (
-    <div className="grid gap-8 sm:grid-cols-2">
-      <ProductGallery images={product.images} alt={product.name} themeConfig={themeConfig} />
-
-      <div className="space-y-4">
-        {categoryName && (
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">{categoryName}</p>
-        )}
-        <h1 className={`text-2xl font-semibold text-neutral-900 ${themeConfig.headingFontClassName}`}>
-          {product.name}
-        </h1>
-
-        <ProductBuyBox storeSlug={slug} product={product} currency={storeInfo.currency} themeConfig={themeConfig} />
-
-        {product.description && (
-          <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-600">{product.description}</p>
-        )}
-      </div>
-    </div>
+    <ProductDetailLayout
+      storeSlug={slug}
+      product={product}
+      categoryName={categoryName}
+      currency={storeInfo.currency}
+      themeConfig={themeConfig}
+    />
   );
 }

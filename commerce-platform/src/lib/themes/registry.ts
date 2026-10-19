@@ -22,6 +22,7 @@ export const THEME_REGISTRY: Record<StoreTheme, ThemeConfig> = {
       imageAspectClassName: "aspect-square",
     },
     hero: { style: "none", tagline: "" },
+    detailLayout: "standard",
   },
 
   fashion: {
@@ -39,6 +40,7 @@ export const THEME_REGISTRY: Record<StoreTheme, ThemeConfig> = {
       imageAspectClassName: "aspect-[3/4]",
     },
     hero: { style: "lookbook", tagline: "New arrivals, curated for the season." },
+    detailLayout: "lookbook",
   },
 
   electronics: {
@@ -56,6 +58,7 @@ export const THEME_REGISTRY: Record<StoreTheme, ThemeConfig> = {
       imageAspectClassName: "aspect-square",
     },
     hero: { style: "techSpec", tagline: "Compare specs, prices and stock at a glance." },
+    detailLayout: "specSheet",
   },
 
   grocery: {
@@ -73,6 +76,7 @@ export const THEME_REGISTRY: Record<StoreTheme, ThemeConfig> = {
       imageAspectClassName: "aspect-[4/3]",
     },
     hero: { style: "freshGrid", tagline: "Today's picks, fresh in stock." },
+    detailLayout: "quickBuy",
   },
 };
 
