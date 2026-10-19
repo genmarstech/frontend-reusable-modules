@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import type { Product, ProductVariant } from "@/lib/api/types";
-import { formatMoney } from "@/lib/format";
 import { THEME_REGISTRY } from "@/lib/themes/registry";
 import type { ThemeConfig } from "@/lib/themes/types";
 import { AddToCartForm } from "./AddToCartForm";
+import { PriceDisplay } from "./PriceDisplay";
 import { VariantPicker, groupByName } from "./VariantPicker";
 
 /**
@@ -36,9 +36,7 @@ export function ProductBuyBox({
   if (groups.length === 0) {
     return (
       <div className="space-y-4">
-        <p className={`text-xl font-semibold ${themeConfig.accentTextClassName}`}>
-          {formatMoney(product.price, currency)}
-        </p>
+        <PriceDisplay amount={product.price} currency={currency} accentClassName={themeConfig.accentTextClassName} />
         <AddToCartForm
           storeSlug={storeSlug}
           productId={product.id}

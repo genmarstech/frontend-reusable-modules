@@ -52,3 +52,39 @@ export function formatMoney(price: string, currency?: string | null): string {
     return formatPrice(price);
   }
 }
+
+/**
+ * Splits a price into the whole-amount portion and its fraction digits (if
+ * the currency has any — JPY doesn't), for PriceDisplay's large-price
+ * treatment: big digits, small raised cents, the pattern most storefronts
+ * (Amazon's included) use on a product page. Built on
+ * `Intl.NumberFormat.formatToParts()` rather than string-splitting
+ * `formatMoney`'s own output, because not every currency puts two digits
+ * after a `.` in a fixed spot — guessing from the formatted string would
+ * silently misplace the split for one this platform's multi-currency
+ * businesses actually use. Falls back to `formatMoney`'s own fallback
+ * chain (no currency, an unrecognized one, a non-numeric price) with no
+ * fraction, same as formatMoney already does for all three.
+ */
+export interface MoneyParts {
+  whole: string;
+  fraction: string | null;
+}
+
+export function formatMoneyParts(price: string, currency?: string | null): MoneyParts {
+  const amount = Number(price);
+  if (!currency || !Number.isFinite(amount)) {
+    return { whole: formatMoney(price, currency), fraction: null };
+  }
+  try {
+    const parts = new Intl.NumberFormat("en-US", { style: "currency", currency }).formatToParts(amount);
+    const fraction = parts.find((part) => part.type === "fraction")?.value ?? null;
+    const whole = parts
+      .filter((part) => part.type !== "fraction" && part.type !== "decimal")
+      .map((part) => part.value)
+      .join("");
+    return { whole, fraction };
+  } catch {
+    return { whole: formatMoney(price, currency), fraction: null };
+  }
+}
