@@ -1,0 +1,148 @@
+"use client";
+
+import { useActionState, useState } from "react";
+
+import type { Category } from "@/lib/api/types";
+import { createProductAction } from "./actions";
+import type { InventoryActionResult } from "./actions";
+
+const initialState: InventoryActionResult = {};
+
+/**
+ * Lives on the Inventory screen on purpose, not a separate "Products"
+ * page — creating a product with no stock line is the exact gap this
+ * form closes (see createProductAction), so the two happen as one
+ * submission a manager never has to remember to split in two.
+ */
+export function NewProductForm({ storeSlug, categories }: { storeSlug: string; categories: Category[] }) {
+  const [state, formAction, pending] = useActionState(createProductAction, initialState);
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium"
+      >
+        + New product
+      </button>
+    );
+  }
+
+  return (
+    <form action={formAction} className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4 text-sm">
+      <input type="hidden" name="storeSlug" value={storeSlug} />
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">New product</h3>
+        <button type="button" onClick={() => setOpen(false)} className="text-xs text-neutral-500 underline">
+          Cancel
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label htmlFor="name" className="block text-xs text-neutral-500">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label htmlFor="sku" className="block text-xs text-neutral-500">
+            SKU
+          </label>
+          <input
+            id="sku"
+            name="sku"
+            type="text"
+            required
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label htmlFor="price" className="block text-xs text-neutral-500">
+            Price
+          </label>
+          <input
+            id="price"
+            name="price"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label htmlFor="category" className="block text-xs text-neutral-500">
+            Category (optional)
+          </label>
+          <select
+            id="category"
+            name="category"
+            defaultValue=""
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          >
+            <option value="">No category</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="initialQuantity" className="block text-xs text-neutral-500">
+            Opening stock
+          </label>
+          <input
+            id="initialQuantity"
+            name="initialQuantity"
+            type="number"
+            min="0"
+            step="1"
+            defaultValue="0"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label htmlFor="lowStockThreshold" className="block text-xs text-neutral-500">
+            Low stock threshold (optional)
+          </label>
+          <input
+            id="lowStockThreshold"
+            name="lowStockThreshold"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="business default"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          />
+        </div>
+      </div>
+
+      <label className="flex items-center gap-2 text-xs text-neutral-600">
+        <input type="checkbox" name="publish" />
+        Publish immediately (otherwise saved as a draft, hidden from the storefront)
+      </label>
+
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-white disabled:opacity-50"
+        >
+          {pending ? "Creating…" : "Create product"}
+        </button>
+        {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+        {state.success && <p className="text-xs text-green-700">Created.</p>}
+      </div>
+    </form>
+  );
+}
