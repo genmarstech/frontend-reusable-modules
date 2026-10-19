@@ -35,6 +35,15 @@ export function resolveStoreTheme(value: string | undefined | null): StoreTheme 
 
 export type ProductCardStyle = "grid" | "editorial" | "compact" | "vibrant";
 export type HeroStyle = "none" | "lookbook" | "techSpec" | "freshGrid";
+/**
+ * Picks the branch in ProductDetailLayout, the same way cardStyle picks the
+ * branch in ProductCard — "standard" renders the page's original, unthemed
+ * composition byte-for-byte, so a store that has never touched its theme
+ * setting sees no change. The other three rearrange and emphasize the same
+ * real fields (sku, category, variants, description) differently per
+ * vertical; none of them invent data the backend doesn't return.
+ */
+export type DetailLayoutStyle = "standard" | "lookbook" | "specSheet" | "quickBuy";
 
 export interface ThemeConfig {
   key: StoreTheme;
@@ -58,4 +67,5 @@ export interface ThemeConfig {
     style: HeroStyle;
     tagline: string;
   };
+  detailLayout: DetailLayoutStyle;
 }
