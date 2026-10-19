@@ -1,7 +1,7 @@
 import "server-only";
 
 import { apiFetch } from "./client";
-import type { Category, Paginated, Product, ProductImage } from "./types";
+import type { Category, Paginated, Product, ProductImage, ProductVariant } from "./types";
 
 /**
  * GET /api/<business_slug>/products/ — anonymous-readable, published-only
@@ -145,4 +145,31 @@ export function uploadProductImage(
 /** DELETE /api/<business_slug>/product-images/{id}/ — owner/manager only. */
 export function deleteProductImage(accessToken: string, businessSlug: string, id: number | string) {
   return apiFetch<void>(`product-images/${id}/`, { businessSlug, accessToken, method: "DELETE" });
+}
+
+/**
+ * POST /api/<business_slug>/product-variants/ — owner/manager only
+ * (catalog/views.py::ProductVariantViewSet). `name` is free text on the
+ * backend (catalog/models.py), not an enum — "Size" and "Colour" are the
+ * common case, not the only allowed ones, which is the whole point for a
+ * fashion business selling by both at once. `sku` is unique per business
+ * (ProductVariantSerializer.validate_sku); a clashing one comes back as a
+ * normal field error through ApiError, not a 500.
+ */
+export function createVariant(
+  accessToken: string,
+  businessSlug: string,
+  data: { product: number; name: string; value: string; sku: string; price_override?: string | null }
+) {
+  return apiFetch<ProductVariant>("product-variants/", {
+    businessSlug,
+    accessToken,
+    method: "POST",
+    body: data,
+  });
+}
+
+/** DELETE /api/<business_slug>/product-variants/{id}/ — owner/manager only. */
+export function deleteVariant(accessToken: string, businessSlug: string, id: number | string) {
+  return apiFetch<void>(`product-variants/${id}/`, { businessSlug, accessToken, method: "DELETE" });
 }

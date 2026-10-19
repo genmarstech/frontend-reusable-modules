@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 
 import type { Category, Product } from "@/lib/api/types";
+import { parseDescription } from "@/lib/products/descriptionFields";
 import { updateProductAction, type InventoryActionResult } from "./actions";
 
 const initialState: InventoryActionResult = {};
@@ -27,6 +28,7 @@ export function EditProductForm({
 }) {
   const [state, formAction, pending] = useActionState(updateProductAction, initialState);
   const [open, setOpen] = useState(false);
+  const descriptionFields = parseDescription(product.description);
 
   if (!open) {
     return (
@@ -105,15 +107,55 @@ export function EditProductForm({
         </div>
       </div>
 
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <label htmlFor={`material-${product.id}`} className="block text-neutral-500">
+            🧵 Material
+          </label>
+          <input
+            id={`material-${product.id}`}
+            name="material"
+            defaultValue={descriptionFields.material}
+            placeholder="100% Cotton"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1"
+          />
+        </div>
+        <div>
+          <label htmlFor={`fit-${product.id}`} className="block text-neutral-500">
+            📏 Fit
+          </label>
+          <input
+            id={`fit-${product.id}`}
+            name="fit"
+            defaultValue={descriptionFields.fit}
+            placeholder="Regular fit"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1"
+          />
+        </div>
+        <div>
+          <label htmlFor={`care-${product.id}`} className="block text-neutral-500">
+            🧺 Care
+          </label>
+          <input
+            id={`care-${product.id}`}
+            name="care"
+            defaultValue={descriptionFields.care}
+            placeholder="Machine wash cold"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1"
+          />
+        </div>
+      </div>
+
       <div>
-        <label htmlFor={`description-${product.id}`} className="block text-neutral-500">
+        <label htmlFor={`notes-${product.id}`} className="block text-neutral-500">
           Description
         </label>
         <textarea
-          id={`description-${product.id}`}
-          name="description"
-          defaultValue={product.description}
+          id={`notes-${product.id}`}
+          name="notes"
+          defaultValue={descriptionFields.notes}
           rows={3}
+          placeholder="Anything else a customer should know."
           className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
         />
       </div>
