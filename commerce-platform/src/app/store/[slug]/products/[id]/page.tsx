@@ -5,8 +5,7 @@ import { ApiError, NetworkError } from "@/lib/api/client";
 import { getStoreInfo } from "@/lib/api/store";
 import { getThemeConfig } from "@/lib/themes/registry";
 import { resolveStoreTheme } from "@/lib/themes/types";
-import { ProductImagePlaceholder } from "@/components/storefront/ProductImagePlaceholder";
-import { ProductImage } from "@/components/storefront/ProductImage";
+import { ProductGallery } from "@/components/storefront/ProductGallery";
 import { ProductBuyBox } from "@/components/storefront/ProductBuyBox";
 import { ErrorState } from "@/components/ui/States";
 
@@ -58,18 +57,11 @@ export default async function ProductDetailPage({
     throw error;
   }
 
-  const image = product.images[0];
   const themeConfig = getThemeConfig(resolveStoreTheme(storeInfo.theme));
 
   return (
     <div className="grid gap-8 sm:grid-cols-2">
-      <div className={`overflow-hidden rounded-lg bg-neutral-100 ${themeConfig.productGrid.imageAspectClassName}`}>
-        {image ? (
-          <ProductImage src={image.image} alt={product.name} className="h-full w-full" />
-        ) : (
-          <ProductImagePlaceholder className="h-full w-full" />
-        )}
-      </div>
+      <ProductGallery images={product.images} alt={product.name} themeConfig={themeConfig} />
 
       <div className="space-y-4">
         {categoryName && (
