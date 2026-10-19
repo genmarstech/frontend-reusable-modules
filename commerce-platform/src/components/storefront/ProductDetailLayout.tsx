@@ -1,5 +1,6 @@
 import type { Product } from "@/lib/api/types";
 import type { ThemeConfig } from "@/lib/themes/types";
+import { ExpandableText } from "./ExpandableText";
 import { ProductGallery } from "./ProductGallery";
 import { ProductBuyBox } from "./ProductBuyBox";
 import { groupByName } from "./VariantPicker";
@@ -29,7 +30,7 @@ export function ProductDetailLayout({
     <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">{categoryName}</p>
   );
   const description = product.description && (
-    <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-600">{product.description}</p>
+    <ExpandableText text={product.description} className="text-sm leading-relaxed text-neutral-600" />
   );
 
   if (themeConfig.detailLayout === "lookbook") {
@@ -49,9 +50,7 @@ export function ProductDetailLayout({
             {product.name}
           </h1>
           {product.description && (
-            <p className="whitespace-pre-line text-base leading-relaxed text-neutral-600">
-              {product.description}
-            </p>
+            <ExpandableText text={product.description} className="text-base leading-relaxed text-neutral-600" />
           )}
           <div className="pt-2">
             <ProductBuyBox storeSlug={storeSlug} product={product} currency={currency} themeConfig={themeConfig} />

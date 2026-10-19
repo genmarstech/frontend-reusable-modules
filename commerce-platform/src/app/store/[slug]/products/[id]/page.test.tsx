@@ -53,7 +53,8 @@ describe("ProductDetailPage", () => {
     const html = renderToStaticMarkup(element);
 
     expect(html).toContain("Men&#x27;s Classic Fit Shirt");
-    expect(html).toContain("1,500.00");
+    expect(html).toContain("1,500");
+    expect(html).toMatch(/<sup[^>]*>00<\/sup>/);
     expect(html).toContain("A shirt.");
   });
 
@@ -124,7 +125,8 @@ describe("ProductDetailPage", () => {
       await ProductDetailPage({ params: Promise.resolve({ slug: "genmars-store", id: "1" }) })
     );
 
-    expect(html).toContain("$2,500.00");
+    expect(html).toContain("$2,500");
+    expect(html).toMatch(/<sup[^>]*>00<\/sup>/);
   });
 
   it("applies the fashion theme's heading font and taller image aspect ratio", async () => {

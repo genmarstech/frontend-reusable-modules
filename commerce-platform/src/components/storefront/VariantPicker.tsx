@@ -1,7 +1,7 @@
 "use client";
 
 import type { Product, ProductVariant } from "@/lib/api/types";
-import { formatMoney } from "@/lib/format";
+import { PriceDisplay } from "./PriceDisplay";
 
 /**
  * Only rendered when `product.variants.length > 0` — a product with no
@@ -47,8 +47,10 @@ export function VariantPicker({
   return (
     <div className="space-y-4">
       {groups.map(([name, variants]) => (
-        <div key={name}>
-          <p className="text-sm font-medium text-neutral-700">{name}</p>
+        <div key={name} className="rounded-md border border-neutral-200 p-3">
+          <p className="text-sm font-medium text-neutral-700">
+            {name} <span className="font-normal text-neutral-400">({variants.length})</span>
+          </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {variants.map((variant) => (
               <button
@@ -69,10 +71,7 @@ export function VariantPicker({
         </div>
       ))}
 
-      <p className="text-xl font-semibold text-neutral-900">
-        {groups.length > 1 && "Starting at "}
-        {formatMoney(price, currency)}
-      </p>
+      <PriceDisplay amount={price} currency={currency} prefix={groups.length > 1 ? "Starting at" : undefined} />
     </div>
   );
 }

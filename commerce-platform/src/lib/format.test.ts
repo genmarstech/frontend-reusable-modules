@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { displayNameFromSlug, formatMoney, formatPrice } from "./format";
+import { displayNameFromSlug, formatMoney, formatMoneyParts, formatPrice } from "./format";
 
 describe("displayNameFromSlug", () => {
   it("title-cases each hyphen-separated word", () => {
@@ -44,5 +44,36 @@ describe("formatMoney", () => {
 
   it("returns the raw price unchanged for a non-numeric value, same as formatPrice", () => {
     expect(formatMoney("not-a-number", "KES")).toBe("not-a-number");
+  });
+});
+
+describe("formatMoneyParts", () => {
+  it("splits a USD amount into a whole portion with no decimal point and a two-digit fraction", () => {
+    expect(formatMoneyParts("2500.00", "USD")).toEqual({ whole: "$2,500", fraction: "00" });
+  });
+
+  it("carries the real currency code into the whole portion, same as formatMoney", () => {
+    const { whole, fraction } = formatMoneyParts("1500.00", "KES");
+    expect(whole.replace(/\s/g, " ")).toBe("KES 1,500");
+    expect(fraction).toBe("00");
+  });
+
+  it("has no fraction at all for a currency that doesn't use one", () => {
+    expect(formatMoneyParts("1500", "JPY")).toEqual({ whole: "¥1,500", fraction: null });
+  });
+
+  it("falls back to formatMoney's own fallback, no fraction, when no currency is given", () => {
+    expect(formatMoneyParts("1500.00")).toEqual({ whole: formatMoney("1500.00"), fraction: null });
+  });
+
+  it("falls back rather than throwing for a currency code Intl doesn't recognize", () => {
+    expect(formatMoneyParts("1500.00", "NOT-A-CODE")).toEqual({
+      whole: formatMoney("1500.00", "NOT-A-CODE"),
+      fraction: null,
+    });
+  });
+
+  it("returns the raw price unchanged for a non-numeric value, same as formatMoney", () => {
+    expect(formatMoneyParts("not-a-number", "KES")).toEqual({ whole: "not-a-number", fraction: null });
   });
 });
