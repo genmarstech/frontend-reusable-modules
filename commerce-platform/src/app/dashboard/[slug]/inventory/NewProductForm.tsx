@@ -149,6 +149,18 @@ export function NewProductForm({ storeSlug, categories }: { storeSlug: string; c
           </div>
         </div>
 
+        <div>
+          <label htmlFor="description" className="block text-xs text-neutral-500">
+            Description (optional)
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={3}
+            className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1.5"
+          />
+        </div>
+
         <label className="flex items-center gap-2 text-xs text-neutral-600">
           <input type="checkbox" name="publish" />
           Publish immediately (otherwise saved as a draft, hidden from the storefront)

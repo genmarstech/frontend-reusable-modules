@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { ApiError, NetworkError } from "@/lib/api/client";
-import { createCategory, createProduct, deleteProductImage, uploadProductImage } from "@/lib/api/catalog";
+import { createCategory, createProduct, deleteProductImage, updateProduct, uploadProductImage } from "@/lib/api/catalog";
 import { adjustInventory, createInventoryRecord, updateInventoryThreshold } from "@/lib/api/inventory";
 import { requireAccessToken } from "@/lib/auth/requireAccessToken";
 import type { Category } from "@/lib/api/types";
@@ -155,6 +155,7 @@ export async function createProductAction(
   const name = String(formData.get("name") ?? "").trim();
   const sku = String(formData.get("sku") ?? "").trim();
   const price = String(formData.get("price") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
   const categoryRaw = String(formData.get("category") ?? "");
   const category = categoryRaw ? Number(categoryRaw) : null;
   const publish = formData.get("publish") === "on";
@@ -177,6 +178,7 @@ export async function createProductAction(
       name,
       sku,
       price,
+      description,
       category,
       status: publish ? "published" : "draft",
     });
@@ -206,6 +208,59 @@ export async function createProductAction(
       const message = error instanceof ApiError || error instanceof NetworkError ? error.message : "an unknown error";
       return { error: `"${product.name}" was created, but setting its opening stock failed (${message}). Adjust it below.` };
     }
+  }
+
+  revalidatePath(returnPath);
+  return { success: true };
+}
+
+/**
+ * The only way to change a product's name, description, SKU, price,
+ * category or published state after createProductAction above has already
+ * created it — createProduct's own fields (including description) were
+ * writable from day one on the backend; this is what was missing on the
+ * frontend to ever reach any of them again post-creation. A PATCH, not a
+ * PUT — see catalog.ts::updateProduct — so a field this form doesn't
+ * collect (there isn't one today) would stay untouched rather than get
+ * silently cleared.
+ */
+export async function updateProductAction(
+  _previousState: InventoryActionResult,
+  formData: FormData
+): Promise<InventoryActionResult> {
+  const storeSlug = String(formData.get("storeSlug"));
+  const returnPath = `/dashboard/${storeSlug}/inventory`;
+  const accessToken = await requireAccessToken(returnPath);
+
+  const productId = Number(formData.get("productId"));
+  const name = String(formData.get("name") ?? "").trim();
+  const sku = String(formData.get("sku") ?? "").trim();
+  const price = String(formData.get("price") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const categoryRaw = String(formData.get("category") ?? "");
+  const category = categoryRaw ? Number(categoryRaw) : null;
+  const publish = formData.get("publish") === "on";
+
+  if (!Number.isFinite(productId) || productId <= 0) return { error: "Missing product." };
+  if (!name) return { error: "Enter a product name." };
+  if (!sku) return { error: "Enter a SKU." };
+  if (!price || Number.isNaN(Number(price)) || Number(price) <= 0) {
+    return { error: "Enter a price greater than zero." };
+  }
+
+  try {
+    await updateProduct(accessToken, storeSlug, productId, {
+      name,
+      sku,
+      price,
+      description,
+      category,
+      status: publish ? "published" : "draft",
+    });
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message };
+    if (error instanceof NetworkError) return { error: error.message };
+    throw error;
   }
 
   revalidatePath(returnPath);

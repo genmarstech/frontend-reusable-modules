@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getProduct, listCategories, listProducts } from "./catalog";
+import { getProduct, listCategories, listProducts, updateProduct } from "./catalog";
 
 /**
  * Asserts the exact URL each call builds, mocking `fetch` directly rather
@@ -60,6 +60,19 @@ describe("getProduct", () => {
     await getProduct("acme-fashion", 42);
     const requestedUrl = fetchMock.mock.calls[0][0] as URL;
     expect(requestedUrl.toString()).toBe("http://localhost:8010/api/acme-fashion/products/42/");
+  });
+});
+
+describe("updateProduct", () => {
+  it("sends a PATCH to the business-scoped product-detail endpoint with only the given fields", async () => {
+    const fetchMock = mockFetchOnce({ id: 42 });
+    await updateProduct("token", "genmars-store", 42, { description: "Now with a real description." });
+
+    const requestedUrl = fetchMock.mock.calls[0][0] as URL;
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(requestedUrl.toString()).toBe("http://localhost:8010/api/genmars-store/products/42/");
+    expect(init.method).toBe("PATCH");
+    expect(JSON.parse(init.body as string)).toEqual({ description: "Now with a real description." });
   });
 });
 
