@@ -9,3 +9,9 @@ export const RegisterUser = async (payload) => {
     
 }
 
+export const LoginUser = async (payload) => {
+    const response = await api.post('/idn/api/auth/login/', payload)
+
+    return response.data
+    
+}
