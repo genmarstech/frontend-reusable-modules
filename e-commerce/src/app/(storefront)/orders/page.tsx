@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Receipt } from "lucide-react";
 import { djangoFetch, toQuery } from "@/lib/django";
@@ -28,7 +29,13 @@ export default async function OrdersPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-text">Your orders</h1>
+      <div className="relative overflow-hidden rounded-3xl">
+        <div className="relative h-36 sm:h-44">
+          <Image src="/images/delivery-handoff.jpg" alt="" fill sizes="(min-width: 640px) 768px, 100vw" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+        </div>
+        <h1 className="absolute bottom-5 left-6 text-3xl font-semibold tracking-tight text-paper">Your orders</h1>
+      </div>
 
       {orders.results.length === 0 ? (
         <EmptyState icon={Receipt} tone="blue" title="No orders yet" description="Your order history will show up here." className="mt-8" />
