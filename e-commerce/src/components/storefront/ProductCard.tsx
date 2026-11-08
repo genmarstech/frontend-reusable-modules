@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { SlidersHorizontal } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatMoney } from "@/lib/format";
 import { AddToCartButton } from "./AddToCartButton";
@@ -8,6 +9,12 @@ import { CategoryIllustration } from "./illustrations/CategoryIllustration";
 export function ProductCard({ product, categoryName }: { product: Product; categoryName?: string }) {
   const cover = product.images[0];
   const outOfStock = product.status !== "published";
+  // Variants (size, colour, ...) have their own stock records — the
+  // product itself has none (see inventory/models.py's "exactly one of
+  // product/variant" rule), so a quick add-to-cart with no variant chosen
+  // is guaranteed to fail at checkout. Send these through the product page
+  // to pick one instead of offering a button that can't work.
+  const hasVariants = product.variants.length > 0;
 
   return (
     <div className="group flex flex-col">
@@ -37,7 +44,17 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
           </Link>
           <p className="text-sm text-text-muted">{formatMoney(product.price)}</p>
         </div>
-        <AddToCartButton productId={product.id} disabled={outOfStock} />
+        {hasVariants ? (
+          <Link
+            href={`/products/${product.id}`}
+            aria-label="Choose options"
+            className="inline-flex size-9 items-center justify-center rounded-full border border-border text-text-muted hover:text-text"
+          >
+            <SlidersHorizontal className="size-4" />
+          </Link>
+        ) : (
+          <AddToCartButton productId={product.id} disabled={outOfStock} />
+        )}
       </div>
     </div>
   );

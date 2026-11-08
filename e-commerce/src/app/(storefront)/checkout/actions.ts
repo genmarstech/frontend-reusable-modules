@@ -11,6 +11,12 @@ export interface CheckoutState {
 export async function submitCheckout(_prevState: CheckoutState, formData: FormData): Promise<CheckoutState> {
   const addressId = formData.get("address_id");
 
+  // There's no separate "contact phone" field in the UI any more — asking
+  // for it twice (once as the delivery phone, again as "the M-Pesa number")
+  // was pure friction, since in practice they're the same number. A new
+  // address's phone covers both; a saved address already has its own phone
+  // on file, so contact_phone is simply omitted and the backend falls back
+  // to the account's phone number.
   const payload: Record<string, unknown> =
     addressId && addressId !== "new"
       ? { address_id: Number(addressId) }
@@ -20,9 +26,8 @@ export async function submitCheckout(_prevState: CheckoutState, formData: FormDa
           delivery_line2: formData.get("delivery_line2") || "",
           delivery_city: formData.get("delivery_city"),
           delivery_phone: formData.get("delivery_phone"),
+          contact_phone: formData.get("delivery_phone") || "",
         };
-
-  payload.contact_phone = formData.get("contact_phone") || "";
 
   let order: Order;
   try {

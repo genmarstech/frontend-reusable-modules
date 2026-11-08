@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { djangoFetch, toQuery } from "@/lib/django";
 import type { Category, Paginated, Product } from "@/lib/types";
@@ -22,23 +23,35 @@ export default async function HomePage() {
           className="pointer-events-none absolute -bottom-24 -left-24 size-96 rounded-full opacity-50 blur-3xl"
           style={{ background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)" }}
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="text-sm font-medium text-accent">/ Shop</p>
-          <h1 className="mt-2 max-w-xl text-5xl font-semibold tracking-tight text-text sm:text-6xl">
-            Good things, plainly sold.
-          </h1>
-          <p className="mt-4 max-w-md text-base text-text-muted">
-            A small, honest catalog. Server-priced, always in stock when it says so.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 rounded-full bg-inverse px-6 py-3 text-sm font-medium text-inverse-text hover:opacity-85"
-            >
-              Browse the shop
-              <ArrowRight className="size-4" />
-            </Link>
-            <MpesaBadge />
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:py-28">
+          <div>
+            <p className="text-sm font-medium text-accent">/ Shop</p>
+            <h1 className="mt-2 max-w-xl text-5xl font-semibold tracking-tight text-text sm:text-6xl">
+              Good things, plainly sold.
+            </h1>
+            <p className="mt-4 max-w-md text-base text-text-muted">
+              A small, honest catalog. Server-priced, always in stock when it says so.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                href="/shop"
+                className="inline-flex items-center gap-2 rounded-full bg-inverse px-6 py-3 text-sm font-medium text-inverse-text hover:opacity-85"
+              >
+                Browse the shop
+                <ArrowRight className="size-4" />
+              </Link>
+              <MpesaBadge />
+            </div>
+          </div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl lg:aspect-square">
+            <Image
+              src="/images/hero-shopping-cart.jpg"
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 90vw"
+              className="object-cover"
+            />
           </div>
         </div>
       </section>
