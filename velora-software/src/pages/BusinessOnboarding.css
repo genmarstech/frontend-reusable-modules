@@ -522,3 +522,170 @@
     }
 }
 
+
+/* Services onboarding */
+
+.services-onboarding {
+    margin-top: 25px;
+}
+
+.service-form {
+    margin-top: 22px;
+}
+
+.service-availability {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.service-availability input {
+    width: 17px;
+    height: 17px;
+    accent-color: #7651a8;
+}
+
+.saved-services {
+    margin-top: 35px;
+}
+
+.saved-services-heading {
+    margin-bottom: 16px;
+}
+
+.saved-services-heading h3 {
+    margin: 0 0 5px;
+    font-size: 18px;
+}
+
+.saved-services-heading p {
+    margin: 0;
+    font-size: 13px;
+    color: #85858d;
+}
+
+.saved-services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.saved-service-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #e9e9ed;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.service-item-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: #f3eff8;
+    color: #7651a8;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.service-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 0;
+}
+
+.service-item-details strong {
+    font-size: 14px;
+}
+
+.service-item-details small {
+    color: #85858d;
+    font-size: 12px;
+}
+
+.service-item-price {
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.service-status {
+    font-size: 11px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.service-status.available {
+    background: #e8f8ef;
+    color: #16834a;
+}
+
+.service-status.unavailable {
+    background: #f2f2f2;
+    color: #777;
+}
+
+.services-continue {
+    margin-top: 25px;
+    padding-top: 22px;
+    border-top: 1px solid #ededf0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.services-continue p {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.services-continue button {
+    background: #7651a8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.services-continue button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .saved-service-item {
+        flex-wrap: wrap;
+    }
+
+    .service-item-details {
+        min-width: 120px;
+    }
+
+    .services-continue {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .services-continue button {
+        justify-content: center;
+    }
+}
+
+

@@ -1,0 +1,352 @@
+
+/* =========================================
+   VELORA — BUSINESS SELECTION
+========================================= */
+
+.business-selection {
+    min-height: 100vh;
+    width: 100%;
+    padding: 75px 7%;
+    background: #f8f7f2;
+    font-family: "DM Sans", sans-serif;
+    color: #202b26;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.business-selection header {
+    max-width: 760px;
+    margin: 0 auto 55px;
+    text-align: center;
+}
+
+.business-selection header h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 500;
+    letter-spacing: -1.3px;
+    line-height: 1.2;
+    color: #202b26;
+    margin: 0 0 16px;
+}
+
+.business-selection header p {
+    max-width: 540px;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #858b83;
+}
+
+/* =========================================
+   BUSINESS GRID
+========================================= */
+
+.business-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(270px, 1fr)
+    );
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   BUSINESS CARD
+========================================= */
+
+.business-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+
+    background: #ffffff;
+    border: 1px solid #e8e8df;
+    border-radius: 10px;
+
+    cursor: pointer;
+    font-family: inherit;
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.business-card:hover {
+    transform: translateY(-5px);
+    border-color: #aab9aa;
+    box-shadow: 0 14px 32px rgba(32, 43, 38, 0.08);
+}
+
+.business-card:focus-visible {
+    outline: 3px solid #627c69;
+    outline-offset: 4px;
+}
+
+/* =========================================
+   BUSINESS IMAGE
+========================================= */
+
+.business-card img {
+    display: block;
+    width: 100%;
+    height: 185px;
+
+    object-fit: cover;
+    object-position: center;
+
+    border-radius: 7px;
+    background: #e9ece4;
+}
+
+/* =========================================
+   BUSINESS NAME
+========================================= */
+
+.business-card h3 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.35;
+
+    color: #202b26;
+    margin: 20px 5px 7px;
+}
+
+/* =========================================
+   BUSINESS CATEGORY
+========================================= */
+
+.business-card p {
+    font-size: 13px;
+    font-weight: 500;
+    color: #858b83;
+
+    margin: 0 5px 22px;
+    letter-spacing: 0.2px;
+}
+
+/* =========================================
+   OPEN DASHBOARD ACTION
+========================================= */
+
+.business-card span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    margin-top: auto;
+    padding: 15px 5px 5px;
+
+    border-top: 1px solid #e8e8df;
+
+    color: #3e5948;
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: color 0.2s ease;
+}
+
+.business-card:hover span {
+    color: #627c69;
+}
+
+/* =========================================
+   LOADING / ERROR STATES
+========================================= */
+
+.business-selection > p {
+    text-align: center;
+    color: #858b83;
+    font-size: 14px;
+    margin-top: 50px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 768px) {
+    .business-selection {
+        padding: 55px 5%;
+    }
+
+    .business-selection header {
+        margin-bottom: 40px;
+    }
+
+    .business-grid {
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(230px, 1fr)
+        );
+        gap: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .business-selection {
+        padding: 40px 18px;
+    }
+
+    .business-selection header h1 {
+        font-size: 2.2rem;
+    }
+
+    .business-selection header p {
+        font-size: 14px;
+    }
+
+    .business-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .business-card img {
+        height: 200px;
+    }
+}
+
+
+
+.business-selection-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 45px;
+}
+
+.business-selection-eyebrow {
+    display: block;
+    color: #82947b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.business-selection-header h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(32px, 5vw, 48px);
+    color: #202b26;
+    margin: 0 0 12px;
+}
+
+.business-selection-header h1 span {
+    color: #82947b;
+}
+
+.business-selection-header p {
+    color: #777d75;
+    margin: 0;
+}
+
+.create-business-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border: none;
+    border-radius: 7px;
+    background: #3e5948;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.create-business-button:hover {
+    background: #2d4436;
+    transform: translateY(-2px);
+}
+
+.create-business-button span {
+    font-size: 21px;
+    line-height: 1;
+}
+
+.business-empty-state {
+    text-align: center;
+    max-width: 480px;
+    margin: 90px auto;
+    padding: 30px;
+}
+
+.business-empty-icon {
+    width: 65px;
+    height: 65px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #e9eee6;
+    color: #627c69;
+    font-size: 28px;
+}
+
+.business-empty-state h2 {
+    font-family: "Playfair Display", serif;
+    color: #202b26;
+    font-size: 28px;
+}
+
+.business-empty-state p {
+    color: #777d75;
+    line-height: 1.7;
+    margin-bottom: 25px;
+}
+
+.business-logo-placeholder {
+    width: 65px;
+    height: 65px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #e9eee6;
+    color: #3e5948;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.business-selection-error {
+    padding: 18px;
+    border-radius: 8px;
+    background: #fcebea;
+    color: #a33b35;
+}
+
+.business-selection-loading {
+    padding: 60px 20px;
+    text-align: center;
+    color: #777d75;
+}
+
+@media (max-width: 650px) {
+    .business-selection-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .create-business-button {
+        width: 100%;
+    }
+
+    .business-empty-state {
+        margin: 45px auto;
+    }
+}
