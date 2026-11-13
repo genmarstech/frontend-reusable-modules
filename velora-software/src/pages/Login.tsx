@@ -78,8 +78,8 @@ function Login() {
 
       // Navigate to your next page.
       setTimeout(() => {
-      navigate("/onboarding/business", { replace: true });
-    }, 50);
+        navigate("/businesses", { replace: true });
+      }, 50);
 
     } catch (error) {
       const apiError = handleApiError(error);

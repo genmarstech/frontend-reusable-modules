@@ -1,0 +1,363 @@
+.dashboard-overview {
+    min-height: 100vh;
+    padding: 32px;
+    background: #f8f7f2;
+    color: #26332c;
+    font-family: "DM Sans", sans-serif;
+}
+
+/* Header */
+.dashboard-overview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.dashboard-overview-header h1 {
+    margin: 0 0 8px;
+    font-family: "Playfair Display", serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: #26332c;
+}
+
+.dashboard-overview-header p {
+    margin: 0;
+    color: #89918a;
+    font-size: 14px;
+}
+
+/* Statistics */
+.overview-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 36px;
+}
+
+.overview-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e9e9e1;
+    border-radius: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.overview-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(38, 51, 44, 0.06);
+}
+
+.overview-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #edf2ec;
+    color: #55745e;
+}
+
+.overview-stat-icon svg {
+    width: 23px;
+    height: 23px;
+}
+
+.overview-stat-card p {
+    margin: 0 0 6px;
+    color: #89918a;
+    font-size: 13px;
+}
+
+.overview-stat-card h2 {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: #26332c;
+}
+
+/* General sections */
+.overview-section {
+    margin-bottom: 36px;
+    padding: 26px;
+    background: #ffffff;
+    border: 1px solid #e9e9e1;
+    border-radius: 18px;
+}
+
+.overview-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.overview-section-heading h2 {
+    margin: 0 0 7px;
+    font-family: "Playfair Display", serif;
+    font-size: 23px;
+    font-weight: 600;
+    color: #26332c;
+}
+
+.overview-section-heading p {
+    margin: 0;
+    color: #929a92;
+    font-size: 13px;
+}
+
+.overview-section-heading > span {
+    padding: 8px 13px;
+    border-radius: 30px;
+    background: #edf2ec;
+    color: #55745e;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Services */
+.services-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.service-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #eeeee8;
+    border-radius: 13px;
+    background: #fdfdfa;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.service-card:hover {
+    border-color: #bdcdbf;
+    transform: translateY(-2px);
+}
+
+.service-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #edf2ec;
+    color: #55745e;
+}
+
+.service-details {
+    min-width: 0;
+}
+
+.service-details h3 {
+    margin: 2px 0 7px;
+    color: #35443a;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.service-details p {
+    margin: 0;
+    color: #929a92;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Staff */
+.staff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.staff-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px;
+    border: 1px solid #eeeee8;
+    border-radius: 13px;
+    background: #fdfdfa;
+    transition: border-color 0.2s ease;
+}
+
+.staff-card:hover {
+    border-color: #bdcdbf;
+}
+
+.staff-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #e7eee5;
+    color: #49634e;
+    font-family: "Playfair Display", serif;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.staff-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.staff-details h3 {
+    margin: 0 0 5px;
+    color: #35443a;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.staff-details p {
+    margin: 0;
+    color: #929a92;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.staff-status {
+    padding: 7px 12px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.staff-status.available {
+    background: #e9f3e9;
+    color: #4d8056;
+}
+
+.staff-status.unavailable {
+    background: #f9ebea;
+    color: #b45d56;
+}
+
+/* Empty states */
+.overview-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 42px 20px;
+    text-align: center;
+    border: 1px dashed #dfe4dc;
+    border-radius: 13px;
+    background: #fdfdfa;
+    color: #829184;
+}
+
+.overview-empty-state svg {
+    margin-bottom: 14px;
+    color: #78917b;
+}
+
+.overview-empty-state h3 {
+    margin: 0 0 7px;
+    color: #35443a;
+    font-size: 15px;
+}
+
+.overview-empty-state p {
+    margin: 0;
+    color: #929a92;
+    font-size: 12px;
+}
+
+/* Loading and error */
+.dashboard-loading,
+.dashboard-error {
+    padding: 50px 24px;
+    text-align: center;
+    color: #78847a;
+    font-size: 14px;
+}
+
+.dashboard-error {
+    color: #b45d56;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .services-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-overview {
+        padding: 22px 16px;
+    }
+
+    .dashboard-overview-header h1 {
+        font-size: 26px;
+    }
+
+    .overview-stats {
+        gap: 12px;
+    }
+
+    .overview-stat-card {
+        gap: 12px;
+        padding: 17px;
+    }
+
+    .overview-stat-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .overview-stat-card h2 {
+        font-size: 25px;
+    }
+
+    .overview-section {
+        padding: 19px 15px;
+    }
+
+    .overview-section-heading h2 {
+        font-size: 20px;
+    }
+
+    .services-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .overview-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-section-heading {
+        align-items: flex-start;
+    }
+
+    .staff-card {
+        gap: 10px;
+    }
+
+    .staff-status {
+        padding: 6px 9px;
+        font-size: 10px;
+    }
+}

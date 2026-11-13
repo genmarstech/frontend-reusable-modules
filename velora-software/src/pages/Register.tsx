@@ -18,10 +18,12 @@ import {
   CheckCircle2
 } from "lucide-react";
 
-import { RegisterUser } from "../lib/api/auth";
 import { handleApiError } from "../lib/api/handleErrors";
 
 import "./Register.css";
+import { useNavigate } from "react-router";
+import type { RegisterPayload } from "../types/register.auth";
+import { RegisterUser } from "../lib/api/auth";
 
 // VALIDATION SCHEMA
 const registerSchema = z.object({
@@ -63,11 +65,14 @@ const registerSchema = z.object({
   }
 );
 
+export type RegisterFormValues = z.infer<typeof registerSchema>;
+
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [serverError, setServerError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate()
 
   const {
     register,
@@ -75,75 +80,79 @@ function Register() {
     setError,
     reset,
     formState: { errors, isSubmitting }
-  } = useForm({
+} = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     mode: "onBlur",
     defaultValues: {
-      full_name: "",
-      email: "",
-      phone_number: "",
-      password: "",
-      confirm_password: ""
+        full_name: "",
+        email: "",
+        phone_number: "",
+        password: "",
+        confirm_password: ""
     }
-  });
+});
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (values: RegisterFormValues) => {
     setServerError("");
     setSuccessMessage("");
 
-    // Normalize and exclude confirm_password
-    const payload = {
-      full_name: data.full_name.trim(),
-      email: data.email.trim().toLowerCase(),
-      phone_number: data.phone_number.trim(),
-      password: data.password
+    const payload: RegisterPayload = {
+        full_name: values.full_name.trim(),
+        email: values.email.trim().toLowerCase(),
+        phone_number: values.phone_number.trim(),
+        password: values.password
     };
 
     try {
-      const response = await RegisterUser(payload);
+        const response = await RegisterUser(payload);
 
-      setSuccessMessage(
-        response?.data?.message || "Your Velora account has been created successfully."
-      );
-
-      reset();
-
-    } catch (error) {
-      const apiError = handleApiError(error);
-
-      const fieldErrors = apiError?.errors || {};
-
-      const allowedFields = [
-        "full_name",
-        "email",
-        "phone_number",
-        "password"
-      ];
-
-      let hasFieldError = false;
-
-      Object.entries(fieldErrors).forEach(([field, messages]) => {
-        if (allowedFields.includes(field)) {
-          const message = Array.isArray(messages)
-            ? messages[0]
-            : messages;
-
-          setError(field, {
-            type: "server",
-            message: String(message)
-          });
-
-          hasFieldError = true;
-        }
-      });
-
-      if (!hasFieldError) {
-        setServerError(
-          apiError?.message || "Something went wrong. Please try again."
+        setSuccessMessage(
+            `Hello ${response.full_name}, your account has been created successfully.`
         );
-      }
+
+        reset();
+
+        setTimeout(() => {
+            navigate("/businesses", { replace: true });
+        }, 1500);
+
+    } catch (error: unknown) {
+        const apiError = handleApiError(error);
+
+        const fieldErrors = apiError?.errors || {};
+
+        const allowedFields = [
+            "full_name",
+            "email",
+            "phone_number",
+            "password"
+        ] as const;
+
+        let hasFieldError = false;
+
+        Object.entries(fieldErrors).forEach(([field, messages]) => {
+            if ((allowedFields as readonly string[]).includes(field)) {
+                const message = Array.isArray(messages)
+                    ? messages[0]
+                    : messages;
+
+                setError(field as keyof RegisterFormValues, {
+                    type: "server",
+                    message: String(message)
+                });
+
+                hasFieldError = true;
+            }
+        });
+
+        if (!hasFieldError) {
+            setServerError(
+                apiError?.message ||
+                "Something went wrong. Please try again."
+            );
+        }
     }
-  };
+};
 
   return (
     <main className="register-page">
@@ -159,7 +168,7 @@ function Register() {
           <div className="brand-message">
             <div className="brand-tag">
               <Sparkles size={15} />
-              <span>WELCOME TO VE​LORA</span>
+              <span>WELCOME TO VELORA</span>
             </div>
 
             <h1>
