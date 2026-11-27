@@ -8,6 +8,9 @@ import type {
     Customer,
     Location,
     NotificationLog,
+    Overview,
+    PaymentsReport,
+    Performance,
     PublicBooking,
     PublicBusiness,
     Resource,
@@ -224,6 +227,17 @@ export interface AnalyticsFilters {
 
 export const getAnalytics = async (business: number, filters: AnalyticsFilters) =>
     (await backendClient.get<AnalyticsReport>("bk/analytics/", { params: clean({ business, ...filters }) })).data;
+
+export const getOverview = async (business: number, date?: string) =>
+    (await backendClient.get<Overview>("bk/overview/", { params: clean({ business, date }) })).data;
+
+export const getPerformance = async (
+    business: number,
+    range: { days: number } | { date_from: string; date_to: string }
+) => (await backendClient.get<Performance>("bk/overview/performance/", { params: clean({ business, ...range }) })).data;
+
+export const getPayments = async (business: number, range: { date_from: string; date_to: string }) =>
+    (await backendClient.get<PaymentsReport>("bk/payments/", { params: clean({ business, ...range }) })).data;
 
 export const downloadAnalyticsCsv = async (
     business: number,

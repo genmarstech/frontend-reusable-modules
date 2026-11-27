@@ -1,7 +1,8 @@
 import { Check } from "lucide-react";
 import { BookingArt } from "../../components/Illustrations";
 import { usePageMeta } from "../../lib/usePageMeta";
-import { FEATURES } from "./content";
+import { PHOTOS } from "../../lib/photos";
+import { FEATURES, slugify } from "./content";
 import { FinalCta, PageIntro } from "./parts";
 
 function Features() {
@@ -21,10 +22,12 @@ function Features() {
             />
 
             <section className="feature-rows">
-                {FEATURES.map(({ icon: Icon, art: Art, title, summary, points }, index) => (
-                    <article className={`feature-row ${index % 2 ? "is-flipped" : ""}`} key={title}>
-                        <div className="feature-row-art">
-                            <Art />
+                {FEATURES.map(({ icon: Icon, art: Art, title, summary, points }, index) => {
+                    const photo = PHOTOS.features[slugify(title)];
+                    return (
+                    <article className={`feature-row ${index % 2 ? "is-flipped" : ""}`} key={title} id={slugify(title)}>
+                        <div className={`feature-row-art ${photo ? "has-photo" : ""}`}>
+                            {photo ? <img className="v-photo" src={photo} alt="" loading="lazy" width={1200} height={900} /> : <Art />}
                         </div>
                         <div className="feature-row-text">
                             <div className="feature-icon" aria-hidden="true">
@@ -43,7 +46,8 @@ function Features() {
                             </ul>
                         </div>
                     </article>
-                ))}
+                    );
+                })}
             </section>
 
             <FinalCta />

@@ -10,10 +10,14 @@ import { BookingArt, ClientsArt, InsightsArt, PhoneBookingArt, ServicesArt, Team
 
 export const NAV_PAGES = [
     { to: "/features", label: "Features" },
-    { to: "/solutions", label: "Solutions" },
+    { to: "/solutions", label: "For Businesses" },
     { to: "/how-it-works", label: "How it works" },
     { to: "/about", label: "About" },
 ];
+
+/** "Online booking" -> "online-booking", for #anchors on the Features and Solutions pages. */
+export const slugify = (text: string) =>
+    text.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 type Feature = {
     icon: ComponentType;

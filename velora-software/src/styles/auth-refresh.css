@@ -1,0 +1,238 @@
+/* Log in and sign-up, in the 2026-11 look: cream form side, deep green panel with
+   a glimpse of the real dashboard, pill buttons and soft rounded inputs. */
+
+body,
+.login-page,
+.register-page {
+  background: #f7f4ee;
+}
+
+.login-brand,
+.register-brand {
+  background: radial-gradient(120% 80% at 80% 10%, #4a6753 0%, #3e5948 40%, #2f4637 100%);
+}
+
+.login-brand-tag,
+.brand-tag {
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  color: #e3ebdf;
+  letter-spacing: .12em;
+}
+
+.login-brand-message h1 em,
+.register-brand h1 em {
+  color: #b9cdb4;
+}
+
+.login-eyebrow,
+.form-eyebrow {
+  display: inline-flex;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #e5e9dc;
+  color: #26332c;
+  letter-spacing: .12em;
+}
+
+.login-heading h2,
+.register-form-container h2 {
+  color: #1d2822;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.login-input,
+.register-input {
+  border-color: #e4dfd2;
+  border-radius: 14px;
+  background: #fffefb;
+}
+
+.login-submit,
+.register-submit {
+  border-radius: 999px;
+  background: #3e5948;
+  box-shadow: 0 10px 22px rgba(62, 89, 72, .2);
+}
+
+.login-submit:hover:not(:disabled),
+.register-submit:hover:not(:disabled) {
+  background: #2f463a;
+}
+
+/* The dashboard glimpse on the green panel */
+.product-peek {
+  position: relative;
+  margin: 10px -30% 28px 0;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .14);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .25);
+  transform: perspective(1600px) rotateY(-8deg);
+  transform-origin: left center;
+}
+
+.product-peek img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+@media (max-width: 950px) {
+  .product-peek {
+    margin-right: 0;
+    transform: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .product-peek {
+    display: none;
+  }
+}
+
+/* ---------- Public booking page (same 2026-11 look) ---------- */
+
+.bk-page {
+  background: #f7f4ee;
+}
+
+.bk-hero {
+  background: radial-gradient(120% 140% at 85% 0%, #4a6753 0%, #3e5948 45%, #2f4637 100%);
+}
+
+.bk-eyebrow {
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.bk-card {
+  border: 1px solid #ebe7dc;
+  border-radius: 24px;
+  background: #fffefb;
+  box-shadow: 0 1px 2px rgba(29, 40, 34, .03), 0 18px 44px rgba(29, 40, 34, .08);
+}
+
+.bk-steps span {
+  height: 5px;
+  border-radius: 999px;
+}
+
+.bk-steps span.done {
+  background: #3e5948;
+}
+
+.bk-option,
+.bk-day {
+  border-color: #ece8dd;
+  border-radius: 16px;
+  background: #fffefb;
+}
+
+.bk-option:hover {
+  border-color: #c4d2c2;
+  background: #f8f7f1;
+}
+
+.bk-option.active {
+  border-color: #3e5948;
+  background: #f1f4ec;
+  box-shadow: 0 0 0 1px #3e5948 inset;
+}
+
+.bk-day.active {
+  border-color: #3e5948;
+  background: #3e5948;
+}
+
+.bk-price {
+  color: #3e5948;
+}
+
+.bk-summary {
+  border-radius: 16px;
+  background: #f5f4ee;
+}
+
+.bk-page .v-btn {
+  border-radius: 999px;
+  padding: 13px 24px;
+}
+
+/* ---------- Business picker ---------- */
+
+.business-selection {
+  background: #f7f4ee;
+}
+
+.business-selection header.business-selection-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.business-selection-eyebrow {
+  display: inline-flex;
+  margin-bottom: 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #e5e9dc;
+  color: #26332c;
+}
+
+.create-business-button {
+  border-radius: 999px !important;
+  padding: 13px 24px !important;
+}
+
+.business-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 300px));
+  justify-content: center;
+}
+
+.business-card {
+  padding: 18px;
+  border-color: #ebe7dc;
+  border-radius: 22px;
+  background: #fffefb;
+  box-shadow: 0 1px 2px rgba(29, 40, 34, .03), 0 14px 34px rgba(29, 40, 34, .06);
+}
+
+/* ---------- Business onboarding ---------- */
+
+.business-onboarding {
+  background: #f7f4ee;
+}
+
+.onboarding-header {
+  background: rgba(251, 250, 245, .92);
+}
+
+.business-form,
+.business-review {
+  border-color: #ebe7dc !important;
+  border-radius: 24px !important;
+  background: #fffefb !important;
+  box-shadow: 0 1px 2px rgba(29, 40, 34, .03), 0 14px 34px rgba(29, 40, 34, .06);
+}
+
+.business-onboarding .form-field input:not([type="file"]),
+.business-onboarding .form-field select,
+.business-onboarding .form-field textarea {
+  border-radius: 14px;
+}
+
+.business-onboarding .form-footer button,
+.business-onboarding .review-footer button {
+  border-radius: 999px;
+}
+
+.progress-fill {
+  background: #3e5948;
+}

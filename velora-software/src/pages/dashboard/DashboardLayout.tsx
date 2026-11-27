@@ -1,11 +1,15 @@
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router";
 import {
     BarChart3,
     Bell,
     CalendarDays,
+    ChevronDown,
     Clock3,
-    LayoutDashboard,
+    CreditCard,
+    ExternalLink,
+    LayoutGrid,
+    Link2,
     LogOut,
     Menu,
     Scissors,
@@ -15,15 +19,25 @@ import {
 } from "lucide-react";
 
 import { getBusiness, getBusinessStaff, getServices } from "../../lib/api/auth";
-import { getBookings, getBookingsSeenAt, getPolicy, mediaUrl, publicBookingUrl } from "../../lib/api/bookings";
+import {
+    getBookings,
+    getBookingsSeenAt,
+    getNotifications,
+    getPolicy,
+    mediaUrl,
+    publicBookingUrl,
+} from "../../lib/api/bookings";
 import { useAuth } from "../../context/auth-context";
 import type { Business } from "../../types/business";
 import { CATEGORY_LABELS } from "../../types/business";
-import type { BookingPolicy } from "../../types/bookings";
+import type { Booking, BookingPolicy } from "../../types/bookings";
 import type { Service } from "../../types/services";
 import type { Staff } from "../../types/staff";
 import type { DashboardContext } from "./dashboard-context";
-import { PageLoading, Spinner } from "../../components/ui";
+import { Avatar, PageLoading, Spinner } from "../../components/ui";
+import { BudSprig } from "../../components/Decor";
+import { formatDateTime, timeAgo } from "../../lib/format";
+import { SITE } from "../../lib/site";
 import { Logo } from "../../components/Brand";
 import { LostArt } from "../../components/Illustrations";
 import StatusPage from "../../components/StatusPage";
@@ -31,15 +45,17 @@ import { usePageMeta } from "../../lib/usePageMeta";
 
 import "../DashboardOverview.css";
 import "../../styles/dashboard.css";
+import "../../styles/dashboard-refresh.css";
 
 const NAV = [
-    { to: "overview", label: "Overview", icon: LayoutDashboard },
+    { to: "overview", label: "Overview", icon: LayoutGrid },
     { to: "bookings", label: "Bookings", icon: CalendarDays },
     { to: "customers", label: "Customers", icon: UserRound },
-    { section: "Business" },
+    { section: "Business operations" },
     { to: "services", label: "Services", icon: Scissors },
     { to: "team", label: "Team", icon: Users },
     { to: "schedule", label: "Schedule", icon: Clock3 },
+    { to: "payments", label: "Payments", icon: CreditCard },
     { section: "Insights" },
     { to: "analytics", label: "Analytics", icon: BarChart3 },
     { to: "notifications", label: "Notifications", icon: Bell },
@@ -51,7 +67,7 @@ function DashboardLayout() {
     const id = Number(businessId);
     const validId = Number.isInteger(id) && id > 0;
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
 
     const [business, setBusiness] = useState<Business | null>(null);
     const [policy, setPolicy] = useState<BookingPolicy | null>(null);
@@ -59,8 +75,8 @@ function DashboardLayout() {
     const [staff, setStaff] = useState<Staff[]>([]);
     const [error, setError] = useState("");
     const [navOpen, setNavOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const [newBookings, setNewBookings] = useState(0);
+    const [newBookings, setNewBookings] = useState<Booking[]>([]);
+    const [failedMessages, setFailedMessages] = useState(0);
     const { pathname } = useLocation();
 
     // Tab title: "Bookings · Glow Salon · Velora"
@@ -98,13 +114,20 @@ function DashboardLayout() {
         let active = true;
         const check = () => {
             const since = getBookingsSeenAt(id) || new Date(Date.now() - 7 * 86400000).toISOString();
-            getBookings(id, { channel: "online", booked_since: since, limit: 100 })
-                .then((rows) => active && setNewBookings(rows.length))
+            getBookings(id, { channel: "online", booked_since: since, ordering: "-created_at", limit: 100 })
+                .then((rows) => active && setNewBookings(rows))
+                .catch(() => undefined);
+            // Messages that failed in the last 30 days need a look (retry or fix the address).
+            getNotifications(id, { status: "failed" })
+                .then((rows) => {
+                    const cutoff = Date.now() - 30 * 86400000;
+                    if (active) setFailedMessages(rows.filter((n) => new Date(n.created_at).getTime() > cutoff).length);
+                })
                 .catch(() => undefined);
         };
         check();
         const timer = setInterval(check, 60_000);
-        const onSeen = () => setNewBookings(0);
+        const onSeen = () => setNewBookings([]);
         window.addEventListener("velora:bookings-seen", onSeen);
         return () => {
             active = false;
@@ -141,15 +164,16 @@ function DashboardLayout() {
         navigate("/login", { replace: true });
     };
 
-    const copyLink = async () => {
+    const copyBookingLink = useCallback(async () => {
+        const url = publicBookingUrl(business?.slug || String(id));
         try {
-            await navigator.clipboard.writeText(publicBookingUrl(business?.slug || String(id)));
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1800);
+            await navigator.clipboard.writeText(url);
+            return true;
         } catch {
-            window.prompt("Copy your booking link", publicBookingUrl(business?.slug || String(id)));
+            window.prompt("Copy your booking link", url);
+            return false;
         }
-    };
+    }, [business?.slug, id]);
 
     if (!validId || error) {
         return (
@@ -167,6 +191,19 @@ function DashboardLayout() {
         return <PageLoading label="Loading your workspace..." />;
     }
 
+    const accountActions = (
+        <AccountActions
+            name={user?.name || business.business_name}
+            email={user?.email || ""}
+            slug={business.slug}
+            newBookings={newBookings}
+            failedMessages={failedMessages}
+            timeZone={policy.timezone}
+            onCopyLink={copyBookingLink}
+            onLogout={handleLogout}
+        />
+    );
+
     const context: DashboardContext = {
         business,
         policy,
@@ -177,6 +214,8 @@ function DashboardLayout() {
         reloadStaff,
         setPolicy,
         setBusiness,
+        accountActions,
+        copyBookingLink,
     };
 
     const logo = mediaUrl(business.business_logo);
@@ -203,9 +242,8 @@ function DashboardLayout() {
                     <div className="v-business-switch-text">
                         <strong>{business.business_name}</strong>
                         <small>
-                            {CATEGORY_LABELS[business.business_category] ||
-                                business.business_category_label}{" "}
-                            · Switch
+                            {CATEGORY_LABELS[business.business_category] || business.business_category_label} · Switch
+                            <ChevronDown size={12} aria-hidden="true" />
                         </small>
                     </div>
                 </Link>
@@ -220,9 +258,14 @@ function DashboardLayout() {
                             <NavLink key={item.to} to={item.to}>
                                 <item.icon />
                                 {item.label}
-                                {item.to === "bookings" && newBookings > 0 && (
-                                    <span className="v-nav-badge" aria-label={`${newBookings} new`}>
-                                        {newBookings > 99 ? "99+" : newBookings}
+                                {item.to === "bookings" && newBookings.length > 0 && (
+                                    <span className="v-nav-badge" aria-label={`${newBookings.length} new`}>
+                                        {newBookings.length > 99 ? "99+" : newBookings.length}
+                                    </span>
+                                )}
+                                {item.to === "notifications" && failedMessages > 0 && (
+                                    <span className="v-nav-badge" aria-label={`${failedMessages} failed`}>
+                                        {failedMessages > 99 ? "99+" : failedMessages}
                                     </span>
                                 )}
                             </NavLink>
@@ -231,19 +274,27 @@ function DashboardLayout() {
                 </nav>
 
                 <div className="v-sidebar-footer">
-                    <div className="v-booking-link">
-                        <p>Share your booking page so customers can book themselves.</p>
-                        <div>
-                            <a href={`/book/${business.slug}`} target="_blank" rel="noreferrer">
-                                Open
-                            </a>
-                            <button type="button" onClick={copyLink}>
-                                {copied ? "Copied" : "Copy link"}
-                            </button>
-                        </div>
+                    <div className="v-help-card">
+                        <BudSprig />
+                        <strong>Need help?</strong>
+                        {SITE.contactEmail ? (
+                            <>
+                                <p>Our support team is here for you.</p>
+                                <a className="v-btn v-btn-pill v-btn-small" href={`mailto:${SITE.contactEmail}`}>
+                                    Contact support
+                                </a>
+                            </>
+                        ) : (
+                            <>
+                                <p>See how Velora fits your day, step by step.</p>
+                                <Link className="v-btn v-btn-pill v-btn-small" to="/how-it-works">
+                                    How it works
+                                </Link>
+                            </>
+                        )}
                     </div>
                     <button type="button" className="v-logout" onClick={handleLogout}>
-                        <LogOut size={16} aria-hidden="true" /> Log out
+                        <LogOut size={17} aria-hidden="true" /> Log out
                     </button>
                 </div>
             </aside>
@@ -272,6 +323,136 @@ function DashboardLayout() {
                     </Suspense>
                 </main>
             </div>
+        </div>
+    );
+}
+
+/** Notifications bell and profile menu, shown at the right of each page header. */
+function AccountActions({
+    name,
+    email,
+    slug,
+    newBookings,
+    failedMessages,
+    timeZone,
+    onCopyLink,
+    onLogout,
+}: {
+    name: string;
+    email: string;
+    slug: string;
+    newBookings: Booking[];
+    failedMessages: number;
+    timeZone: string;
+    onCopyLink: () => Promise<boolean>;
+    onLogout: () => void;
+}) {
+    const [open, setOpen] = useState<"bell" | "profile" | null>(null);
+    const [copied, setCopied] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const count = newBookings.length + failedMessages;
+
+    useEffect(() => {
+        if (!open) return;
+        const onDown = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(null);
+        };
+        const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(null);
+        document.addEventListener("mousedown", onDown);
+        document.addEventListener("keydown", onKey);
+        return () => {
+            document.removeEventListener("mousedown", onDown);
+            document.removeEventListener("keydown", onKey);
+        };
+    }, [open]);
+
+    return (
+        <div className="v-account" ref={ref}>
+            <button
+                type="button"
+                className="v-round-button"
+                aria-label={count ? `Notifications, ${count} new` : "Notifications"}
+                aria-expanded={open === "bell"}
+                onClick={() => setOpen(open === "bell" ? null : "bell")}
+            >
+                <Bell size={18} />
+                {count > 0 && <span className="v-dot-badge">{count > 9 ? "9+" : count}</span>}
+            </button>
+            <button
+                type="button"
+                className="v-profile-button"
+                aria-label="Your account"
+                aria-expanded={open === "profile"}
+                onClick={() => setOpen(open === "profile" ? null : "profile")}
+            >
+                {name.trim().charAt(0).toUpperCase() || "V"}
+            </button>
+
+            {open === "bell" && (
+                <div className="v-popover v-popover-wide" role="dialog" aria-label="Notifications">
+                    <strong className="v-popover-title">Notifications</strong>
+                    {count === 0 && <p className="v-popover-empty">You’re all caught up.</p>}
+                    {newBookings.slice(0, 5).map((b) => (
+                        <Link key={b.id} to="bookings?sort=newest" className="v-popover-item" onClick={() => setOpen(null)}>
+                            <Avatar name={b.customer_name} size={30} />
+                            <span>
+                                <b>{b.customer_name}</b> booked {b.service_name}
+                                <small>
+                                    {formatDateTime(b.start, timeZone)} · {timeAgo(b.created_at)}
+                                </small>
+                            </span>
+                        </Link>
+                    ))}
+                    {newBookings.length > 5 && (
+                        <Link to="bookings?sort=newest" className="v-popover-more" onClick={() => setOpen(null)}>
+                            {newBookings.length - 5} more new bookings →
+                        </Link>
+                    )}
+                    {failedMessages > 0 && (
+                        <Link to="notifications" className="v-popover-item is-warning" onClick={() => setOpen(null)}>
+                            <span className="v-popover-icon"><Bell size={15} /></span>
+                            <span>
+                                <b>{failedMessages}</b> {failedMessages === 1 ? "message" : "messages"} could not be sent
+                                <small>Check the address or try again</small>
+                            </span>
+                        </Link>
+                    )}
+                </div>
+            )}
+
+            {open === "profile" && (
+                <div className="v-popover" role="menu" aria-label="Your account">
+                    <div className="v-popover-user">
+                        <strong>{name}</strong>
+                        {email && <small>{email}</small>}
+                    </div>
+                    <a className="v-popover-link" href={`/book/${slug}`} target="_blank" rel="noreferrer" role="menuitem">
+                        <ExternalLink size={15} /> Open booking page
+                    </a>
+                    <button
+                        type="button"
+                        className="v-popover-link"
+                        role="menuitem"
+                        onClick={async () => {
+                            if (await onCopyLink()) {
+                                setCopied(true);
+                                setTimeout(() => setCopied(false), 1800);
+                            }
+                        }}
+                    >
+                        <Link2 size={15} /> {copied ? "Link copied" : "Copy booking link"}
+                    </button>
+                    <Link className="v-popover-link" to="settings" role="menuitem" onClick={() => setOpen(null)}>
+                        <Settings size={15} /> Settings
+                    </Link>
+                    <Link className="v-popover-link" to="/businesses" role="menuitem">
+                        <Users size={15} /> Switch business
+                    </Link>
+                    <button type="button" className="v-popover-link" role="menuitem" onClick={onLogout}>
+                        <LogOut size={15} /> Log out
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

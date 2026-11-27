@@ -9,15 +9,18 @@ export function PageIntro({
     accent,
     text,
     art: Art,
+    photo,
 }: {
     eyebrow: string;
     title: string;
     accent?: string;
     text: string;
     art?: ComponentType<{ className?: string }>;
+    /** A licensed photo shown instead of the illustration. */
+    photo?: string | null;
 }) {
     return (
-        <section className={`page-intro ${Art ? "has-art" : ""}`}>
+        <section className={`page-intro ${Art || photo ? "has-art" : ""}`}>
             <div className="page-intro-text">
                 <span className="section-eyebrow">{eyebrow}</span>
                 <h1>
@@ -31,7 +34,11 @@ export function PageIntro({
                 </h1>
                 <p>{text}</p>
             </div>
-            {Art && <Art className="page-intro-art" />}
+            {photo ? (
+                <img className="page-intro-photo" src={photo} alt="" width={1200} height={900} />
+            ) : (
+                Art && <Art className="page-intro-art" />
+            )}
         </section>
     );
 }

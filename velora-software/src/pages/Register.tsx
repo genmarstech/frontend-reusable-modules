@@ -21,6 +21,7 @@ import {
 import { handleApiError } from "../lib/api/handleErrors";
 
 import "./Register.css";
+import ProductPeek from "../components/ProductPeek";
 import { Link, useNavigate } from "react-router";
 import { Logo } from "../components/Brand";
 import type { RegisterPayload } from "../types/register.auth";
@@ -190,6 +191,8 @@ function Register() {
               you need, thoughtfully brought together.
             </p>
           </div>
+
+          <ProductPeek />
 
           <div className="brand-bottom">
             <div className="brand-decoration">

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useOutletContext } from "react-router";
 import type { Business } from "../../types/business";
 import type { BookingPolicy } from "../../types/bookings";
@@ -14,6 +15,10 @@ export interface DashboardContext {
     reloadStaff: () => Promise<void>;
     setPolicy: (policy: BookingPolicy) => void;
     setBusiness: (business: Business) => void;
+    /** Bell and profile menu, shown at the right of every page header. */
+    accountActions: ReactNode;
+    /** Copies the public booking link; resolves true when it was copied. */
+    copyBookingLink: () => Promise<boolean>;
 }
 
 export function useDashboard(): DashboardContext {

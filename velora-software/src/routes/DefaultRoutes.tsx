@@ -24,6 +24,7 @@ const TeamPage = lazy(() => import("../pages/dashboard/TeamPage"))
 const SchedulePage = lazy(() => import("../pages/dashboard/SchedulePage"))
 const NotificationsPage = lazy(() => import("../pages/dashboard/NotificationsPage"))
 const AnalyticsPage = lazy(() => import("../pages/dashboard/AnalyticsPage"))
+const PaymentsPage = lazy(() => import("../pages/dashboard/PaymentsPage"))
 const SettingsPage = lazy(() => import("../pages/dashboard/SettingsPage"))
 const BookingPage = lazy(() => import("../pages/public/BookingPage"))
 const ManageBooking = lazy(() => import("../pages/public/ManageBooking"))
@@ -61,6 +62,7 @@ function DefaultRoutes() {
           <Route path="services" element={<ServicesPage />} />
           <Route path="team" element={<TeamPage />} />
           <Route path="schedule" element={<SchedulePage />} />
+          <Route path="payments" element={<PaymentsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="settings" element={<SettingsPage />} />
