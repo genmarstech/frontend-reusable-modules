@@ -3,13 +3,11 @@ import "../styles/dashboard.css";
 
 function NotFound() {
     return (
-        <div className="app-loading">
-            <h1 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, margin: 0, color: "#26332c" }}>
-                Page not found
-            </h1>
-            <p>This page does not exist yet.</p>
+        <main className="app-loading">
+            <h1>Page not found</h1>
+            <p>The link may be old or mistyped. Head back and try again from the start.</p>
             <Link to="/" className="v-btn">Back to Velora</Link>
-        </div>
+        </main>
     );
 }
 

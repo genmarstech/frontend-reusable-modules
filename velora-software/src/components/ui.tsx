@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X, Loader2 } from "lucide-react";
 import { STATUS_LABELS } from "../lib/format";
 
@@ -19,26 +19,72 @@ export function Modal({
     children: ReactNode;
     wide?: boolean;
 }) {
+    const dialogRef = useRef<HTMLDivElement>(null);
+    const titleId = useId();
+
+    // Keep the latest onClose without re-running the effect (callers often pass an inline arrow).
+    const onCloseRef = useRef(onClose);
     useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
+    useEffect(() => {
+        const dialog = dialogRef.current;
+        const previouslyFocused = document.activeElement as HTMLElement | null;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        // Move focus into the dialog: the first field if there is one, otherwise the dialog itself.
+        const firstField = dialog?.querySelector<HTMLElement>(
+            ".v-modal-body input:not([type=hidden]):not([disabled]), .v-modal-body select, .v-modal-body textarea"
+        );
+        (firstField || dialog)?.focus();
+
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") {
+                onCloseRef.current();
+                return;
+            }
+            // Keep Tab inside the dialog.
+            if (e.key !== "Tab" || !dialog) return;
+            const focusable = Array.from(
+                dialog.querySelectorAll<HTMLElement>(
+                    'a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                )
+            );
+            if (focusable.length === 0) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         };
         window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [onClose]);
+        return () => {
+            window.removeEventListener("keydown", onKey);
+            document.body.style.overflow = previousOverflow;
+            previouslyFocused?.focus?.();
+        };
+    }, []);
 
     return (
         <div className="v-modal-backdrop" onMouseDown={onClose}>
             <div
+                ref={dialogRef}
                 className={`v-modal ${wide ? "v-modal-wide" : ""}`}
                 role="dialog"
                 aria-modal="true"
-                aria-label={title}
+                aria-labelledby={titleId}
+                tabIndex={-1}
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 <header className="v-modal-header">
                     <div>
-                        <h2>{title}</h2>
+                        <h2 id={titleId}>{title}</h2>
                         {subtitle && <p>{subtitle}</p>}
                     </div>
                     <button type="button" className="v-icon-button" onClick={onClose} aria-label="Close">
@@ -54,7 +100,7 @@ export function Modal({
 export function EmptyState({ icon, title, text, action }: { icon: ReactNode; title: string; text: string; action?: ReactNode }) {
     return (
         <div className="overview-empty-state">
-            {icon}
+            <span aria-hidden="true">{icon}</span>
             <h3>{title}</h3>
             <p>{text}</p>
             {action}
@@ -89,14 +135,28 @@ export function Field({
 
 export function Alert({ kind = "error", children }: { kind?: "error" | "success" | "info"; children: ReactNode }) {
     if (!children) return null;
-    return <div className={`v-alert v-alert-${kind}`}>{children}</div>;
+    return (
+        <div className={`v-alert v-alert-${kind}`} role={kind === "error" ? "alert" : "status"}>
+            {children}
+        </div>
+    );
 }
 
 export function Spinner({ label = "Loading..." }: { label?: string }) {
     return (
-        <div className="v-loading">
-            <Loader2 size={20} className="v-spin" />
+        <div className="v-loading" role="status">
+            <Loader2 size={20} className="v-spin" aria-hidden="true" />
             <span>{label}</span>
+        </div>
+    );
+}
+
+/** Full-screen loading message, shown before a page (or the whole app) is ready. */
+export function PageLoading({ label = "Loading..." }: { label?: string }) {
+    return (
+        <div className="app-loading" role="status">
+            <div className="app-spinner" aria-hidden="true" />
+            <p>{label}</p>
         </div>
     );
 }

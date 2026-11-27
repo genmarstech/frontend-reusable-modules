@@ -23,7 +23,6 @@
     --v-blue-soft: #e8f0f7;
 }
 
-.app-loading,
 .v-loading {
     display: flex;
     align-items: center;
@@ -35,19 +34,8 @@
     font-size: 14px;
 }
 
-.app-loading {
-    min-height: 100vh;
-    flex-direction: column;
-    background: var(--v-bg);
-}
-
-.app-spinner {
-    width: 28px;
-    height: 28px;
-    border: 3px solid var(--v-sage-soft);
-    border-top-color: var(--v-sage);
-    border-radius: 50%;
-    animation: v-rotate 0.8s linear infinite;
+.app-loading .v-btn {
+    margin-top: 8px;
 }
 
 .v-spin {
@@ -251,6 +239,14 @@
 
 .v-main {
     min-width: 0;
+}
+
+.v-business-switch-text {
+    min-width: 0;
+}
+
+.v-nav-backdrop {
+    display: none;
 }
 
 .v-mobile-bar {
@@ -1120,11 +1116,25 @@
         z-index: 40;
         width: 268px;
         transform: translateX(-100%);
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .v-shell.nav-open .v-sidebar {
+        transform: none;
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
     }
 
-    .v-shell.nav-open .v-sidebar { transform: none; }
+    .v-nav-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 35;
+        display: block;
+        padding: 0;
+        border: none;
+        background: rgba(38, 51, 44, 0.28);
+        cursor: pointer;
+        animation: v-fade-in 0.15s ease;
+    }
 
     .v-mobile-bar {
         position: sticky;
@@ -1149,12 +1159,59 @@
 }
 
 @media (max-width: 560px) {
-    .v-kpis { grid-template-columns: 1fr; }
+    .v-kpis { gap: 10px; }
+    .v-kpi { padding: 16px; }
+    .v-kpi h3 { font-size: 23px; }
+    .overview-section-heading { align-items: flex-start; }
     .dashboard-overview { padding: 20px 16px !important; }
     .dashboard-overview-header { flex-direction: column; align-items: flex-start !important; gap: 14px; }
+}
+
+@media (max-width: 360px) {
+    .v-kpis { grid-template-columns: 1fr; }
+}
+
+/* ---------- Accessibility ---------- */
+
+@keyframes v-fade-in {
+    from { opacity: 0; }
+}
+
+/* A clear keyboard focus ring that matches the sage accent. Mouse clicks do not show it. */
+.v-shell :is(a, button, [role="button"], summary):focus-visible,
+.bk-page :is(a, button, [role="button"], summary):focus-visible,
+.v-modal :is(a, button, [role="button"]):focus-visible {
+    outline: 2px solid var(--v-sage);
+    outline-offset: 2px;
+}
+
+.v-field input[type="checkbox"]:focus-visible,
+.v-field input[type="radio"]:focus-visible {
+    outline: 2px solid var(--v-sage);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .v-shell *,
+    .v-shell *::before,
+    .v-shell *::after,
+    .bk-page *,
+    .v-modal {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+
+    .v-spin,
+    .app-spinner {
+        animation-duration: 1.6s !important;
+    }
 }
 
 @media print {
     .v-sidebar, .v-mobile-bar, .v-header-actions, .v-filters { display: none !important; }
     .v-shell { display: block; }
+}
+
+.v-modal:focus {
+    outline: none;
 }

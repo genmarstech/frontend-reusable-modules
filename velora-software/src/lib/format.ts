@@ -127,6 +127,30 @@ export const CHANNEL_LABELS: Record<string, string> = {
     push: "Push",
 };
 
+/** Where a booking came from (Booking.channel on the API). */
+export const BOOKING_CHANNEL_LABELS: Record<string, string> = {
+    online: "Online booking page",
+    walk_in: "Walk-in",
+    phone: "Phone",
+    staff: "Added by staff",
+    unknown: "Not recorded",
+    "": "Not recorded",
+};
+
+/** Turns an API value such as "bank_transfer" into "Bank transfer". */
+export function humanize(value: string | null | undefined): string {
+    if (!value) return "Not recorded";
+    const text = value.replace(/[_-]+/g, " ").trim();
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** "2026-11-27" -> "27 Nov". */
+export function shortDate(isoDate: string): string {
+    const [y, m, d] = isoDate.split("-").map(Number);
+    if (!y || !m || !d) return isoDate;
+    return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+}
+
 export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export function shortTime(value: string | null | undefined): string {

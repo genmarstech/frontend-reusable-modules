@@ -1,6 +1,3 @@
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap');
-
 :root {
   --velora-bg: #f8f7f2;
   --velora-white: #ffffff;
@@ -9,26 +6,6 @@
   --velora-green-dark: #3e5948;
   --velora-muted: #858b83;
   --velora-border: #e8e8df;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  font-family: 'DM Sans', sans-serif;
-  background: var(--velora-bg);
-  color: var(--velora-dark);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }
 
 .velora-home {

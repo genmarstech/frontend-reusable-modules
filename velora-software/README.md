@@ -41,3 +41,11 @@ and DELETE. If Django rejects a token, it refreshes it and retries once. Call th
 Pages keep the existing look: cream background (`#f8f7f2`), deep green text and buttons, sage accents,
 DM Sans with Playfair Display headings. Shared dashboard styles are in `src/styles/dashboard.css`;
 the customer pages use `src/styles/booking.css`.
+
+- App-wide basics (box sizing, body colour, the full-page loading screen) live in `src/index.css`.
+- Fonts are loaded once from `index.html`.
+- Pages are code-split, but every stylesheet is imported up front in `src/main.tsx` in a fixed order.
+  Some pages share class names (for example `.velora-logo`), so keep that order when adding a stylesheet.
+- Shared building blocks are in `src/components/ui.tsx`: `Modal` (Escape, focus kept inside, page scroll
+  locked), `Spinner`, `PageLoading`, `EmptyState`, `Alert`, `Field`, `PageHeader` and `Section`.
+- Use `BOOKING_CHANNEL_LABELS` and `humanize()` from `src/lib/format.ts` rather than showing raw API values.
