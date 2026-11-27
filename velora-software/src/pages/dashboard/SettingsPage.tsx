@@ -22,30 +22,109 @@ function SettingsPage() {
     );
 }
 
+const SLUG_HINT = "Lowercase letters, numbers and hyphens, e.g. glow-salon.";
+
+function toSlug(value: string) {
+    return value
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+/, "")
+        .slice(0, 80);
+}
+
 function BookingLinkSection() {
-    const { business } = useDashboard();
-    const url = publicBookingUrl(business.id);
+    const { business, setBusiness } = useDashboard();
+    const url = publicBookingUrl(business.slug);
+    const prefix = `${window.location.host}/book/`;
     const [copied, setCopied] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [slug, setSlug] = useState(business.slug);
+    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
+    const [saving, setSaving] = useState(false);
+
+    const save = async (e: FormEvent) => {
+        e.preventDefault();
+        const value = slug.replace(/-+$/, "");
+        setError("");
+        setMessage("");
+        if (value === business.slug) {
+            setEditing(false);
+            return;
+        }
+        setSaving(true);
+        try {
+            const updated = await updateBusiness(business.id, { slug: value });
+            setBusiness(updated);
+            setSlug(updated.slug);
+            setEditing(false);
+            setMessage("Booking link updated. Links you shared with the old name no longer work, so share the new one.");
+        } catch (err) {
+            setError(fieldErrorsFrom(err).slug || handleApiError(err).message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
         <Section title="Your booking page" text="Share this link on WhatsApp, Instagram or your website. Add ?source=instagram to track where bookings come from.">
-            <div className="v-copy-box">
-                <input className="v-input" readOnly value={url} onFocus={(e) => e.target.select()} />
-                <button
-                    className="v-btn"
-                    onClick={async () => {
-                        try {
-                            await navigator.clipboard.writeText(url);
-                            setCopied(true);
-                            setTimeout(() => setCopied(false), 1500);
-                        } catch {
-                            /* the field is selectable as a fallback */
-                        }
-                    }}
-                >
-                    {copied ? "Copied" : "Copy"}
-                </button>
-                <a className="v-btn v-btn-ghost" href={url} target="_blank" rel="noreferrer">Open</a>
-            </div>
+            <Alert kind="success">{message}</Alert>
+            {editing ? (
+                <form onSubmit={save}>
+                    <Field label="Booking link" error={error} hint={SLUG_HINT}>
+                        <div className="v-slug-input">
+                            <span>{prefix}</span>
+                            <input
+                                value={slug}
+                                onChange={(e) => setSlug(toSlug(e.target.value))}
+                                minLength={3}
+                                maxLength={80}
+                                required
+                                autoFocus
+                                aria-label="Booking link name"
+                            />
+                        </div>
+                    </Field>
+                    <div className="v-form-actions">
+                        <button
+                            type="button"
+                            className="v-btn v-btn-ghost"
+                            onClick={() => {
+                                setEditing(false);
+                                setSlug(business.slug);
+                                setError("");
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button className="v-btn" disabled={saving}>{saving ? "Saving..." : "Save link"}</button>
+                    </div>
+                </form>
+            ) : (
+                <div className="v-copy-box">
+                    <input className="v-input" readOnly value={url} onFocus={(e) => e.target.select()} />
+                    <button
+                        className="v-btn"
+                        onClick={async () => {
+                            try {
+                                await navigator.clipboard.writeText(url);
+                                setCopied(true);
+                                setTimeout(() => setCopied(false), 1500);
+                            } catch {
+                                /* the field is selectable as a fallback */
+                            }
+                        }}
+                    >
+                        {copied ? "Copied" : "Copy"}
+                    </button>
+                    <a className="v-btn v-btn-ghost" href={url} target="_blank" rel="noreferrer">Open</a>
+                    <button type="button" className="v-btn v-btn-ghost" onClick={() => { setEditing(true); setMessage(""); }}>
+                        Edit
+                    </button>
+                </div>
+            )}
         </Section>
     );
 }

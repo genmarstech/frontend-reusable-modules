@@ -307,6 +307,7 @@ export interface PublicStaff {
 
 export interface PublicBusiness {
     id: number;
+    slug: string;
     business_name: string;
     business_description: string;
     business_category: string;
@@ -341,6 +342,7 @@ export interface PublicBooking {
     staff_name: string | null;
     customer_name: string;
     business_id: number;
+    business_slug: string;
     business_name: string;
     start: string;
     end: string;

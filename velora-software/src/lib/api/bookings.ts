@@ -222,8 +222,9 @@ export const downloadAnalyticsCsv = async (
 // Public booking API (no login)
 // ------------------------------------------------------------------
 
-export const getPublicBusiness = async (businessId: number) =>
-    (await backendClient.get<PublicBusiness>(`bk/public/${businessId}/`)).data;
+/** `businessRef` is the booking-link slug (glow-salon) or, for older links, the numeric id. */
+export const getPublicBusiness = async (businessRef: string | number) =>
+    (await backendClient.get<PublicBusiness>(`bk/public/${encodeURIComponent(String(businessRef))}/`)).data;
 
 export const getPublicAvailability = async (
     businessId: number,
@@ -286,6 +287,7 @@ export const confirmManagedBooking = async (token: string) =>
 export const updateManagedPreferences = async (token: string, prefs: Record<string, boolean>) =>
     (await backendClient.post<Record<string, boolean>>(`bk/public/manage/${token}/preferences/`, prefs)).data;
 
-export const publicBookingUrl = (businessId: number) => `${window.location.origin}/book/${businessId}`;
+/** Public booking link, e.g. https://getvelora.co.ke/book/glow-salon */
+export const publicBookingUrl = (slug: string) => `${window.location.origin}/book/${slug}`;
 export const mediaUrl = (path: string | null) =>
     !path ? null : path.startsWith("http") ? path : `${API_URL.replace(/\/$/, "")}${path}`;

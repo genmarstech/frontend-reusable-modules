@@ -1,6 +1,8 @@
 export interface Business {
     id: number;
     business_name: string;
+    /** Booking link: /book/<slug> */
+    slug: string;
     business_description: string;
     business_category: string;
     business_category_label?: string;

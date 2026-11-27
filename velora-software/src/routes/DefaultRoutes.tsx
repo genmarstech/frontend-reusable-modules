@@ -27,7 +27,7 @@ function DefaultRoutes() {
       <Route path="/register" element={<Register />} />
 
       {/* Customer-facing, no account needed */}
-      <Route path="/book/:businessId" element={<BookingPage />} />
+      <Route path="/book/:businessRef" element={<BookingPage />} />
       <Route path="/manage/:token" element={<ManageBooking />} />
 
       <Route element={<ProtectedRoute />}>

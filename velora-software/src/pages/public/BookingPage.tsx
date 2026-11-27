@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link, useParams, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { CalendarCheck2, Loader2 } from "lucide-react";
 
 import {
@@ -50,8 +50,13 @@ function detectSource(param: string | null): string {
 type Step = "service" | "staff" | "time" | "details" | "done";
 
 function BookingPage() {
-    const { businessId } = useParams<{ businessId: string }>();
-    const id = Number(businessId);
+    // The link is /book/<slug>; older /book/<id> links still load and are
+    // swapped for the slug in the address bar.
+    const { businessRef = "" } = useParams<{ businessRef: string }>();
+    const ref = businessRef.trim().toLowerCase();
+    const validRef = /^[a-z0-9-]+$/.test(ref);
+    const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams] = useSearchParams();
     const sessionKey = useMemo(() => getSessionKey(), []);
     const source = useMemo(() => detectSource(searchParams.get("source")), [searchParams]);
@@ -75,14 +80,25 @@ function BookingPage() {
     const [waitlisted, setWaitlisted] = useState(false);
 
     useEffect(() => {
-        if (!Number.isInteger(id) || id <= 0) return;
-        getPublicBusiness(id)
+        if (!validRef) return;
+        let active = true;
+        getPublicBusiness(ref)
             .then((b) => {
+                if (!active) return;
                 setBusiness(b);
-                trackFunnel(id, "page_view", sessionKey, source);
+                trackFunnel(b.id, "page_view", sessionKey, source);
             })
-            .catch(() => setLoadError("This booking page could not be found."));
-    }, [id, sessionKey, source]);
+            .catch(() => active && setLoadError("This booking page could not be found."));
+        return () => {
+            active = false;
+        };
+    }, [ref, validRef, sessionKey, source]);
+
+    useEffect(() => {
+        if (business?.slug && businessRef !== business.slug) {
+            navigate(`/book/${business.slug}${location.search}`, { replace: true });
+        }
+    }, [business, businessRef, location.search, navigate]);
 
     const timeZone = business?.policy.timezone || "Africa/Nairobi";
 
@@ -123,7 +139,7 @@ function BookingPage() {
         };
     }, [business, service, staffId, date, step]);
 
-    if (loadError || !Number.isInteger(id) || id <= 0) {
+    if (loadError || !validRef) {
         return (
             <main className="bk-page">
                 <div className="app-loading">
