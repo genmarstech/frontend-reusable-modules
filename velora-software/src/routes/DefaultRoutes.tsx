@@ -1,23 +1,26 @@
+import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router"
-import Home from "../pages/Home"
-import Login from "../pages/Login"
-import Register from "../pages/Register"
-import BusinessOnboarding from "../pages/BusinessOnboarding"
 import ProtectedRoute from "../components/ProtectedRoutes"
-import BusinessSelection from "../pages/BusinessSelection"
-import DashboardOverview from "../pages/DashboardOverview"
-import DashboardLayout from "../pages/dashboard/DashboardLayout"
-import BookingsPage from "../pages/dashboard/BookingsPage"
-import CustomersPage from "../pages/dashboard/CustomersPage"
-import ServicesPage from "../pages/dashboard/ServicesPage"
-import TeamPage from "../pages/dashboard/TeamPage"
-import SchedulePage from "../pages/dashboard/SchedulePage"
-import NotificationsPage from "../pages/dashboard/NotificationsPage"
-import AnalyticsPage from "../pages/dashboard/AnalyticsPage"
-import SettingsPage from "../pages/dashboard/SettingsPage"
-import BookingPage from "../pages/public/BookingPage"
-import ManageBooking from "../pages/public/ManageBooking"
-import NotFound from "../pages/NotFound"
+
+// Each page loads on demand, so the landing and booking pages stay light.
+const Home = lazy(() => import("../pages/Home"))
+const Login = lazy(() => import("../pages/Login"))
+const Register = lazy(() => import("../pages/Register"))
+const BusinessOnboarding = lazy(() => import("../pages/BusinessOnboarding"))
+const BusinessSelection = lazy(() => import("../pages/BusinessSelection"))
+const DashboardOverview = lazy(() => import("../pages/DashboardOverview"))
+const DashboardLayout = lazy(() => import("../pages/dashboard/DashboardLayout"))
+const BookingsPage = lazy(() => import("../pages/dashboard/BookingsPage"))
+const CustomersPage = lazy(() => import("../pages/dashboard/CustomersPage"))
+const ServicesPage = lazy(() => import("../pages/dashboard/ServicesPage"))
+const TeamPage = lazy(() => import("../pages/dashboard/TeamPage"))
+const SchedulePage = lazy(() => import("../pages/dashboard/SchedulePage"))
+const NotificationsPage = lazy(() => import("../pages/dashboard/NotificationsPage"))
+const AnalyticsPage = lazy(() => import("../pages/dashboard/AnalyticsPage"))
+const SettingsPage = lazy(() => import("../pages/dashboard/SettingsPage"))
+const BookingPage = lazy(() => import("../pages/public/BookingPage"))
+const ManageBooking = lazy(() => import("../pages/public/ManageBooking"))
+const NotFound = lazy(() => import("../pages/NotFound"))
 
 function DefaultRoutes() {
   return (

@@ -280,37 +280,6 @@
     line-height: 1;
 }
 
-.business-empty-state {
-    text-align: center;
-    max-width: 480px;
-    margin: 90px auto;
-    padding: 30px;
-}
-
-.business-empty-icon {
-    width: 65px;
-    height: 65px;
-    display: grid;
-    place-items: center;
-    margin: 0 auto 20px;
-    border-radius: 50%;
-    background: #e9eee6;
-    color: #627c69;
-    font-size: 28px;
-}
-
-.business-empty-state h2 {
-    font-family: "Playfair Display", serif;
-    color: #202b26;
-    font-size: 28px;
-}
-
-.business-empty-state p {
-    color: #777d75;
-    line-height: 1.7;
-    margin-bottom: 25px;
-}
-
 .business-logo-placeholder {
     width: 65px;
     height: 65px;
@@ -346,7 +315,4 @@
         width: 100%;
     }
 
-    .business-empty-state {
-        margin: 45px auto;
-    }
 }

@@ -3,7 +3,7 @@ import { Download, Printer } from "lucide-react";
 
 import { downloadAnalyticsCsv, getAnalytics } from "../../lib/api/bookings";
 import { handleApiError } from "../../lib/api/handleErrors";
-import { addDays, formatMoney, todayIn } from "../../lib/format";
+import { addDays, BOOKING_CHANNEL_LABELS, formatMoney, humanize, shortDate, todayIn } from "../../lib/format";
 import type { AnalyticsReport } from "../../types/bookings";
 import { Alert, Field, PageHeader, Section, Spinner } from "../../components/ui";
 import { useDashboard } from "./dashboard-context";
@@ -74,6 +74,7 @@ function AnalyticsPage() {
     };
 
     const r = report;
+    const trendMax = r ? Math.max(1, ...r.bookings.trend.map((x) => x.bookings)) : 1;
 
     return (
         <div className="dashboard-overview">
@@ -130,14 +131,18 @@ function AnalyticsPage() {
                         <Kpi label="Staff occupancy" value={`${r.capacity.occupancy_pct}%`} note={`${r.capacity.idle_hours} idle hours`} />
                     </div>
 
-                    <Section title="Bookings per day" badge={`${r.range.date_from} to ${r.range.date_to}`}>
-                        <div className="v-columns">
-                            {r.bookings.trend.map((d) => {
-                                const max = Math.max(1, ...r.bookings.trend.map((x) => x.bookings));
-                                return <div key={d.date} className="v-column" title={`${d.date}: ${d.bookings}`} style={{ height: `${Math.max((d.bookings / max) * 100, d.bookings ? 4 : 1)}%` }} />;
-                            })}
+                    <Section title="Bookings per day" badge={`${shortDate(r.range.date_from)} – ${shortDate(r.range.date_to)}`}>
+                        <div className="v-columns" role="img" aria-label={`Bookings per day from ${shortDate(r.range.date_from)} to ${shortDate(r.range.date_to)}`}>
+                            {r.bookings.trend.map((d) => (
+                                <div
+                                    key={d.date}
+                                    className="v-column"
+                                    title={`${shortDate(d.date)}: ${d.bookings} booking${d.bookings === 1 ? "" : "s"}`}
+                                    style={{ height: `${Math.max((d.bookings / trendMax) * 100, d.bookings ? 4 : 1)}%` }}
+                                />
+                            ))}
                         </div>
-                        <div className="v-axis"><span>{r.range.date_from}</span><span>{r.range.date_to}</span></div>
+                        <div className="v-axis"><span>{shortDate(r.range.date_from)}</span><span>{shortDate(r.range.date_to)}</span></div>
                     </Section>
 
                     <div className="v-two-col">
@@ -146,7 +151,7 @@ function AnalyticsPage() {
                             {r.funnel.by_source.length > 0 && (
                                 <>
                                     <h3 className="v-subheading">By source</h3>
-                                    <Bars rows={r.funnel.by_source.map((s) => ({ label: s.source, value: s.conversion_pct }))} format={(v) => `${v}%`} />
+                                    <Bars rows={r.funnel.by_source.map((s) => ({ label: humanize(s.source), value: s.conversion_pct }))} format={(v) => `${v}%`} />
                                 </>
                             )}
                         </Section>
@@ -160,7 +165,7 @@ function AnalyticsPage() {
                                 <div><dt>No-shows without reminder</dt><dd>{r.attendance.reminder_effectiveness.no_show_rate_without_reminder_pct}%</dd></div>
                             </dl>
                             <h3 className="v-subheading">Booked through</h3>
-                            <Bars rows={Object.entries(r.bookings.by_channel).map(([k, v]) => ({ label: k.replace("_", " "), value: v }))} />
+                            <Bars rows={Object.entries(r.bookings.by_channel).map(([k, v]) => ({ label: BOOKING_CHANNEL_LABELS[k] || humanize(k), value: v }))} />
                         </Section>
                     </div>
 
@@ -219,7 +224,7 @@ function AnalyticsPage() {
                                 <div><dt>Fees collected</dt><dd>{formatMoney(r.revenue.cancellation_fees_collected)}</dd></div>
                             </dl>
                             <h3 className="v-subheading">By payment method</h3>
-                            <Bars rows={r.revenue.by_payment_method.map((x) => ({ label: x.method, value: Number(x.amount) }))} format={formatMoney} />
+                            <Bars rows={r.revenue.by_payment_method.map((x) => ({ label: humanize(x.method), value: Number(x.amount) }))} format={formatMoney} />
                             {r.revenue.by_location.length > 1 && (
                                 <>
                                     <h3 className="v-subheading">By location</h3>
@@ -237,7 +242,7 @@ function AnalyticsPage() {
                             <Kpi label="Days between visits" value={r.customers.avg_days_between_visits ?? "—"} />
                         </div>
                         <h3 className="v-subheading">How customers first found you</h3>
-                        <Bars rows={r.customers.top_channels.map((c) => ({ label: c.channel.replace("_", " "), value: c.customers }))} />
+                        <Bars rows={r.customers.top_channels.map((c) => ({ label: BOOKING_CHANNEL_LABELS[c.channel] || humanize(c.channel), value: c.customers }))} />
                     </Section>
                 </>
             )}

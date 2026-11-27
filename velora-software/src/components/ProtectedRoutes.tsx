@@ -1,17 +1,13 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import { useAuth } from "../context/auth-context";
+import { PageLoading } from "./ui";
 
 function ProtectedRoute() {
     const { isAuthenticated, loading } = useAuth();
     const location = useLocation();
 
     if (loading) {
-        return (
-            <div className="app-loading">
-                <div className="app-spinner" />
-                <p>Checking your session...</p>
-            </div>
-        );
+        return <PageLoading label="Checking your session..." />;
     }
 
     if (!isAuthenticated) {

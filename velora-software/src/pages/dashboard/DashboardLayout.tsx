@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router";
 import {
     BarChart3,
@@ -23,6 +23,7 @@ import type { BookingPolicy } from "../../types/bookings";
 import type { Service } from "../../types/services";
 import type { Staff } from "../../types/staff";
 import type { DashboardContext } from "./dashboard-context";
+import { PageLoading, Spinner } from "../../components/ui";
 
 import "../DashboardOverview.css";
 import "../../styles/dashboard.css";
@@ -76,6 +77,21 @@ function DashboardLayout() {
         };
     }, [id, validId]);
 
+    // Phone menu: close with Escape and stop the page behind it from scrolling.
+    useEffect(() => {
+        if (!navOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setNavOpen(false);
+        };
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        window.addEventListener("keydown", onKey);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener("keydown", onKey);
+        };
+    }, [navOpen]);
+
     const reloadServices = useCallback(async () => {
         setServices(await getServices(id));
     }, [id]);
@@ -102,19 +118,14 @@ function DashboardLayout() {
     if (!validId || error) {
         return (
             <div className="app-loading">
-                <p>{validId ? error : "Invalid business ID."}</p>
+                <p role="alert">{validId ? error : "That link does not point to a business."}</p>
                 <Link to="/businesses" className="v-btn">Back to your businesses</Link>
             </div>
         );
     }
 
     if (!business || !policy) {
-        return (
-            <div className="app-loading">
-                <div className="app-spinner" />
-                <p>Loading your workspace...</p>
-            </div>
-        );
+        return <PageLoading label="Loading your workspace..." />;
     }
 
     const context: DashboardContext = {
@@ -133,7 +144,15 @@ function DashboardLayout() {
 
     return (
         <div className={`v-shell ${navOpen ? "nav-open" : ""}`}>
-            <aside className="v-sidebar">
+            {navOpen && (
+                <button
+                    type="button"
+                    className="v-nav-backdrop"
+                    aria-label="Close menu"
+                    onClick={() => setNavOpen(false)}
+                />
+            )}
+            <aside className="v-sidebar" id="v-sidebar" aria-label="Dashboard navigation">
                 <Link to="/" className="v-sidebar-logo">
                     velora<span>.</span>
                 </Link>
@@ -142,7 +161,7 @@ function DashboardLayout() {
                     <div className="v-business-avatar">
                         {logo ? <img src={logo} alt="" /> : business.business_name.charAt(0).toUpperCase()}
                     </div>
-                    <div style={{ minWidth: 0 }}>
+                    <div className="v-business-switch-text">
                         <strong>{business.business_name}</strong>
                         <small>
                             {CATEGORY_LABELS[business.business_category] ||
@@ -194,12 +213,18 @@ function DashboardLayout() {
                         type="button"
                         className="v-icon-button"
                         onClick={() => setNavOpen(!navOpen)}
-                        aria-label="Open menu"
+                        aria-label={navOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={navOpen}
+                        aria-controls="v-sidebar"
                     >
                         <Menu size={18} />
                     </button>
                 </div>
-                <Outlet context={context} />
+                <main className="v-content">
+                    <Suspense fallback={<Spinner label="Loading..." />}>
+                        <Outlet context={context} />
+                    </Suspense>
+                </main>
             </div>
         </div>
     );
