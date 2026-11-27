@@ -23,6 +23,7 @@ import { handleApiError } from "../lib/api/handleErrors";
 import { useAuth } from "../context/auth-context";
 
 import "./Login.css";
+import ProductPeek from "../components/ProductPeek";
 
 // VALIDATION SCHEMA
 const loginSchema = z.object({
@@ -145,6 +146,8 @@ function Login() {
             </p>
 
           </div>
+
+          <ProductPeek />
 
           <div className="login-brand-bottom">
             <div className="login-brand-icon">

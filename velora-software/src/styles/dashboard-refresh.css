@@ -1455,3 +1455,12 @@ button.ov-slot:hover {
 @media (prefers-reduced-motion: reduce) {
     .ov-skeleton { animation: none; }
 }
+
+/* The promo photo fades into the green on its left edge, so the text stays readable. */
+.ov-promo-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #3e5948 0%, rgba(62, 89, 72, 0.55) 22%, rgba(62, 89, 72, 0) 50%);
+    pointer-events: none;
+}

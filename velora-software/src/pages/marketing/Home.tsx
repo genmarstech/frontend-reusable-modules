@@ -1,15 +1,10 @@
 import { Link } from "react-router";
-import {
-  ArrowRight,
-  CalendarDays,
-  ChartNoAxesCombined,
-  Sparkles,
-  ShieldCheck,
-  Check
-} from "lucide-react";
+import { ArrowRight, Banknote, Cross, Play, Scissors, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import { BookingArt, ClientsArt, PhoneBookingArt, SuccessArt } from "../../components/Illustrations";
 import { usePageMeta } from "../../lib/usePageMeta";
-import { INDUSTRIES } from "./content";
+import { PHOTOS } from "../../lib/photos";
+import { LeafSpray } from "../../components/Decor";
+import { BrushStroke, Lotus, Razor, SpaProps } from "./art";
 import { FinalCta } from "./parts";
 
 const EXPLORE = [
@@ -25,134 +20,90 @@ function Home() {
   return (
     <>
       {/* HERO */}
-      <section className="hero-section">
-        <div className="hero-content">
-
-          <div className="hero-label">
-            <Sparkles size={15} aria-hidden="true" />
-            <span>Business management, reimagined</span>
+      <section className="hero2">
+        <div className="hero2-content">
+          <div className="hero2-tag">
+            <Sparkles size={16} aria-hidden="true" />
+            <span>The complete salon &amp; beauty business solution</span>
           </div>
 
           <h1>
-            Beautifully managed.
+            Beautifully
             <br />
-            <span>Effortlessly organised.</span>
+            managed.
+            <span className="hero2-accent">
+              Effortlessly organised.
+              <BrushStroke />
+            </span>
           </h1>
 
-          <p className="hero-description">
-            Velora is the booking and appointments platform for salons,
-            barbershops, spas and beauty professionals. Clients book online,
-            reminders go out on their own, and your whole day sits in one calm place.
+          <p className="hero2-description">
+            Run your beauty business with less effort. Manage appointments, services, staff and
+            clients, while giving your customers a seamless way to discover and book your
+            services online.
           </p>
 
-          <div className="hero-actions">
-            <Link to="/register" className="primary-button">
+          <div className="hero2-actions">
+            <Link to="/register" className="hero2-primary">
               Get started for free <ArrowRight size={18} aria-hidden="true" />
             </Link>
-
-            <Link to="/features" className="secondary-button">
-              Explore the platform
+            <Link to="/how-it-works" className="hero2-secondary">
+              <span className="hero2-play" aria-hidden="true">
+                <Play size={15} />
+              </span>
+              See how it works
             </Link>
           </div>
 
-          <div className="hero-trust">
-            <ShieldCheck size={18} aria-hidden="true" />
-            <span>One platform. Your entire business.</span>
-          </div>
+          <ul className="hero2-trust">
+            <li>
+              <ShieldCheck aria-hidden="true" /> Secure sign-in
+            </li>
+            <li>
+              <Zap aria-hidden="true" /> Set up in minutes
+            </li>
+            <li>
+              <Banknote aria-hidden="true" /> Prices in KES
+            </li>
+          </ul>
         </div>
 
-        {/* PRODUCT PREVIEW */}
-        <div className="hero-preview" role="img" aria-label="A preview of the Velora dashboard showing today’s bookings, client count and upcoming appointments">
-          <div className="preview-window">
-
-            <div className="preview-header">
-              <div>
-                <span className="preview-overline">BUSINESS OVERVIEW</span>
-                <h3>Good morning, Wanjiru</h3>
-                <p>Here's what's happening today.</p>
-              </div>
-              <div className="preview-avatar" aria-hidden="true">W</div>
-            </div>
-
-            <div className="preview-stats">
-              <div className="stat-card">
-                <span>Appointments</span>
-                <strong>24</strong>
-                <small>Today's bookings</small>
-              </div>
-              <div className="stat-card">
-                <span>Total clients</span>
-                <strong>186</strong>
-                <small>Client records</small>
-              </div>
-            </div>
-
-            <div className="preview-appointments">
-              <div className="preview-section-heading">
-                <strong>Upcoming appointments</strong>
-                <span>View all</span>
-              </div>
-
-              <div className="appointment-row">
-                <div className="appointment-time">09:00</div>
-                <div className="appointment-details">
-                  <strong>Silk press</strong>
-                  <span>Amina Hassan</span>
-                </div>
-                <span className="appointment-status">Confirmed</span>
-              </div>
-
-              <div className="appointment-row">
-                <div className="appointment-time">10:30</div>
-                <div className="appointment-details">
-                  <strong>Signature facial</strong>
-                  <span>Njeri Mwangi</span>
-                </div>
-                <span className="appointment-status">Confirmed</span>
-              </div>
-
-              <div className="appointment-row">
-                <div className="appointment-time">12:00</div>
-                <div className="appointment-details">
-                  <strong>Gel manicure</strong>
-                  <span>Faith Wambui</span>
-                </div>
-                <span className="appointment-status">Pending</span>
-              </div>
-            </div>
-
-            <div className="preview-footer">
-              <Check size={15} />
-              Your business is looking organised.
-            </div>
-          </div>
-
-          <div className="floating-card floating-card-top">
-            <span className="floating-icon"><CalendarDays size={18} /></span>
-            <div>
-              <strong>Appointment booked!</strong>
-              <small>A new client just scheduled.</small>
-            </div>
-          </div>
-
-          <div className="floating-card floating-card-bottom">
-            <span className="floating-icon"><ChartNoAxesCombined size={18} /></span>
-            <div>
-              <strong>Stay in control</strong>
-              <small>Your business, at a glance.</small>
-            </div>
-          </div>
+        <div className="hero2-visual">
+          <div className="hero2-sun" aria-hidden="true" />
+          <LeafSpray className="hero2-leaves" />
+          <figure className="hero2-device">
+            <img
+              src={PHOTOS.product}
+              alt="The Velora dashboard: today’s bookings, the day’s schedule, latest bookings, setup progress and business performance"
+              width={1800}
+              height={1013}
+              fetchPriority="high"
+            />
+          </figure>
+          {PHOTOS.heroProps ? (
+            <img className="hero2-props" src={PHOTOS.heroProps} alt="" />
+          ) : (
+            <SpaProps />
+          )}
         </div>
       </section>
 
-      {/* INDUSTRY STRIP */}
-      <section className="industry-strip">
-        <p>BUILT FOR THE BUSINESSES THAT HELP PEOPLE FEEL THEIR BEST</p>
-        <div className="industry-list">
-          {INDUSTRIES.map((industry) => (
-            <span key={industry.name}>{industry.name}</span>
-          ))}
-        </div>
+      {/* WHO IT'S FOR */}
+      <section className="hero2-strip" aria-label="Who Velora is for">
+        <p>
+          Made for forward-thinking
+          <br />
+          beauty businesses
+        </p>
+        <ul>
+          <li><Scissors aria-hidden="true" /> Salons</li>
+          <li><Razor /> Barbershops</li>
+          <li><Lotus /> Spas</li>
+          <li><Cross aria-hidden="true" /> Beauty Clinics</li>
+        </ul>
+        <Link to="/solutions" className="hero2-learn">
+          Learn more <ArrowRight size={16} aria-hidden="true" />
+        </Link>
       </section>
 
       {/* EXPLORE: each part of the site has its own page */}

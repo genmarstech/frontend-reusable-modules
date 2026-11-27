@@ -35,3 +35,9 @@ staff or reviews.
 
 Photographer names were taken from Pexels listings for these photos or for the same
 photo series. Check the linked page if you need the exact credit.
+
+## Our own images
+
+| File | Source |
+| --- | --- |
+| `product/dashboard-overview.webp` | Screenshot of the Velora dashboard with made-up demo data (no real customers). Retake it when the dashboard changes. |

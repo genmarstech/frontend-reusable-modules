@@ -1,8 +1,8 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { Link, NavLink, useLocation } from "react-router";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { Logo } from "./Brand";
-import { NAV_PAGES } from "../pages/marketing/content";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { FEATURES, INDUSTRIES, NAV_PAGES, slugify } from "../pages/marketing/content";
 
 /** Becomes "scrolled" once the page moves, so the bar gains a border and tightens up. */
 function useScrolled(offset = 8): boolean {
@@ -16,17 +16,41 @@ function useScrolled(offset = 8): boolean {
     return scrolled;
 }
 
+/** The two menus in the bar: what Velora does, and who it is for. */
+const MENUS: Record<string, { to: string; label: string; text: string; icon?: typeof FEATURES[number]["icon"] }[]> = {
+    "/features": FEATURES.map((f) => ({ to: `/features#${slugify(f.title)}`, label: f.title, text: f.summary, icon: f.icon })),
+    "/solutions": INDUSTRIES.map((i) => ({ to: `/solutions#${slugify(i.name)}`, label: i.name, text: i.text })),
+};
+
 function SiteHeader() {
     const scrolled = useScrolled();
     const { pathname } = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [dropdown, setDropdown] = useState<string | null>(null);
+    const navRef = useRef<HTMLElement>(null);
 
-    // Moving to another page closes the phone menu.
+    // Moving to another page closes the phone menu and any open dropdown.
     const [menuPath, setMenuPath] = useState(pathname);
     if (menuPath !== pathname) {
         setMenuPath(pathname);
         setMenuOpen(false);
+        setDropdown(null);
     }
+
+    // Dropdowns close on Escape or a click elsewhere.
+    useEffect(() => {
+        if (!dropdown) return;
+        const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDropdown(null);
+        const onDown = (e: PointerEvent) => {
+            if (navRef.current && !navRef.current.contains(e.target as Node)) setDropdown(null);
+        };
+        window.addEventListener("keydown", onKey);
+        document.addEventListener("pointerdown", onDown);
+        return () => {
+            window.removeEventListener("keydown", onKey);
+            document.removeEventListener("pointerdown", onDown);
+        };
+    }, [dropdown]);
 
     // Phone menu: Escape closes it, the page behind does not scroll,
     // and it closes by itself if the window grows to desktop width.
@@ -35,7 +59,7 @@ function SiteHeader() {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") setMenuOpen(false);
         };
-        const desktop = window.matchMedia("(min-width: 769px)");
+        const desktop = window.matchMedia("(min-width: 961px)");
         const onResize = () => {
             if (desktop.matches) setMenuOpen(false);
         };
@@ -50,7 +74,10 @@ function SiteHeader() {
         };
     }, [menuOpen]);
 
-    const close = () => setMenuOpen(false);
+    const close = () => {
+        setMenuOpen(false);
+        setDropdown(null);
+    };
 
     const backToTop = (e: MouseEvent<HTMLAnchorElement>) => {
         // Already on the home page: glide back up instead of reloading it.
@@ -71,19 +98,62 @@ function SiteHeader() {
                     Skip to content
                 </a>
 
-                <nav className="velora-nav" aria-label="Main">
+                <nav className="velora-nav" aria-label="Main" ref={navRef}>
                     <Link to="/" className="velora-logo" onClick={backToTop} aria-label="Velora home">
                         <Logo />
                     </Link>
 
                     <ul className="nav-links">
-                        {NAV_PAGES.map((page) => (
-                            <li key={page.to}>
-                                <NavLink to={page.to} className={linkClass}>
-                                    {page.label}
-                                </NavLink>
-                            </li>
-                        ))}
+                        {NAV_PAGES.map((page) => {
+                            const items = MENUS[page.to];
+                            if (!items) {
+                                return (
+                                    <li key={page.to}>
+                                        <NavLink to={page.to} className={linkClass}>
+                                            {page.label}
+                                        </NavLink>
+                                    </li>
+                                );
+                            }
+                            const open = dropdown === page.to;
+                            const id = `menu-${page.to.slice(1)}`;
+                            return (
+                                <li key={page.to} className="nav-dropdown">
+                                    <button
+                                        type="button"
+                                        className={`nav-dropdown-toggle ${pathname === page.to ? "is-active" : ""}`}
+                                        aria-expanded={open}
+                                        aria-controls={id}
+                                        onClick={() => setDropdown(open ? null : page.to)}
+                                    >
+                                        {page.label} <ChevronDown size={15} aria-hidden="true" />
+                                    </button>
+                                    <div id={id} className="nav-dropdown-panel" hidden={!open}>
+                                        <ul>
+                                            {items.map((item) => (
+                                                <li key={item.to}>
+                                                    <Link to={item.to} onClick={close}>
+                                                        {item.icon && (
+                                                            <span className="nav-dropdown-icon" aria-hidden="true">
+                                                                <item.icon />
+                                                            </span>
+                                                        )}
+                                                        <span>
+                                                            <strong>{item.label}</strong>
+                                                            <small>{item.text}</small>
+                                                        </span>
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <Link to={page.to} className="nav-dropdown-all" onClick={close}>
+                                            {page.to === "/features" ? "See all features" : "See how Velora fits your business"}{" "}
+                                            <ArrowRight size={15} aria-hidden="true" />
+                                        </Link>
+                                    </div>
+                                </li>
+                            );
+                        })}
                     </ul>
 
                     <div className="nav-actions">

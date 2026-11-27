@@ -1,6 +1,7 @@
 import { HeartHandshake, Leaf, MessageCircle } from "lucide-react";
 import { SuccessArt } from "../../components/Illustrations";
 import { usePageMeta } from "../../lib/usePageMeta";
+import { PHOTOS } from "../../lib/photos";
 import { FinalCta, PageIntro } from "./parts";
 
 const VALUES = [
@@ -32,6 +33,7 @@ function About() {
                 accent="that help people feel their best."
                 text="Salons, barbershops, spas and independent professionals do skilled, personal work. Too much of their day still goes on phone calls, paper diaries and chasing no-shows. Velora takes that on, so they can get back to their clients."
                 art={SuccessArt}
+                photo={PHOTOS.aboutStudio}
             />
 
             <section className="features-section about-values">

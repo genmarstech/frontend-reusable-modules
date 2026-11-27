@@ -908,7 +908,7 @@
 
 /* RESPONSIVENESS */
 
-@media (min-width: 769px) {
+@media (min-width: 961px) {
   .mobile-panel,
   .mobile-scrim {
     display: none;
@@ -929,7 +929,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .velora-nav {
     padding: 20px 6%;
   }
