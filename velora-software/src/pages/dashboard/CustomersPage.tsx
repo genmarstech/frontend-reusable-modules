@@ -60,7 +60,7 @@ function CustomersPage() {
                 </Field>
             </div>
             <Alert>{error}</Alert>
-            <Section title="Customer list" badge={customers ? `${customers.length} customers` : undefined}>
+            <Section title="Customer list" badge={customers ? `${customers.length} ${customers.length === 1 ? "customer" : "customers"}` : undefined}>
                 {customers === null ? (
                     <Spinner />
                 ) : customers.length === 0 ? (

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { getBusiness, getBusinessStaff, getServices } from "../../lib/api/auth";
-import { getPolicy, mediaUrl, publicBookingUrl } from "../../lib/api/bookings";
+import { getBookings, getBookingsSeenAt, getPolicy, mediaUrl, publicBookingUrl } from "../../lib/api/bookings";
 import { useAuth } from "../../context/auth-context";
 import type { Business } from "../../types/business";
 import { CATEGORY_LABELS } from "../../types/business";
@@ -56,6 +56,7 @@ function DashboardLayout() {
     const [error, setError] = useState("");
     const [navOpen, setNavOpen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [newBookings, setNewBookings] = useState(0);
 
     useEffect(() => {
         if (!validId) return;
@@ -74,6 +75,27 @@ function DashboardLayout() {
             });
         return () => {
             active = false;
+        };
+    }, [id, validId]);
+
+    // Badge on "Bookings": online bookings made since the owner last looked.
+    useEffect(() => {
+        if (!validId) return;
+        let active = true;
+        const check = () => {
+            const since = getBookingsSeenAt(id) || new Date(Date.now() - 7 * 86400000).toISOString();
+            getBookings(id, { channel: "online", booked_since: since, limit: 100 })
+                .then((rows) => active && setNewBookings(rows.length))
+                .catch(() => undefined);
+        };
+        check();
+        const timer = setInterval(check, 60_000);
+        const onSeen = () => setNewBookings(0);
+        window.addEventListener("velora:bookings-seen", onSeen);
+        return () => {
+            active = false;
+            clearInterval(timer);
+            window.removeEventListener("velora:bookings-seen", onSeen);
         };
     }, [id, validId]);
 
@@ -181,6 +203,11 @@ function DashboardLayout() {
                             <NavLink key={item.to} to={item.to}>
                                 <item.icon />
                                 {item.label}
+                                {item.to === "bookings" && newBookings > 0 && (
+                                    <span className="v-nav-badge" aria-label={`${newBookings} new`}>
+                                        {newBookings > 99 ? "99+" : newBookings}
+                                    </span>
+                                )}
                             </NavLink>
                         )
                     )}

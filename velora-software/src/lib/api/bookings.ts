@@ -89,6 +89,32 @@ export interface BookingFilters {
     service?: number | string;
     customer?: number | string;
     search?: string;
+    channel?: string;
+    /** ISO date-time: only bookings made since then. */
+    booked_since?: string;
+    /** "start" (appointment time, default), "-start", or "-created_at" (newest bookings first). */
+    ordering?: "start" | "-start" | "-created_at";
+    limit?: number;
+}
+
+/** Remembers when the owner last looked at bookings, to flag new online ones. */
+const seenKey = (business: number) => `velora.bookingsSeen.${business}`;
+
+export function getBookingsSeenAt(business: number): string | null {
+    try {
+        return localStorage.getItem(seenKey(business));
+    } catch {
+        return null;
+    }
+}
+
+export function markBookingsSeen(business: number) {
+    try {
+        localStorage.setItem(seenKey(business), new Date().toISOString());
+        window.dispatchEvent(new Event("velora:bookings-seen"));
+    } catch {
+        /* storage unavailable: the badge just stays */
+    }
 }
 
 export const getBookings = async (business: number, filters: BookingFilters = {}) =>

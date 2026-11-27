@@ -193,8 +193,12 @@ function BookingPage() {
         if (!service || !slot) return;
         setErrors({});
         setError("");
-        if (!form.email.trim() && !form.phone_number.trim()) {
-            setErrors({ email: "Give an email address or a phone number so we can confirm your booking." });
+        const missing: Record<string, string> = {};
+        if (!form.full_name.trim()) missing.full_name = "Please enter your name.";
+        if (!form.phone_number.trim()) missing.phone_number = "Please enter your phone number.";
+        if (!form.email.trim()) missing.email = "Please enter your email so we can send your confirmation.";
+        if (Object.keys(missing).length) {
+            setErrors(missing);
             return;
         }
         setSubmitting(true);
@@ -388,10 +392,10 @@ function BookingPage() {
                                     <input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} autoComplete="name" required />
                                 </Field>
                                 <Field label="Phone number" error={errors.phone_number}>
-                                    <input type="tel" placeholder="+254 7XX XXX XXX" autoComplete="tel" value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} />
+                                    <input type="tel" placeholder="+254 7XX XXX XXX" autoComplete="tel" value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} required />
                                 </Field>
                                 <Field label="Email" error={errors.email}>
-                                    <input type="email" autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                                    <input type="email" autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                                 </Field>
                                 <Field label="Where should we message you?">
                                     <select value={form.preferred_channel} onChange={(e) => setForm({ ...form, preferred_channel: e.target.value })}>
