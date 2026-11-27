@@ -1,0 +1,213 @@
+/* Brand pieces shared across the whole app: the logo mark, illustrations,
+   page transitions, the loading screen and the full-page status messages.
+   Loaded last so it can line the mark up inside each page's own logo style. */
+
+/* LOGO: mark + "velora." wordmark */
+
+.velora-logo,
+.login-logo,
+.register-logo,
+.v-sidebar-logo,
+.v-status-brand {
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-mark {
+  flex: none;
+  width: .92em;
+  height: .92em;
+  margin-right: .3em;
+  border-radius: 25%;
+  /* Optical alignment with the lowercase wordmark */
+  transform: translateY(.04em);
+}
+
+/* On the dark green panels the tile gets a soft light edge so it doesn't sink into the background. */
+.login-logo .brand-mark,
+.register-logo .brand-mark,
+.velora-footer .brand-mark {
+  box-shadow: 0 0 0 1.5px rgba(248, 247, 242, .28);
+}
+
+.v-sidebar-logo {
+  align-self: flex-start;
+}
+
+/* ILLUSTRATIONS */
+
+.v-illustration {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Empty states with an illustration */
+
+.overview-empty-state.has-art {
+  padding-top: 26px;
+}
+
+.overview-empty-state .v-empty-art {
+  width: 170px;
+  margin-bottom: 6px;
+}
+
+.overview-empty-state .v-empty-art svg {
+  margin: 0;
+  color: inherit;
+}
+
+/* Booking confirmed */
+
+.bk-success-art {
+  width: 170px;
+  margin: -8px auto 6px;
+}
+
+/* "Powered by velora." under public booking pages */
+
+.bk-powered {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bk-footer .bk-powered {
+  color: #a5aba4;
+  font-weight: 400;
+}
+
+.bk-powered .brand-mark {
+  width: 15px;
+  height: 15px;
+  transform: none;
+}
+
+.bk-powered span {
+  color: #3e5948;
+  font-family: "Playfair Display", serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* PAGE TRANSITIONS: each new page settles in softly */
+
+.page-transition {
+  animation: v-page-in .38s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+@keyframes v-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* LOADING: the mark, with a ring turning around it */
+
+.app-loader {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+}
+
+.app-loader .brand-mark {
+  width: 38px;
+  height: 38px;
+  transform: none;
+  animation: v-breathe 1.8s ease-in-out infinite;
+}
+
+.app-loader .app-spinner {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-width: 2px;
+}
+
+@keyframes v-breathe {
+  50% {
+    transform: scale(.92);
+    opacity: .85;
+  }
+}
+
+/* STATUS PAGES: 404, broken links, errors */
+
+.v-status-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 24px 60px;
+  background: #f8f7f2;
+  color: #6c746b;
+  font-family: "DM Sans", sans-serif;
+  text-align: center;
+  outline: none;
+}
+
+.v-status-brand {
+  margin-bottom: 26px;
+  color: #202b26;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.v-status-brand span {
+  color: #627c69;
+}
+
+.v-status-art {
+  width: min(280px, 80vw);
+}
+
+.v-status-code {
+  margin-top: 6px;
+  color: #627c69;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.v-status-page h1 {
+  margin: 10px 0 8px;
+  color: #26332c;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 500;
+}
+
+.v-status-page p {
+  max-width: 440px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.v-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition,
+  .app-loader .brand-mark {
+    animation: none;
+  }
+}

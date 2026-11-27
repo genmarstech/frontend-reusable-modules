@@ -4,7 +4,7 @@ React + TypeScript + Vite app for Velora, the bookings and appointments platform
 `genmarstech/softwares` under `velora/`.
 
 ```bash
-cp .env.example .env     # VITE_API_URL points at the Django API (default http://localhost:8000/)
+cp .env.example .env     # VITE_API_URL (Django API) and VITE_SITE_URL (public address, see below)
 npm install
 npm run dev              # http://localhost:5173
 npm run build            # type-check and production build
@@ -15,7 +15,9 @@ npm run lint
 
 | Route | Who | What |
 | --- | --- | --- |
-| `/`, `/login`, `/register` | Everyone | Landing page and accounts |
+| `/`, `/features`, `/solutions`, `/how-it-works`, `/about` | Everyone | Public site, one page each (old `/#features` style links redirect) |
+| `/terms`, `/privacy` | Everyone | Plain-language legal pages (draft, have them reviewed before launch) |
+| `/login`, `/register` | Everyone | Accounts |
 | `/onboarding/business` | Owner | Business profile, services, team (owner is added as staff if the team is left empty) |
 | `/businesses` | Owner | Pick a business workspace |
 | `/dashboard/:id/overview` | Owner | Today's schedule, bookings needing attention, services and team |
@@ -29,6 +31,14 @@ npm run lint
 | `/dashboard/:id/settings` | Owner | Booking rules, deposits, reminders, quiet hours, business profile |
 | `/book/:id` | Customers | Public booking page (`?source=instagram` tracks where bookings come from) |
 | `/manage/:token` | Customers | Confirm, reschedule or cancel through the private link in every message |
+
+## Brand and site address
+
+Logo, colours, illustrations and the writing voice are described in [BRAND.md](BRAND.md).
+
+The public address is set with `VITE_SITE_URL` (default `https://getvelora.co.ke`, not final). At build
+time it fills in the canonical link and link-preview tags in `index.html`, and writes `robots.txt` and
+`sitemap.xml` (see `vite.config.ts`). Changing domain is that one setting.
 
 ## CSRF
 

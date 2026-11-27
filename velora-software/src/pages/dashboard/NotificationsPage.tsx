@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
 
 import { getNotifications, retryNotification } from "../../lib/api/bookings";
 import { handleApiError } from "../../lib/api/handleErrors";
@@ -7,6 +6,7 @@ import { CHANNEL_LABELS, formatDateTime } from "../../lib/format";
 import type { NotificationLog } from "../../types/bookings";
 import { Alert, EmptyState, Field, Modal, PageHeader, Section, Spinner, StatusBadge } from "../../components/ui";
 import { useDashboard } from "./dashboard-context";
+import { MessagesArt } from "../../components/Illustrations";
 
 function NotificationsPage() {
     const { business, timeZone } = useDashboard();
@@ -76,7 +76,7 @@ function NotificationsPage() {
                 {items === null ? (
                     <Spinner />
                 ) : items.length === 0 ? (
-                    <EmptyState icon={<Bell size={30} />} title="No messages yet" text="Messages appear here when bookings are made or changed." />
+                    <EmptyState art={<MessagesArt />} title="No messages yet" text="Messages appear here when bookings are made or changed." />
                 ) : (
                     <div className="v-table-wrap">
                         <table className="v-table">

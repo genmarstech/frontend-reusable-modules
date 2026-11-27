@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router";
+import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router";
 import {
     BarChart3,
     Bell,
@@ -24,6 +24,10 @@ import type { Service } from "../../types/services";
 import type { Staff } from "../../types/staff";
 import type { DashboardContext } from "./dashboard-context";
 import { PageLoading, Spinner } from "../../components/ui";
+import { Logo } from "../../components/Brand";
+import { LostArt } from "../../components/Illustrations";
+import StatusPage from "../../components/StatusPage";
+import { usePageMeta } from "../../lib/usePageMeta";
 
 import "../DashboardOverview.css";
 import "../../styles/dashboard.css";
@@ -57,6 +61,16 @@ function DashboardLayout() {
     const [navOpen, setNavOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const [newBookings, setNewBookings] = useState(0);
+    const { pathname } = useLocation();
+
+    // Tab title: "Bookings · Glow Salon · Velora"
+    const section = pathname.split("/")[3] || "overview";
+    const sectionLabel = NAV.find((item) => "to" in item && item.to === section);
+    usePageMeta(
+        [sectionLabel && "label" in sectionLabel ? sectionLabel.label : "Dashboard", business?.business_name]
+            .filter(Boolean)
+            .join(" · ")
+    );
 
     useEffect(() => {
         if (!validId) return;
@@ -139,10 +153,13 @@ function DashboardLayout() {
 
     if (!validId || error) {
         return (
-            <div className="app-loading">
-                <p role="alert">{validId ? error : "That link does not point to a business."}</p>
+            <StatusPage
+                art={<LostArt />}
+                title="We couldn’t open this business"
+                text={validId ? error : "That link does not point to a business."}
+            >
                 <Link to="/businesses" className="v-btn">Back to your businesses</Link>
-            </div>
+            </StatusPage>
         );
     }
 
@@ -175,8 +192,8 @@ function DashboardLayout() {
                 />
             )}
             <aside className="v-sidebar" id="v-sidebar" aria-label="Dashboard navigation">
-                <Link to="/" className="v-sidebar-logo">
-                    velora<span>.</span>
+                <Link to="/" className="v-sidebar-logo" aria-label="Velora home">
+                    <Logo />
                 </Link>
 
                 <Link to="/businesses" className="v-business-switch" title="Switch business">
@@ -226,15 +243,15 @@ function DashboardLayout() {
                         </div>
                     </div>
                     <button type="button" className="v-logout" onClick={handleLogout}>
-                        <LogOut size={16} /> Sign out
+                        <LogOut size={16} aria-hidden="true" /> Log out
                     </button>
                 </div>
             </aside>
 
             <div className="v-main">
                 <div className="v-mobile-bar">
-                    <Link to="/" className="v-sidebar-logo">
-                        velora<span>.</span>
+                    <Link to="/" className="v-sidebar-logo" aria-label="Velora home">
+                        <Logo />
                     </Link>
                     <button
                         type="button"
@@ -249,7 +266,9 @@ function DashboardLayout() {
                 </div>
                 <main className="v-content">
                     <Suspense fallback={<Spinner label="Loading..." />}>
-                        <Outlet context={context} />
+                        <div className="page-transition" key={pathname}>
+                            <Outlet context={context} />
+                        </div>
                     </Suspense>
                 </main>
             </div>

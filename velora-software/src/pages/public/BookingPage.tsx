@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
-import { CalendarCheck2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import {
     createPublicBooking,
@@ -14,7 +14,11 @@ import {
 import { fieldErrorsFrom, handleApiError } from "../../lib/api/handleErrors";
 import { formatDayLabel, formatDateTime, formatMoney, todayIn } from "../../lib/format";
 import type { PublicBooking, PublicBusiness, PublicService, Slot } from "../../types/bookings";
-import { Alert, Field } from "../../components/ui";
+import { Alert, Field, PageLoading } from "../../components/ui";
+import { LogoMark } from "../../components/Brand";
+import { LostArt, SuccessArt } from "../../components/Illustrations";
+import StatusPage from "../../components/StatusPage";
+import { usePageMeta } from "../../lib/usePageMeta";
 import { CATEGORY_LABELS } from "../../types/business";
 import "../../styles/dashboard.css";
 import "../../styles/booking.css";
@@ -77,6 +81,10 @@ function BookingPage() {
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [booking, setBooking] = useState<PublicBooking | null>(null);
+    usePageMeta(
+        business ? `Book at ${business.business_name}` : "Book an appointment",
+        business ? business.business_description || `Book your next appointment at ${business.business_name} online.` : undefined
+    );
     const [waitlisted, setWaitlisted] = useState(false);
 
     useEffect(() => {
@@ -141,20 +149,19 @@ function BookingPage() {
 
     if (loadError || !validRef) {
         return (
-            <main className="bk-page">
-                <div className="app-loading">
-                    <p>{loadError || "This booking page could not be found."}</p>
-                    <Link to="/" className="v-btn">Go to Velora</Link>
-                </div>
-            </main>
+            <StatusPage
+                art={<LostArt />}
+                title="Booking page not found"
+                text="This booking link may have changed. Ask the business for their latest link, or check it for typos."
+            >
+                <Link to="/" className="v-btn">Go to Velora</Link>
+            </StatusPage>
         );
     }
 
     if (!business) {
         return (
-            <main className="bk-page">
-                <div className="app-loading"><div className="app-spinner" /><p>Loading booking page...</p></div>
-            </main>
+<PageLoading label="Loading booking page..." />
         );
     }
 
@@ -421,7 +428,7 @@ function BookingPage() {
 
                     {step === "done" && booking && (
                         <div className="bk-success">
-                            <div className="bk-success-icon"><CalendarCheck2 size={30} /></div>
+                            <SuccessArt className="bk-success-art" />
                             <h2>
                                 {booking.status === "confirmed" ? "You're booked!" : booking.status === "held" ? "Your slot is on hold" : "Request received"}
                             </h2>
@@ -447,7 +454,7 @@ function BookingPage() {
                 <div className="bk-footer">
                     Questions? {business.whatsapp_number && <a href={`https://wa.me/${business.whatsapp_number.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp {business.business_name}</a>}
                     <br />
-                    Powered by <Link to="/">velora.</Link>
+                    <Link to="/" className="bk-powered">Powered by <LogoMark /> <span>velora.</span></Link>
                 </div>
             </div>
         </main>

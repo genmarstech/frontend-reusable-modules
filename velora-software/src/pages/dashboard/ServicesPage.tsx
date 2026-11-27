@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Plus, Scissors } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { createService, deleteService, updateService } from "../../lib/api/auth";
 import { getResources } from "../../lib/api/bookings";
@@ -9,6 +9,7 @@ import type { Resource } from "../../types/bookings";
 import type { Service } from "../../types/services";
 import { Alert, EmptyState, Field, Modal, PageHeader, Section } from "../../components/ui";
 import { useDashboard } from "./dashboard-context";
+import { ServicesArt } from "../../components/Illustrations";
 
 function ServicesPage() {
     const { business, services, reloadServices, policy } = useDashboard();
@@ -43,7 +44,7 @@ function ServicesPage() {
             <Alert>{error}</Alert>
             <Section title="Service menu" badge={`${services.length} ${services.length === 1 ? "service" : "services"}`}>
                 {services.length === 0 ? (
-                    <EmptyState icon={<Scissors size={30} />} title="No services yet" text="Add your first service to open bookings." />
+                    <EmptyState art={<ServicesArt />} title="No services yet" text="Add your first service to open bookings." />
                 ) : (
                     <div className="v-table-wrap">
                         <table className="v-table">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
+import { Logo } from "../components/Brand";
 import type { ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 
@@ -496,9 +497,9 @@ function BusinessOnboarding() {
     return (
         <main className="business-onboarding">
             <header className="onboarding-header">
-                <div className="velora-logo">
-                    Velora<span>.</span>
-                </div>
+                <Link to="/" className="velora-logo" aria-label="Velora home">
+                    <Logo />
+                </Link>
 
                 <div className="onboarding-account">
                     <div className="account-avatar">

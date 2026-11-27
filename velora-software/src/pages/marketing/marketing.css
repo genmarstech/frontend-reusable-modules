@@ -1,0 +1,383 @@
+/* Public site pages (features, solutions, how it works, about, legal).
+   Builds on Home.css: same palette, type and spacing, so the pages read as one site. */
+
+/* PAGE INTRO: the heading block at the top of each page */
+
+.page-intro {
+  max-width: 1440px;
+  margin: auto;
+  padding: 90px 7% 70px;
+  text-align: center;
+}
+
+.page-intro.has-art {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  align-items: center;
+  gap: 60px;
+  text-align: left;
+}
+
+.page-intro h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 4.6vw, 60px);
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  font-weight: 500;
+  margin: 20px 0;
+}
+
+.page-intro h1 span {
+  color: var(--velora-green);
+  font-style: italic;
+}
+
+.page-intro p {
+  max-width: 560px;
+  margin: 0;
+  color: #777e76;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.page-intro:not(.has-art) p {
+  margin: 0 auto;
+}
+
+.page-intro-art {
+  width: 100%;
+  max-width: 420px;
+  justify-self: center;
+}
+
+/* HOME: "explore" cards that lead to each page */
+
+.explore-card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+}
+
+.explore-art {
+  width: 100%;
+  max-width: 190px;
+  margin: -6px auto 4px;
+}
+
+.explore-card h3 {
+  margin-top: 12px;
+}
+
+.explore-card p {
+  min-height: 0;
+  flex: 1;
+}
+
+.explore-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--velora-green-dark);
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.explore-card:hover .explore-more svg {
+  transform: translateX(3px);
+}
+
+.explore-more svg {
+  transition: transform .2s ease;
+}
+
+/* FEATURES: alternating rows */
+
+.feature-rows {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 7% 110px;
+  display: grid;
+  gap: 28px;
+}
+
+.feature-row {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  align-items: center;
+  gap: 60px;
+  padding: 40px;
+  background: white;
+  border: 1px solid #ebede6;
+  border-radius: 12px;
+}
+
+.feature-row.is-flipped .feature-row-art {
+  order: 2;
+}
+
+.feature-row-art svg {
+  width: 100%;
+  max-width: 380px;
+  display: block;
+  margin: auto;
+}
+
+.feature-row-text {
+  position: relative;
+}
+
+.feature-row-text .feature-number {
+  top: 0;
+  right: 0;
+}
+
+.feature-row-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 500;
+  margin: 22px 0 10px;
+}
+
+.feature-row-text > p {
+  color: #777e76;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 18px;
+}
+
+.feature-row-text ul {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feature-row-text li {
+  display: flex;
+  gap: 10px;
+  color: #4d5a52;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.feature-row-text li svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--velora-green);
+}
+
+/* SOLUTIONS page: list with a line for each kind of business */
+
+.solutions-page .solutions-list {
+  margin: 0;
+  list-style: none;
+}
+
+.solutions-page .solution-item {
+  align-items: flex-start;
+}
+
+.solutions-page .solution-item > span {
+  padding-top: 5px;
+}
+
+.solutions-page .solution-item p {
+  margin: 6px 0 0;
+  color: #858b83;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* HOW IT WORKS page */
+
+.how-section .steps-grid {
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.step-art {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto 6px;
+}
+
+.step-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 21px;
+  font-weight: 600;
+  margin: 18px 0 0;
+}
+
+.booking-link-demo {
+  max-width: 640px;
+  margin: 50px auto 0;
+  text-align: center;
+  color: #777e76;
+  font-size: 13px;
+}
+
+.booking-link-demo code {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: white;
+  border: 1px solid var(--velora-border);
+  color: var(--velora-dark);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  word-break: break-all;
+}
+
+.booking-link-demo strong {
+  color: var(--velora-green);
+}
+
+/* ABOUT page */
+
+.values-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.values-grid .feature-card p {
+  min-height: 0;
+}
+
+/* LEGAL pages */
+
+.legal-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 80px 7% 110px;
+  color: #4d5a52;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.legal-page h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 4.4vw, 52px);
+  font-weight: 500;
+  color: var(--velora-dark);
+  margin: 18px 0 12px;
+}
+
+.legal-page h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--velora-dark);
+  margin: 36px 0 8px;
+}
+
+.legal-intro {
+  font-size: 16px;
+  color: #6c746b;
+}
+
+.legal-page a {
+  color: var(--velora-green-dark);
+  text-decoration: underline;
+}
+
+/* FOOTER links (now a nav) */
+
+.velora-footer > nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  margin-bottom: 35px;
+}
+
+.velora-footer > nav a {
+  color: #c2c9c1;
+  font-size: 12px;
+}
+
+.velora-footer > nav a:hover,
+.velora-footer small a:hover {
+  color: white;
+}
+
+.velora-footer small a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Gentle hover for the CTA arrows */
+
+.primary-button svg,
+.cta-button svg,
+.nav-cta svg {
+  transition: transform .2s ease;
+}
+
+.primary-button:hover svg,
+.cta-button:hover svg,
+.nav-cta:hover svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 1050px) {
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-row {
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-intro,
+  .page-intro.has-art {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 55px 7% 45px;
+    text-align: left;
+  }
+
+  .page-intro-art {
+    max-width: 300px;
+    order: -1;
+    justify-self: start;
+  }
+
+  .feature-row {
+    grid-template-columns: 1fr;
+    padding: 26px 22px;
+  }
+
+  .feature-row.is-flipped .feature-row-art {
+    order: 0;
+  }
+
+  .feature-row-art svg {
+    max-width: 260px;
+  }
+
+  .feature-rows {
+    padding-bottom: 75px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-more svg,
+  .primary-button svg,
+  .cta-button svg,
+  .nav-cta svg {
+    transition: none;
+  }
+}
+
+/* The sparkle above "Make room for what you do best" sat at the far left (icons render as blocks). */
+.cta-decoration {
+  display: flex;
+  justify-content: center;
+}

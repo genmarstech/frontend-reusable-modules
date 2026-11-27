@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { AlertCircle, CalendarCheck, CalendarDays, Inbox, Scissors, Users } from "lucide-react";
+import { AlertCircle, CalendarCheck, CalendarDays, Scissors, Users } from "lucide-react";
 
 import { getBookings, getBookingsSeenAt, markBookingsSeen } from "../lib/api/bookings";
 import { addDays, formatMoney, todayIn } from "../lib/format";
@@ -10,6 +10,7 @@ import { BookingRow } from "./dashboard/BookingsPage";
 import { BookingDetailModal, NewBookingModal } from "./dashboard/BookingModals";
 import { useDashboard } from "./dashboard/dashboard-context";
 import "./DashboardOverview.css";
+import { BookingArt, PhoneBookingArt } from "../components/Illustrations";
 
 function DashboardOverview() {
     const { business, services, staff, timeZone } = useDashboard();
@@ -114,7 +115,7 @@ function DashboardOverview() {
                     <Spinner />
                 ) : latest.length === 0 ? (
                     <EmptyState
-                        icon={<Inbox size={30} />}
+                        art={<BookingArt />}
                         title="No bookings yet"
                         text="When a customer books on your booking page, it shows up here."
                     />
@@ -160,7 +161,7 @@ function DashboardOverview() {
                     <Spinner />
                 ) : todayBookings.length === 0 ? (
                     <EmptyState
-                        icon={<CalendarDays size={30} />}
+                        art={<PhoneBookingArt />}
                         title="No appointments today"
                         text="Share your booking page so customers can book themselves."
                     />
