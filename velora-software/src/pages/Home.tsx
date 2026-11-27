@@ -7,12 +7,11 @@ import {
   Clock3,
   Sparkles,
   ShieldCheck,
-  Menu,
   Check
 } from "lucide-react";
 
 import "./Home.css";
-import { Link } from "react-router";
+import SiteHeader from "../components/SiteHeader";
 
 function Home() {
   const features = [
@@ -51,32 +50,9 @@ function Home() {
   ];
 
   return (
-    <main className="velora-home">
-
-      {/* NAVIGATION */}
-      <nav className="velora-nav">
-        <a href="/" className="velora-logo">
-          velora<span>.</span>
-        </a>
-
-        <div className="nav-links">
-          <a href="#features">Features</a>
-          <a href="#solutions">Solutions</a>
-          <a href="#how-it-works">How it works</a>
-          <a href="#about">About</a>
-        </div>
-
-        <div className="nav-actions">
-          <Link to="/login" className="login-link">Log in</Link>
-          <a href="/register" className="nav-cta">
-            Get started <ArrowRight size={16} />
-          </a>
-        </div>
-
-        <button className="mobile-menu" aria-label="Open navigation">
-          <Menu />
-        </button>
-      </nav>
+    <>
+    <SiteHeader />
+    <main className="velora-home" id="main" tabIndex={-1}>
 
       {/* HERO */}
       <section className="hero-section">
@@ -328,6 +304,7 @@ function Home() {
       </footer>
 
     </main>
+    </>
   );
 }
 
