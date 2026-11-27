@@ -27,6 +27,7 @@ import { LeafSpray, RelaxArt } from "../components/Decor";
 import { BookingArt, PhoneBookingArt } from "../components/Illustrations";
 import { BookingDetailModal, NewBookingModal } from "./dashboard/BookingModals";
 import { useDashboard } from "./dashboard/dashboard-context";
+import { ShareLinkModal } from "./dashboard/ShareLinkModal";
 import "./DashboardOverview.css";
 
 type Range = 7 | 30 | 90 | "custom";
@@ -121,7 +122,7 @@ function CardHeading({ icon, title, link, children }: { icon?: ReactNode; title:
 }
 
 function DashboardOverview() {
-    const { business, timeZone, accountActions, copyBookingLink } = useDashboard();
+    const { business, timeZone, accountActions } = useDashboard();
     const { user } = useAuth();
     const navigate = useNavigate();
     const today = todayIn(timeZone);
@@ -136,7 +137,7 @@ function DashboardOverview() {
     const [openId, setOpenId] = useState<number | null>(null);
     const [creating, setCreating] = useState(false);
     const [reload, setReload] = useState(0);
-    const [copied, setCopied] = useState(false);
+    const [sharing, setSharing] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -192,14 +193,10 @@ function DashboardOverview() {
         [performance]
     );
 
-    const share = async () => {
-        if (await copyBookingLink()) {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
+    const share = () => setSharing(true);
 
     const setup = overview?.setup;
+    const shareStep = setup?.steps.find((s) => s.key === "share");
     const nextStep = setup?.steps.find((s) => !s.done);
     const goToStep = (link: string) => (link === "share" ? share() : navigate(`../${link}`));
 
@@ -443,7 +440,14 @@ function DashboardOverview() {
                                     </span>
                                     <span>
                                         <strong>{step.label}</strong>
-                                        <small>{step.key === "share" && copied ? "Link copied. Paste it anywhere." : step.text}</small>
+                                        <small>{step.text}</small>
+                                        {step.progress && !step.done && (
+                                            <span className="ov-step-progress" aria-hidden="true">
+                                                {Array.from({ length: step.progress.target }, (_, i) => (
+                                                    <i key={i} className={i < step.progress!.value ? "on" : ""} />
+                                                ))}
+                                            </span>
+                                        )}
                                     </span>
                                     <span className="v-sr-only">{step.done ? "(done)" : "(to do)"}</span>
                                 </button>
@@ -456,7 +460,7 @@ function DashboardOverview() {
                             className="v-btn v-btn-pill ov-setup-cta"
                             onClick={() => (nextStep ? goToStep(nextStep.link) : window.open(`/book/${business.slug}`, "_blank"))}
                         >
-                            {nextStep ? (nextStep.key === "share" ? (copied ? "Link copied" : "Copy booking link") : "Continue setup") : "Open booking page"}
+                            {nextStep ? (nextStep.key === "share" ? "Share your link" : "Continue setup") : "Open booking page"}
                             <ArrowRight size={15} />
                         </button>
                     )}
@@ -588,7 +592,7 @@ function DashboardOverview() {
                         <h2>Grow your beauty business with Velora.</h2>
                         <p>More bookings. Happier clients. A smoother workflow.</p>
                         <button type="button" className="ov-promo-button" onClick={share}>
-                            {copied ? "Link copied" : "Share booking page"} <ArrowRight size={14} />
+                            Share booking page <ArrowRight size={14} />
                         </button>
                     </div>
                     <div className="ov-promo-art">
@@ -596,6 +600,15 @@ function DashboardOverview() {
                     </div>
                 </section>
             </div>
+
+            {sharing && (
+                <ShareLinkModal
+                    businessName={business.business_name}
+                    slug={business.slug}
+                    progress={shareStep?.progress}
+                    onClose={() => setSharing(false)}
+                />
+            )}
 
             {openId !== null && (
                 <BookingDetailModal bookingId={openId} onClose={() => setOpenId(null)} onChanged={() => setReload((n) => n + 1)} />

@@ -288,7 +288,8 @@ export interface PublicBookingPayload {
     service: number;
     staff?: number | null;
     start: string;
-    full_name: string;
+    /** Guests only: a signed-in customer books as their account. */
+    full_name?: string;
     email?: string;
     phone_number?: string;
     intake_notes?: string;

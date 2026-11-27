@@ -82,7 +82,10 @@ function CustomersPage() {
                             <tbody>
                                 {customers.map((c) => (
                                     <tr key={c.id} className="v-clickable" onClick={() => setEditing(c)}>
-                                        <td><strong>{c.full_name}</strong></td>
+                                        <td>
+                                            <strong>{c.full_name}</strong>
+                                            {c.has_account && <span className="v-status v-status-confirmed cust-joined" title="Signed up on your booking link">Joined</span>}
+                                        </td>
                                         <td>
                                             {c.phone_number}
                                             <small>{c.email}</small>
