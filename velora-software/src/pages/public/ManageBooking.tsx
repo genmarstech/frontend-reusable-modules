@@ -13,7 +13,11 @@ import {
 import { handleApiError } from "../../lib/api/handleErrors";
 import { addDays, formatDateTime, formatMoney, formatTime, todayIn } from "../../lib/format";
 import type { PublicBooking, Slot } from "../../types/bookings";
-import { Alert, Field, StatusBadge } from "../../components/ui";
+import { Alert, Field, PageLoading, StatusBadge } from "../../components/ui";
+import { LogoMark } from "../../components/Brand";
+import { LostArt } from "../../components/Illustrations";
+import StatusPage from "../../components/StatusPage";
+import { usePageMeta } from "../../lib/usePageMeta";
 import "../../styles/dashboard.css";
 import "../../styles/booking.css";
 
@@ -22,6 +26,7 @@ type Mode = "view" | "reschedule" | "cancel";
 function ManageBooking() {
     const { token = "" } = useParams<{ token: string }>();
     const [booking, setBooking] = useState<PublicBooking | null>(null);
+    usePageMeta(booking ? `Your booking at ${booking.business_name}` : "Your booking");
     const [loadError, setLoadError] = useState("");
     const [mode, setMode] = useState<Mode>("view");
     const [error, setError] = useState("");
@@ -73,17 +78,15 @@ function ManageBooking() {
 
     if (loadError) {
         return (
-            <main className="bk-page">
-                <div className="app-loading"><p>{loadError}</p><Link to="/" className="v-btn">Go to Velora</Link></div>
-            </main>
+            <StatusPage art={<LostArt />} title="We couldn’t find this booking" text="The link may be incomplete. Check the link in your confirmation message, or contact the business.">
+                <Link to="/" className="v-btn">Go to Velora</Link>
+            </StatusPage>
         );
     }
 
     if (!booking) {
         return (
-            <main className="bk-page">
-                <div className="app-loading"><div className="app-spinner" /><p>Loading your booking...</p></div>
-            </main>
+<PageLoading label="Loading your booking..." />
         );
     }
 
@@ -243,7 +246,7 @@ function ManageBooking() {
                         <Link className="bk-back" to={`/book/${booking.business_slug || booking.business_id}`}>Book another appointment →</Link>
                     </div>
                 </div>
-                <div className="bk-footer">Powered by <Link to="/">velora.</Link></div>
+                <div className="bk-footer"><Link to="/" className="bk-powered">Powered by <LogoMark /> <span>velora.</span></Link></div>
             </div>
         </main>
     );

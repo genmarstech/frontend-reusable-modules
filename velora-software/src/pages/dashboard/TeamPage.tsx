@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Plus, Users } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { createStaff, deleteStaff, updateStaff } from "../../lib/api/auth";
 import { fieldErrorsFrom, handleApiError } from "../../lib/api/handleErrors";
@@ -7,6 +7,7 @@ import type { Staff } from "../../types/staff";
 import { Alert, EmptyState, Field, Modal, PageHeader, Section } from "../../components/ui";
 import HoursEditor from "./HoursEditor";
 import { useDashboard } from "./dashboard-context";
+import { TeamArt } from "../../components/Illustrations";
 
 function TeamPage() {
     const { staff, services } = useDashboard();
@@ -27,7 +28,7 @@ function TeamPage() {
             <Section title="Your team" badge={`${staff.length} ${staff.length === 1 ? "member" : "members"}`}>
                 {staff.length === 0 ? (
                     <EmptyState
-                        icon={<Users size={30} />}
+                        art={<TeamArt />}
                         title="No team members yet"
                         text="Customers can only book once at least one team member is added. Add yourself if you work alone."
                     />

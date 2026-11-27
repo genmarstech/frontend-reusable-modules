@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, UserPlus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, UserPlus } from "lucide-react";
 
 import { getBookings, markBookingsSeen } from "../../lib/api/bookings";
 import { handleApiError } from "../../lib/api/handleErrors";
@@ -9,6 +9,7 @@ import type { Booking } from "../../types/bookings";
 import { Alert, EmptyState, Field, PageHeader, Section, Spinner, StatusBadge } from "../../components/ui";
 import { BookingDetailModal, NewBookingModal } from "./BookingModals";
 import { useDashboard } from "./dashboard-context";
+import { BookingArt } from "../../components/Illustrations";
 
 const STATUS_FILTERS = [
     { value: "", label: "All" },
@@ -193,7 +194,7 @@ function BookingsPage() {
             ) : bookings.length === 0 ? (
                 <Section title="No bookings" text="Nothing matches these filters.">
                     <EmptyState
-                        icon={<CalendarDays size={30} />}
+                        art={<BookingArt />}
                         title="No bookings in this range"
                         text="Share your booking page or add a booking yourself."
                     />

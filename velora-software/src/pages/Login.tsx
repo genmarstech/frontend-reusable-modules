@@ -1,4 +1,5 @@
 
+import { Logo } from "../components/Brand";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -105,7 +106,7 @@ function Login() {
       if (!hasFieldError) {
         setServerError(
           apiError?.message ||
-          "Unable to sign in. Please check your credentials and try again."
+          "We couldn’t log you in. Check your email and password and try again."
         );
       }
     }
@@ -118,8 +119,8 @@ function Login() {
       <section className="login-brand">
         <div className="login-brand-content">
 
-          <Link to="/" className="login-logo">
-            velora<span>.</span>
+          <Link to="/" className="login-logo" aria-label="Velora home">
+            <Logo />
           </Link>
 
           <div className="login-brand-message">
@@ -139,7 +140,7 @@ function Login() {
 
             <p>
               Everything you need to keep your business
-              organized, your clients connected and your
+              organised, your clients connected and your
               daily operations running smoothly.
             </p>
 
@@ -174,7 +175,7 @@ function Login() {
             <h2>Welcome back</h2>
 
             <p>
-              Sign in to access your Velora account
+              Log in to your Velora account
               and manage your business.
             </p>
           </div>
@@ -263,11 +264,11 @@ function Login() {
               {isSubmitting ? (
                 <>
                   <Loader2 size={18} className="login-spinner" />
-                  Signing you in...
+                  Logging you in...
                 </>
               ) : (
                 <>
-                  Sign in to Velora
+                  Log in to Velora
                   <ArrowRight size={18} />
                 </>
               )}

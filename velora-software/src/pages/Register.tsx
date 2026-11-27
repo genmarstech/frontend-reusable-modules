@@ -21,7 +21,8 @@ import {
 import { handleApiError } from "../lib/api/handleErrors";
 
 import "./Register.css";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { Logo } from "../components/Brand";
 import type { RegisterPayload } from "../types/register.auth";
 import { RegisterUser } from "../lib/api/auth";
 import { useAuth } from "../context/auth-context";
@@ -167,9 +168,9 @@ function Register() {
       <section className="register-brand">
         <div className="register-brand-content">
 
-          <a href="/" className="register-logo">
-            velora<span>.</span>
-          </a>
+          <Link to="/" className="register-logo" aria-label="Velora home">
+            <Logo />
+          </Link>
 
           <div className="brand-message">
             <div className="brand-tag">
@@ -207,7 +208,7 @@ function Register() {
 
         <div className="register-top">
           <span>Already have an account?</span>
-          <a href="/login">Sign in <ArrowRight size={15} /></a>
+          <Link to="/login">Log in <ArrowRight size={15} aria-hidden="true" /></Link>
         </div>
 
         <div className="register-form-container">
@@ -361,8 +362,8 @@ function Register() {
 
             <div className="register-terms">
               By creating an account, you agree to our
-              <a href="/terms"> Terms of Service</a> and
-              <a href="/privacy"> Privacy Policy</a>.
+              {" "}<Link to="/terms">Terms of Service</Link> and
+              {" "}<Link to="/privacy">Privacy Policy</Link>.
             </div>
 
             <button

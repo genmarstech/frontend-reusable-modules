@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Plus, UserRound } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { createCustomer, getCustomerBookings, getCustomers, updateCustomer } from "../../lib/api/bookings";
 import { fieldErrorsFrom, handleApiError } from "../../lib/api/handleErrors";
@@ -9,6 +9,7 @@ import { Alert, EmptyState, Field, Modal, PageHeader, Section, Spinner } from ".
 import { BookingRow } from "./BookingsPage";
 import { BookingDetailModal } from "./BookingModals";
 import { useDashboard } from "./dashboard-context";
+import { ClientsArt } from "../../components/Illustrations";
 
 const EMPTY = {
     full_name: "",
@@ -64,7 +65,7 @@ function CustomersPage() {
                 {customers === null ? (
                     <Spinner />
                 ) : customers.length === 0 ? (
-                    <EmptyState icon={<UserRound size={30} />} title="No customers yet" text="Customers appear here once they book." />
+                    <EmptyState art={<ClientsArt />} title="No customers yet" text="Customers appear here once they book." />
                 ) : (
                     <div className="v-table-wrap">
                         <table className="v-table">

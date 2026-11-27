@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X, Loader2 } from "lucide-react";
 import { STATUS_LABELS } from "../lib/format";
+import { LogoMark } from "./Brand";
 
 export function StatusBadge({ status }: { status: string }) {
     return <span className={`v-status v-status-${status}`}>{STATUS_LABELS[status] || status}</span>;
@@ -97,10 +98,23 @@ export function Modal({
     );
 }
 
-export function EmptyState({ icon, title, text, action }: { icon: ReactNode; title: string; text: string; action?: ReactNode }) {
+/** Friendly "nothing here yet" panel. Pass `art` (an illustration) for the main empty views, or a small `icon`. */
+export function EmptyState({
+    icon,
+    art,
+    title,
+    text,
+    action,
+}: {
+    icon?: ReactNode;
+    art?: ReactNode;
+    title: string;
+    text: string;
+    action?: ReactNode;
+}) {
     return (
-        <div className="overview-empty-state">
-            <span aria-hidden="true">{icon}</span>
+        <div className={`overview-empty-state ${art ? "has-art" : ""}`}>
+            {art ? <div className="v-empty-art">{art}</div> : icon && <span aria-hidden="true">{icon}</span>}
             <h3>{title}</h3>
             <p>{text}</p>
             {action}
@@ -155,7 +169,10 @@ export function Spinner({ label = "Loading..." }: { label?: string }) {
 export function PageLoading({ label = "Loading..." }: { label?: string }) {
     return (
         <div className="app-loading" role="status">
-            <div className="app-spinner" aria-hidden="true" />
+            <div className="app-loader" aria-hidden="true">
+                <LogoMark />
+                <div className="app-spinner" />
+            </div>
             <p>{label}</p>
         </div>
     );
