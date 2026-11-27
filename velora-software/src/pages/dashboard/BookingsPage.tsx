@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { CalendarDays, ChevronLeft, ChevronRight, Plus, UserPlus } from "lucide-react";
 
-import { getBookings } from "../../lib/api/bookings";
+import { getBookings, markBookingsSeen } from "../../lib/api/bookings";
 import { handleApiError } from "../../lib/api/handleErrors";
-import { addDays, dateIn, formatDayLabel, formatMoney, formatTime, minutesIn, todayIn } from "../../lib/format";
+import { addDays, dateIn, formatDate, formatDayLabel, formatMoney, formatTime, minutesIn, timeAgo, todayIn } from "../../lib/format";
 import type { Booking } from "../../types/bookings";
 import { Alert, EmptyState, Field, PageHeader, Section, Spinner, StatusBadge } from "../../components/ui";
 import { BookingDetailModal, NewBookingModal } from "./BookingModals";
@@ -21,9 +22,12 @@ function BookingsPage() {
     const { business, staff, services, timeZone } = useDashboard();
     const today = todayIn(timeZone);
 
+    const [searchParams, setSearchParams] = useSearchParams();
     const [view, setView] = useState<"list" | "day">("list");
+    // Default: every booking from today on, however far ahead it is.
     const [dateFrom, setDateFrom] = useState(today);
-    const [dateTo, setDateTo] = useState(addDays(today, 6));
+    const [dateTo, setDateTo] = useState("");
+    const [ordering, setOrdering] = useState<"start" | "-created_at">(searchParams.get("sort") === "newest" ? "-created_at" : "start");
     const [day, setDay] = useState(today);
     const [status, setStatus] = useState("");
     const [staffFilter, setStaffFilter] = useState("");
@@ -32,16 +36,21 @@ function BookingsPage() {
 
     const [bookings, setBookings] = useState<Booking[] | null>(null);
     const [error, setError] = useState("");
-    const [openId, setOpenId] = useState<number | null>(null);
+    // ?booking=<id> (used in the new-booking email) opens that booking.
+    const [openId, setOpenId] = useState<number | null>(() => Number(searchParams.get("booking")) || null);
     const [creating, setCreating] = useState<null | "booking" | "walk_in">(null);
     const [reload, setReload] = useState(0);
 
     useEffect(() => {
         let active = true;
-        const range = view === "day" ? { date_from: day, date_to: day } : { date_from: dateFrom, date_to: dateTo };
+        const newest = view === "list" && ordering === "-created_at";
+        const range =
+            view === "day" ? { date_from: day, date_to: day } : newest ? {} : { date_from: dateFrom, date_to: dateTo };
         const timer = setTimeout(() => {
             getBookings(business.id, {
                 ...range,
+                ordering: newest ? "-created_at" : "start",
+                limit: newest ? 100 : undefined,
                 status: view === "day" ? "" : status,
                 staff: staffFilter,
                 service: serviceFilter,
@@ -51,6 +60,7 @@ function BookingsPage() {
                     if (!active) return;
                     setBookings(rows);
                     setError("");
+                    markBookingsSeen(business.id);
                 })
                 .catch((err) => active && setError(handleApiError(err).message));
         }, 200);
@@ -58,7 +68,16 @@ function BookingsPage() {
             active = false;
             clearTimeout(timer);
         };
-    }, [business.id, view, day, dateFrom, dateTo, status, staffFilter, serviceFilter, search, reload]);
+    }, [business.id, view, day, dateFrom, dateTo, ordering, status, staffFilter, serviceFilter, search, reload]);
+
+    const closeBooking = () => {
+        setOpenId(null);
+        if (searchParams.has("booking")) {
+            const next = new URLSearchParams(searchParams);
+            next.delete("booking");
+            setSearchParams(next, { replace: true });
+        }
+    };
 
     const groups = useMemo(() => {
         const map = new Map<string, Booking[]>();
@@ -99,12 +118,22 @@ function BookingsPage() {
             <div className="v-filters">
                 {view === "list" ? (
                     <>
-                        <Field label="From">
-                            <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                        <Field label="Show">
+                            <select value={ordering} onChange={(e) => setOrdering(e.target.value as "start" | "-created_at")}>
+                                <option value="start">By appointment date</option>
+                                <option value="-created_at">Newest bookings first</option>
+                            </select>
                         </Field>
-                        <Field label="To">
-                            <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
-                        </Field>
+                        {ordering === "start" && (
+                            <>
+                                <Field label="From">
+                                    <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                                </Field>
+                                <Field label="To" hint={dateTo ? undefined : "Any date"}>
+                                    <input type="date" value={dateTo} min={dateFrom} onChange={(e) => setDateTo(e.target.value)} />
+                                </Field>
+                            </>
+                        )}
                     </>
                 ) : (
                     <div className="v-header-actions">
@@ -170,8 +199,15 @@ function BookingsPage() {
                     />
                 </Section>
             ) : (
-                <Section title="Appointments" badge={`${bookings.length} ${bookings.length === 1 ? "booking" : "bookings"}`}>
-                    {groups.map(([date, rows]) => (
+                <Section
+                    title={ordering === "-created_at" ? "Newest bookings" : "Appointments"}
+                    badge={`${bookings.length} ${bookings.length === 1 ? "booking" : "bookings"}`}
+                >
+                    {ordering === "-created_at"
+                        ? bookings.map((b) => (
+                              <BookingRow key={b.id} booking={b} timeZone={timeZone} showDate onOpen={() => setOpenId(b.id)} />
+                          ))
+                        : groups.map(([date, rows]) => (
                         <div className="v-day-group" key={date}>
                             <h3>{date === today ? "Today" : formatDayLabel(date)}</h3>
                             {rows.map((b) => (
@@ -183,7 +219,7 @@ function BookingsPage() {
             )}
 
             {openId !== null && (
-                <BookingDetailModal bookingId={openId} onClose={() => setOpenId(null)} onChanged={refresh} />
+                <BookingDetailModal bookingId={openId} onClose={closeBooking} onChanged={refresh} />
             )}
             {creating && (
                 <NewBookingModal
@@ -200,18 +236,38 @@ function BookingsPage() {
     );
 }
 
-export function BookingRow({ booking, timeZone, onOpen }: { booking: Booking; timeZone: string; onOpen: () => void }) {
+export function BookingRow({
+    booking,
+    timeZone,
+    onOpen,
+    showDate = false,
+    isNew = false,
+}: {
+    booking: Booking;
+    timeZone: string;
+    onOpen: () => void;
+    /** Show the appointment date (for lists not grouped by day) and when it was booked. */
+    showDate?: boolean;
+    isNew?: boolean;
+}) {
+    const contact = [booking.customer_phone, booking.customer_email].filter(Boolean).join(" · ");
     return (
-        <button type="button" className="v-booking-row" onClick={onOpen}>
+        <button type="button" className={`v-booking-row ${isNew ? "is-new" : ""}`} onClick={onOpen}>
             <div className="v-booking-time">
+                {showDate && <small className="v-booking-date">{formatDate(booking.start, timeZone)}</small>}
                 <strong>{formatTime(booking.start, timeZone)}</strong>
                 <small>{booking.duration_minutes} min</small>
             </div>
             <div className="v-booking-info">
-                <strong>{booking.customer_name}</strong>
+                <strong>
+                    {booking.customer_name}
+                    {isNew && <span className="v-new-pill">New</span>}
+                </strong>
+                {contact && <small className="v-booking-contact">{contact}</small>}
                 <small>
                     {booking.service_name}
                     {booking.staff_name && ` · ${booking.staff_name}`} · {booking.channel_label}
+                    {showDate && ` · booked ${timeAgo(booking.created_at)}`}
                 </small>
             </div>
             <div className="v-row-meta">

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { AlertCircle, CalendarCheck, CalendarDays, Scissors, Users } from "lucide-react";
+import { AlertCircle, CalendarCheck, CalendarDays, Inbox, Scissors, Users } from "lucide-react";
 
-import { getBookings } from "../lib/api/bookings";
+import { getBookings, getBookingsSeenAt, markBookingsSeen } from "../lib/api/bookings";
 import { addDays, formatMoney, todayIn } from "../lib/format";
 import type { Booking } from "../types/bookings";
 import { EmptyState, Spinner } from "../components/ui";
@@ -18,6 +18,9 @@ function DashboardOverview() {
     const [todayBookings, setTodayBookings] = useState<Booking[] | null>(null);
     const [upcoming, setUpcoming] = useState<Booking[]>([]);
     const [attention, setAttention] = useState<Booking[]>([]);
+    const [latest, setLatest] = useState<Booking[] | null>(null);
+    // Bookings made after the owner last looked are flagged "New" on this visit.
+    const [seenAt] = useState(() => getBookingsSeenAt(business.id));
     const [openId, setOpenId] = useState<number | null>(null);
     const [creating, setCreating] = useState(false);
     const [reload, setReload] = useState(0);
@@ -26,24 +29,29 @@ function DashboardOverview() {
         let active = true;
         Promise.all([
             getBookings(business.id, { date_from: today, date_to: today }),
-            getBookings(business.id, {
-                date_from: today,
-                date_to: addDays(today, 7),
-                status: "pending,held,confirmed,rescheduled",
-            }),
+            getBookings(business.id, { date_from: today, status: "pending,held,confirmed,rescheduled" }),
             getBookings(business.id, { date_from: today, date_to: addDays(today, 60), status: "pending,held" }),
+            getBookings(business.id, { ordering: "-created_at", limit: 6 }),
         ])
-            .then(([t, u, a]) => {
+            .then(([t, u, a, l]) => {
                 if (!active) return;
                 setTodayBookings(t);
                 setUpcoming(u);
                 setAttention(a);
+                setLatest(l);
+                markBookingsSeen(business.id);
             })
             .catch((err) => console.error("Overview fetch error:", err));
         return () => {
             active = false;
         };
     }, [business.id, today, reload]);
+
+    // New online bookings arrive while the dashboard is open: refresh every minute.
+    useEffect(() => {
+        const timer = setInterval(() => setReload((n) => n + 1), 60_000);
+        return () => clearInterval(timer);
+    }, []);
 
     const todaysValue = (todayBookings || [])
         .filter((b) => !["cancelled", "no_show"].includes(b.status))
@@ -73,7 +81,7 @@ function DashboardOverview() {
                 <div className="overview-stat-card">
                     <div className="overview-stat-icon"><CalendarDays /></div>
                     <div>
-                        <p>Next 7 days</p>
+                        <p>Upcoming bookings</p>
                         <h2>{upcoming.length}</h2>
                     </div>
                 </div>
@@ -91,6 +99,37 @@ function DashboardOverview() {
                         <h2>{staff.length}</h2>
                     </div>
                 </div>
+            </section>
+
+            {/* Latest bookings, whatever their appointment date */}
+            <section className="overview-section">
+                <div className="overview-section-heading">
+                    <div>
+                        <h2>Latest bookings</h2>
+                        <p>The most recent bookings, with the customer's contact details.</p>
+                    </div>
+                    <Link to="../bookings?sort=newest" className="v-link">See all →</Link>
+                </div>
+                {latest === null ? (
+                    <Spinner />
+                ) : latest.length === 0 ? (
+                    <EmptyState
+                        icon={<Inbox size={30} />}
+                        title="No bookings yet"
+                        text="When a customer books on your booking page, it shows up here."
+                    />
+                ) : (
+                    latest.map((b) => (
+                        <BookingRow
+                            key={b.id}
+                            booking={b}
+                            timeZone={timeZone}
+                            showDate
+                            isNew={!!seenAt && b.created_at > seenAt}
+                            onOpen={() => setOpenId(b.id)}
+                        />
+                    ))
+                )}
             </section>
 
             {attention.length > 0 && (
