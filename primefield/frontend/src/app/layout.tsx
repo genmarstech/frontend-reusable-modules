@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import Motion from "@/components/Motion";
 import "./globals.css";
+import "./enhance.css";
 
 // Fonts are self-hosted at build time, so a visitor's browser never
 // contacts Google and the text does not jump when the font arrives.
@@ -25,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="top">{children}</main>
         <Footer />
+        <Motion />
       </body>
     </html>
   );

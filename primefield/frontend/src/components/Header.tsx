@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuote } from "@/lib/quote";
 import { KENYA, TANZANIA } from "@/lib/site";
 
@@ -23,6 +23,18 @@ export default function Header() {
   const path = usePathname();
   const quote = useQuote();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onClick = (e: MouseEvent) => !(e.target as Element).closest("header.site") && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("click", onClick);
+    };
+  }, [open]);
 
   return (
     <>
@@ -57,7 +69,8 @@ export default function Header() {
           <Link className="btn btn-gold quote-pill" href="/contact/#quote">
             <span className="lbl">Get a quote</span>
             <span className="lbl-sm" aria-hidden="true">Quote</span>
-            <span className="count" hidden={!quote.length}>{quote.length}</span>
+            {/* Keyed on the count so the badge pops each time it changes. */}
+            <span key={quote.length} className="count pop" hidden={!quote.length}>{quote.length}</span>
           </Link>
           <button
             className="menu-btn"
@@ -66,7 +79,7 @@ export default function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((o) => !o)}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path className="l1" d="M3 6h14" /><path className="l2" d="M3 10h14" /><path className="l3" d="M3 14h14" /></g></svg>
           </button>
         </div>
       </header>

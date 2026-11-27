@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import AddToQuote from "@/components/AddToQuote";
 import { Crumbs } from "@/components/PageHead";
 import ProductCard from "@/components/ProductCard";
+import Rail from "@/components/Rail";
 import { ORIGIN, PRODUCTS, byId, catSlug, productImage, relatedTo } from "@/lib/products";
 
 // One static page per product. The design preview used a single page that
@@ -67,7 +68,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="block tight alt" aria-labelledby="rel-h">
         <div className="wrap">
           <div className="head"><div><div className="eyebrow">You may also need</div><h2 id="rel-h">Related products</h2></div><Link className="btn btn-line" href="/products/">All products</Link></div>
-          <div className="grid">{relatedTo(p).map((r) => <ProductCard key={r.id} p={r} />)}</div>
+          <Rail count={relatedTo(p).length}>{relatedTo(p).map((r) => <ProductCard key={r.id} p={r} />)}</Rail>
         </div>
       </section>
     </>

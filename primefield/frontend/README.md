@@ -15,6 +15,11 @@ npm run verify   # typecheck and build; run before pushing
 - `src/app/globals.css` is the approved design's stylesheet, copied over
   unchanged apart from the font variables. It was kept as CSS, not rewritten
   in Tailwind, so the site cannot drift from what the client signed off.
+- `src/app/enhance.css` is everything added since sign-off: phone layout
+  (swipeable product rows, two-column catalogue, sticky filters) and
+  motion. All motion switches off for visitors who ask for reduced motion.
+- `src/components/Motion.tsx` drives the scroll reveals, the header's
+  scrolled state and the back-to-top button.
 - `src/lib/products.ts` holds the 20 products. Each one gets a page at
   `/products/<id>/` at build time. Photos are `public/img/products/<id>.jpg`.
 - `src/lib/site.ts` holds phone numbers, emails, hours and addresses.

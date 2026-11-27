@@ -37,7 +37,8 @@ export default function Catalogue() {
           </button>
         ))}
       </div>
-      <div className="grid">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+      <p className="result-count" aria-live="polite">Showing {shown.length} of {PRODUCTS.length} products</p>
+      <div className="grid catalogue">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
     </>
   );
 }

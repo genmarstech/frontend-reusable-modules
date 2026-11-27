@@ -2,6 +2,7 @@ import Link from "next/link";
 import Facts from "@/components/Facts";
 import ProductCard from "@/components/ProductCard";
 import QuoteSection from "@/components/QuoteSection";
+import Rail from "@/components/Rail";
 import Steps from "@/components/Steps";
 import { FEATURED, PRODUCTS, byId } from "@/lib/products";
 
@@ -16,7 +17,7 @@ export default function HomePage() {
             <p className="lede">Prime Field Agriculture supplies green coffee, macadamia and cashew nuts, spices, pulses, oils and sisal fibre to wholesalers and distributors in more than 15 countries.</p>
             <div className="ctas">
               <Link className="btn btn-gold" href="/contact/#quote">Request a quote
-                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg></Link>
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path className="arrow" d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg></Link>
               <Link className="btn btn-ghost" href="/products/">Browse {PRODUCTS.length} products</Link>
             </div>
             <div className="ports">
@@ -48,7 +49,7 @@ export default function HomePage() {
             <div><div className="eyebrow">Featured products</div><h2 id="cat-h">What we export</h2></div>
             <p>Add products to your quote as you browse. We reply with pricing, packing options and lead times.</p>
           </div>
-          <div className="grid">{FEATURED.map((id) => <ProductCard key={id} p={byId(id)!} />)}</div>
+          <Rail count={FEATURED.length}>{FEATURED.map((id) => <ProductCard key={id} p={byId(id)!} />)}</Rail>
           <div className="home-more"><Link className="btn btn-line" href="/products/">See all {PRODUCTS.length} products →</Link></div>
         </div>
       </section>
