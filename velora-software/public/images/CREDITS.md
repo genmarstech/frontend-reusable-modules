@@ -28,6 +28,10 @@ staff or reviews.
 | `marketing/solutions-spas.webp` | 1200×900 | [19641822](https://www.pexels.com/photo/19641822/) | Jonathan Borba |
 | `marketing/solutions-clinics.webp` | 1200×900 | [7446684](https://www.pexels.com/photo/7446684/) | Gustavo Fring |
 | `marketing/about-studio.webp` | 1200×900 | [7755458](https://www.pexels.com/photo/7755458/) | RDNE Stock project |
+| `marketing/features-online-booking.webp` | 1200×900 | [7433215](https://www.pexels.com/photo/7433215/) | August de Richelieu |
+| `marketing/features-client-records.webp` | 1200×900 | [7697664](https://www.pexels.com/photo/7697664/) | RDNE Stock project |
+| `marketing/features-team-schedule.webp` | 1200×900 | [7697329](https://www.pexels.com/photo/7697329/) | RDNE Stock project |
+| `marketing/features-reminders-insights.webp` | 1200×900 | [12912112](https://www.pexels.com/photo/12912112/) | Mizuno K |
 
 Photographer names were taken from Pexels listings for these photos or for the same
 photo series. Check the linked page if you need the exact credit.
