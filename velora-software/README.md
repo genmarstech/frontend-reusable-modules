@@ -1,75 +1,43 @@
-# React + TypeScript + Vite
+# Velora frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite app for Velora, the bookings and appointments platform. The API lives in
+`genmarstech/softwares` under `velora/`.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cp .env.example .env     # VITE_API_URL points at the Django API (default http://localhost:8000/)
+npm install
+npm run dev              # http://localhost:5173
+npm run build            # type-check and production build
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Pages
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Route | Who | What |
+| --- | --- | --- |
+| `/`, `/login`, `/register` | Everyone | Landing page and accounts |
+| `/onboarding/business` | Owner | Business profile, services, team (owner is added as staff if the team is left empty) |
+| `/businesses` | Owner | Pick a business workspace |
+| `/dashboard/:id/overview` | Owner | Today's schedule, bookings needing attention, services and team |
+| `/dashboard/:id/bookings` | Owner | List and day calendar, new bookings, walk-ins, confirm, check in, complete, no-show, reschedule, cancel, payments, history |
+| `/dashboard/:id/customers` | Owner | Customer list, history and message opt-outs |
+| `/dashboard/:id/services` | Owner | Prices, durations, prep/cleanup buffers, deposits, rooms |
+| `/dashboard/:id/team` | Owner | Staff, the services they do, their own working hours |
+| `/dashboard/:id/schedule` | Owner | Opening hours, breaks, time off, waitlist, rooms, locations |
+| `/dashboard/:id/notifications` | Owner | Delivery log with retry |
+| `/dashboard/:id/analytics` | Owner | Funnel, attendance, capacity, revenue, retention, CSV export, print to PDF |
+| `/dashboard/:id/settings` | Owner | Booking rules, deposits, reminders, quiet hours, business profile |
+| `/book/:id` | Customers | Public booking page (`?source=instagram` tracks where bookings come from) |
+| `/manage/:token` | Customers | Confirm, reschedule or cancel through the private link in every message |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## CSRF
 
-```
+`src/lib/api/axios.ts` fetches a CSRF token at start-up and attaches `X-CSRFToken` to every POST, PATCH
+and DELETE. If Django rejects a token, it refreshes it and retries once. Call the API through
+`backendClient`; do not read the cookie by hand.
+
+## Styling
+
+Pages keep the existing look: cream background (`#f8f7f2`), deep green text and buttons, sage accents,
+DM Sans with Playfair Display headings. Shared dashboard styles are in `src/styles/dashboard.css`;
+the customer pages use `src/styles/booking.css`.

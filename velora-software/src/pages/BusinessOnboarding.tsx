@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import type { ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/auth-context";
 import type { Staff, StaffFormData } from "../types/staff";
+import type { Service, ServicePayload } from "../types/services";
+import { CATEGORY_LABELS, type Business } from "../types/business";
 import {
     createBusiness,
     createService,
@@ -13,33 +15,14 @@ import {
 
 import "./BusinessOnboarding.css";
 
-interface Business {
-    id: number;
-    business_name: string;
-    business_description: string;
-    business_category: string;
-    whatsapp_number: string;
-    business_email: string;
-    business_logo: string | null;
-}
-
 interface BusinessFormData {
     business_name: string;
     business_description: string;
     business_category: string;
     whatsapp_number: string;
     business_email: string;
+    number_of_service_users: string;
     business_logo: File | null;
-}
-
-interface Service {
-    id: number;
-    business: number;
-    service_name: string;
-    service_description: string;
-    price: string | number;
-    duration_minutes: number;
-    is_available: boolean;
 }
 
 interface ServiceFormData {
@@ -50,24 +33,7 @@ interface ServiceFormData {
     is_available: boolean;
 }
 
-interface ServicePayload {
-    business: number;
-    service_name: string;
-    service_description: string;
-    price: string;
-    duration_minutes: number;
-    is_available: boolean;
-}
-
 type FieldErrors = Record<string, string>;
-
-const CATEGORY_LABELS: Record<string, string> = {
-    SC: "Salon",
-    BSC: "Barbershop",
-    SP: "Spa",
-    BCC: "Beauty Clinic",
-    SPC: "Salon Professional",
-};
 
 const initialBusinessForm: BusinessFormData = {
     business_name: "",
@@ -75,6 +41,7 @@ const initialBusinessForm: BusinessFormData = {
     business_category: "",
     whatsapp_number: "",
     business_email: "",
+    number_of_service_users: "1",
     business_logo: null,
 };
 
@@ -233,6 +200,10 @@ function BusinessOnboarding() {
         payload.append("business_category", formData.business_category);
         payload.append("whatsapp_number", formData.whatsapp_number);
         payload.append("business_email", formData.business_email);
+        payload.append(
+            "number_of_service_users",
+            String(Math.max(1, Number(formData.number_of_service_users) || 1))
+        );
 
         if (formData.business_logo) {
             payload.append("business_logo", formData.business_logo);
@@ -241,9 +212,7 @@ function BusinessOnboarding() {
         try {
             const response = await createBusiness(payload);
 
-            const createdBusiness = (
-                response?.business ?? response?.data ?? response
-            ) as Business;
+            const createdBusiness: Business = response;
 
             if (!createdBusiness?.id) {
                 throw new Error(
@@ -350,9 +319,7 @@ function BusinessOnboarding() {
         try {
             const response = await createService(payload);
 
-            const createdService = (
-                response?.service ?? response?.data ?? response
-            ) as Service;
+            const createdService: Service = response;
 
             setServices((prev) => [...prev, createdService]);
             setServiceForm(initialServiceForm);
@@ -472,8 +439,29 @@ function BusinessOnboarding() {
         }
     };
 
-    const handleFinishOnboarding = (): void => {
+    const [finishing, setFinishing] = useState<boolean>(false);
+
+    const handleFinishOnboarding = async (): Promise<void> => {
         if (!business?.id) return;
+
+        // Bookings are made with a staff member. A solo professional who
+        // skipped this step is added as the first team member, so their
+        // booking page has open slots straight away.
+        if (staff.length === 0 && user) {
+            setFinishing(true);
+            try {
+                await createStaff(business.id, {
+                    staff_name: user.name || "Owner",
+                    staff_email: user.email,
+                    id_number: "OWNER",
+                    is_available: true,
+                });
+            } catch (err) {
+                console.error("Could not add the owner as staff:", err);
+            } finally {
+                setFinishing(false);
+            }
+        }
 
         navigate(`/dashboard/${business.id}/overview`, {
             replace: true,
@@ -703,7 +691,7 @@ function BusinessOnboarding() {
                                 )}
                             </div>
 
-                            <div className="form-field full-width">
+                            <div className="form-field">
                                 <label htmlFor="business_email">
                                     Business email *
                                 </label>
@@ -721,6 +709,28 @@ function BusinessOnboarding() {
                                 {fieldErrors.business_email && (
                                     <small className="field-error">
                                         {fieldErrors.business_email}
+                                    </small>
+                                )}
+                            </div>
+
+                            <div className="form-field">
+                                <label htmlFor="number_of_service_users">
+                                    People providing services *
+                                </label>
+
+                                <input
+                                    id="number_of_service_users"
+                                    name="number_of_service_users"
+                                    type="number"
+                                    min="1"
+                                    value={formData.number_of_service_users}
+                                    onChange={handleChange}
+                                    required
+                                />
+
+                                {fieldErrors.number_of_service_users && (
+                                    <small className="field-error">
+                                        {fieldErrors.number_of_service_users}
                                     </small>
                                 )}
                             </div>
@@ -1190,14 +1200,15 @@ function BusinessOnboarding() {
                             <p>
                                 {staff.length > 0
                                     ? "Your team has been added. You are ready to enter your workspace."
-                                    : "You can skip adding staff for now and add team members later from your dashboard."}
+                                    : "Working alone? Skip this step and we will add you as the first team member, so customers can book you straight away."}
                             </p>
 
                             <button
                                 type="button"
                                 onClick={handleFinishOnboarding}
+                                disabled={finishing}
                             >
-                                Finish onboarding <span>→</span>
+                                {finishing ? "Setting up..." : "Finish onboarding"} <span>→</span>
                             </button>
                         </div>
                     </section>

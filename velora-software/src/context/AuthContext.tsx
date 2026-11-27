@@ -1,65 +1,60 @@
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { getCurrentUser, LogoutUser } from "../lib/api/auth";
+import { ensureCsrfToken } from "../lib/api/axios";
+import type { AuthUser } from "../types/register.auth";
+import { AuthContext } from "./auth-context";
 
-import React, {
-    createContext,
-    useContext,
-    useEffect,
-    useState
-} from "react";
-import { getCurrentUser } from "../lib/api/auth";
-
-
-const AuthContext = createContext(null);
-
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const checkSession = async () => {
-    try {
-        const response = await getCurrentUser();
-
-        // Check the authenticated flag from your view
-        if (response && response.authenticated) {
-            setUser(response.user);
-        } else {
+    const checkSession = useCallback(async () => {
+        try {
+            const response = await getCurrentUser();
+            setUser(response.authenticated ? response.user : null);
+        } catch {
             setUser(null);
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        setUser(null);
-    } finally {
-        setLoading(false); // Only stop loading after we are certain of the state
-    }
-};
-
-
-    useEffect(() => {
-        checkSession();
     }, []);
 
-    const login = (userData) => {
+    useEffect(() => {
+        let active = true;
+        // Make sure a CSRF token exists before any form can be submitted.
+        ensureCsrfToken();
+        getCurrentUser()
+            .then((response) => {
+                if (active) setUser(response.authenticated ? response.user : null);
+            })
+            .catch(() => {
+                if (active) setUser(null);
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const login = useCallback((userData: AuthUser) => {
         setUser(userData);
-    };
+        setLoading(false);
+    }, []);
 
-    const logout = () => {
-        setUser(null);
-    };
+    const logout = useCallback(async () => {
+        try {
+            await LogoutUser();
+        } finally {
+            setUser(null);
+        }
+    }, []);
 
-    return (
-        <AuthContext.Provider
-            value={{
-                user,
-                loading,
-                isAuthenticated: Boolean(user),
-                login,
-                logout,
-                checkSession,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
+    const value = useMemo(
+        () => ({ user, loading, isAuthenticated: Boolean(user), login, logout, checkSession }),
+        [user, loading, login, logout, checkSession]
     );
-}
 
-export function useAuth() {
-    return useContext(AuthContext);
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

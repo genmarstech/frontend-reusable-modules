@@ -1,15 +1,21 @@
-import { Navigate, Outlet } from "react-router";
-import { useAuth } from "../context/AuthContext";
+import { Navigate, Outlet, useLocation } from "react-router";
+import { useAuth } from "../context/auth-context";
 
 function ProtectedRoute() {
     const { isAuthenticated, loading } = useAuth();
+    const location = useLocation();
 
     if (loading) {
-        return <div>Checking your session...</div>;
+        return (
+            <div className="app-loading">
+                <div className="app-spinner" />
+                <p>Checking your session...</p>
+            </div>
+        );
     }
 
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 
     return <Outlet />;

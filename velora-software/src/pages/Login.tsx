@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +19,7 @@ import {
 
 import { LoginUser } from "../lib/api/auth";
 import { handleApiError } from "../lib/api/handleErrors";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/auth-context";
 
 import "./Login.css";
 
@@ -35,8 +35,13 @@ const loginSchema = z.object({
     .min(1, "Password is required.")
 });
 
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo =
+    (location.state as { from?: string } | null)?.from || "/businesses";
 
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -46,7 +51,7 @@ function Login() {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting }
-  } = useForm({
+  } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: "onBlur",
     defaultValues: {
@@ -58,7 +63,7 @@ function Login() {
   const { login } = useAuth();
 
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: LoginFormValues) => {
     setServerError("");
 
     const payload = {
@@ -76,10 +81,7 @@ function Login() {
       // to the page they originally requested.
       login(response.user);
 
-      // Navigate to your next page.
-      setTimeout(() => {
-        navigate("/businesses", { replace: true });
-      }, 50);
+      navigate(redirectTo, { replace: true });
 
     } catch (error) {
       const apiError = handleApiError(error);
@@ -88,7 +90,7 @@ function Login() {
       let hasFieldError = false;
 
       Object.entries(fieldErrors).forEach(([field, messages]) => {
-        if (["email", "password"].includes(field)) {
+        if (field === "email" || field === "password") {
           setError(field, {
             type: "server",
             message: Array.isArray(messages)

@@ -5,6 +5,8 @@ export interface Staff {
     staff_name: string;
     staff_email: string;
     id_number: string;
+    staff_phone?: string;
+    skills: number[];
     is_available: boolean;
     business_category: string;
     created_at: string;
@@ -15,6 +17,8 @@ export interface StaffFormData {
     staff_name: string;
     staff_email: string;
     id_number: string;
+    staff_phone?: string;
+    skills?: number[];
     is_available: boolean;
 }
 
