@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useOutletContext } from "react-router";
 import { X, Loader2 } from "lucide-react";
 import { STATUS_LABELS } from "../lib/format";
 import { LogoMark } from "./Brand";
@@ -178,14 +179,41 @@ export function PageLoading({ label = "Loading..." }: { label?: string }) {
     );
 }
 
-export function PageHeader({ title, text, actions }: { title: string; text?: string; actions?: ReactNode }) {
+/** Initials on a soft tint picked from the name, so the same client always gets the same colour. */
+export function Avatar({ name, size = 32 }: { name: string; size?: number }) {
+    const words = name.trim().split(/\s+/).filter(Boolean);
+    const initials = ((words[0]?.[0] || "") + (words.length > 1 ? words[words.length - 1][0] : "")).toUpperCase() || "?";
+    let hash = 0;
+    for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+    return (
+        <span
+            className={`v-avatar v-avatar-${hash % 5}`}
+            style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
+            aria-hidden="true"
+        >
+            {initials}
+        </span>
+    );
+}
+
+/**
+ * Page title row. Inside the dashboard it also shows the account tools
+ * (notifications bell and profile menu) on the right, like the Overview.
+ */
+export function PageHeader({ title, text, actions }: { title: ReactNode; text?: ReactNode; actions?: ReactNode }) {
+    const shell = useOutletContext<{ accountActions?: ReactNode } | undefined>();
     return (
         <header className="dashboard-overview-header">
             <div>
                 <h1>{title}</h1>
                 {text && <p>{text}</p>}
             </div>
-            {actions && <div className="v-header-actions">{actions}</div>}
+            {(actions || shell?.accountActions) && (
+                <div className="v-header-actions">
+                    {actions}
+                    {shell?.accountActions}
+                </div>
+            )}
         </header>
     );
 }

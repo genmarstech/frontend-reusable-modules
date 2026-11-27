@@ -12,6 +12,7 @@ import "./pages/BusinessOnboarding.css";
 import "./pages/BusinessSelection.css";
 import "./pages/DashboardOverview.css";
 import "./styles/dashboard.css";
+import "./styles/dashboard-refresh.css";
 import "./styles/booking.css";
 import "./styles/brand.css";
 import { AuthProvider } from "./context/AuthContext.tsx";

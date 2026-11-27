@@ -365,3 +365,79 @@ export interface PublicBooking {
         policy_notes: string;
     };
 }
+
+// Owner dashboard overview (GET bk/overview/)
+export interface OverviewBookingItem {
+    type: "booking";
+    id: number;
+    start: string;
+    end: string;
+    customer_name: string;
+    service_name: string;
+    duration_minutes: number;
+    staff_name: string | null;
+    status: BookingStatus;
+    status_label: string;
+}
+
+export interface OverviewFreeItem {
+    type: "available";
+    start: string;
+    end: string;
+    minutes: number;
+}
+
+export interface SetupStep {
+    key: "profile" | "services" | "team" | "hours" | "share";
+    label: string;
+    text: string;
+    done: boolean;
+    link: string;
+}
+
+export interface Overview {
+    date: string;
+    timezone: string;
+    stats: {
+        today: { value: number; previous: number; change_pct: number | null; spark: number[] };
+        upcoming: { value: number; spark: number[] };
+        services: { value: number; total: number; spark: number[] };
+        staff: { value: number; available: number; spark: number[] };
+    };
+    schedule: (OverviewBookingItem | OverviewFreeItem)[];
+    setup: { steps: SetupStep[]; completed: number; total: number };
+    top_services: { service_id: number; name: string; bookings: number; spark: number[] }[];
+    attention: number;
+    failed_messages: number;
+}
+
+// GET bk/overview/performance/
+export interface Performance {
+    range: { date_from: string; date_to: string; timezone: string };
+    bucket: "day" | "week";
+    revenue: { value: string; previous: string; change_pct: number | null };
+    bookings: { value: number; previous: number; change_pct: number | null };
+    returning_clients: { value_pct: number | null; previous_pct: number | null; change_pts: number | null };
+    series: { date: string; end: string; revenue: string; bookings: number }[];
+}
+
+// GET bk/payments/
+export interface PaymentRow {
+    id: number;
+    booking: number;
+    created_at: string;
+    customer_name: string;
+    service_name: string;
+    kind: Payment["kind"];
+    kind_label: string;
+    method: Payment["method"];
+    method_label: string;
+    amount: string;
+    reference: string;
+}
+
+export interface PaymentsReport {
+    range: { date_from: string; date_to: string; timezone: string };
+    summary: { collected: string; deposits: string; refunds: string; outstanding: string; count: number };
+    payments: PaymentRow[];
+}
