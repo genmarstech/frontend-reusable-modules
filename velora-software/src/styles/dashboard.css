@@ -1059,6 +1059,51 @@
     flex: 1;
 }
 
+/* Booking link editor: fixed "getvelora.co.ke/book/" prefix + editable name */
+.v-slug-input {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #e5e5dd;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.v-slug-input:focus-within {
+    border-color: #82977b;
+    box-shadow: 0 0 0 3px rgba(130, 151, 123, 0.12);
+}
+
+.v-slug-input span {
+    display: flex;
+    align-items: center;
+    padding: 0 4px 0 12px;
+    background: #f8f7f2;
+    color: #7a8077;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.v-field .v-slug-input input:not([type="checkbox"]):not([type="radio"]),
+.v-field .v-slug-input input:not([type="checkbox"]):not([type="radio"]):focus {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 11px 12px 11px 2px;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+@media (max-width: 600px) {
+    .v-copy-box { flex-wrap: wrap; }
+    .v-copy-box input { flex-basis: 100%; }
+    .v-slug-input span { max-width: 45%; overflow: hidden; text-overflow: ellipsis; }
+}
+
 @media (max-width: 1100px) {
     .v-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .v-two-col { grid-template-columns: 1fr; }

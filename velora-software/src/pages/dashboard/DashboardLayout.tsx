@@ -91,11 +91,11 @@ function DashboardLayout() {
 
     const copyLink = async () => {
         try {
-            await navigator.clipboard.writeText(publicBookingUrl(id));
+            await navigator.clipboard.writeText(publicBookingUrl(business?.slug || String(id)));
             setCopied(true);
             setTimeout(() => setCopied(false), 1800);
         } catch {
-            window.prompt("Copy your booking link", publicBookingUrl(id));
+            window.prompt("Copy your booking link", publicBookingUrl(business?.slug || String(id)));
         }
     };
 
@@ -171,7 +171,7 @@ function DashboardLayout() {
                     <div className="v-booking-link">
                         <p>Share your booking page so customers can book themselves.</p>
                         <div>
-                            <a href={`/book/${business.id}`} target="_blank" rel="noreferrer">
+                            <a href={`/book/${business.slug}`} target="_blank" rel="noreferrer">
                                 Open
                             </a>
                             <button type="button" onClick={copyLink}>

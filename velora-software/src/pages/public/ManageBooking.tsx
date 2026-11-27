@@ -240,7 +240,7 @@ function ManageBooking() {
                     )}
 
                     <div className="bk-actions">
-                        <Link className="bk-back" to={`/book/${booking.business_id}`}>Book another appointment →</Link>
+                        <Link className="bk-back" to={`/book/${booking.business_slug || booking.business_id}`}>Book another appointment →</Link>
                     </div>
                 </div>
                 <div className="bk-footer">Powered by <Link to="/">velora.</Link></div>
