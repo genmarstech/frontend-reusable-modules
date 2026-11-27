@@ -54,6 +54,10 @@ export default function Motion() {
 
     const arm = (root: ParentNode) => {
       root.querySelectorAll<HTMLElement>(REVEAL).forEach((el) => {
+        // In development React runs this effect twice and the first run's
+        // observer is disconnected; anything it left waiting must be
+        // observed again, or it stays invisible.
+        if (el.classList.contains("rv")) return io.observe(el);
         if (el.dataset.rv) return;
         el.dataset.rv = "1";
         // Already on screen at load: show it, do not make it fade in late.

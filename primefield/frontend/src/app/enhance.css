@@ -127,9 +127,13 @@ nav.main a{transition:background .2s,color .2s}
   .card:hover .ph img{transform:scale(1.06)}
   .panel,.promise div,.req div,.office{transition:transform .25s,box-shadow .25s,border-color .25s}
   .panel:hover,.promise div:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
-  .photos img,.inline-photo img{transition:transform .7s cubic-bezier(.2,.7,.2,1)}
-  .photos figure,.inline-photo{overflow:hidden;border-radius:20px}
-  .photos figure:hover img,.inline-photo:hover img{transform:scale(1.04)}
+  /* The figure itself must not clip: its rounded corner would cut into
+     the caption below the photo. Only the caption-less photo zooms. */
+  .photos img{transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+  .photos figure:hover img{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .inline-photo{overflow:hidden;border-radius:20px}
+  .inline-photo img{transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+  .inline-photo:hover img{transform:scale(1.04)}
 
   .btn:active,.add:active,.filters button:active,.picked button:active,.incoterms span:active,.menu-btn:active{transform:scale(.96)}
   .btn .arrow{transition:transform .2s}

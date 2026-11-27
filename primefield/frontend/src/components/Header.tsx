@@ -24,6 +24,16 @@ export default function Header() {
   const quote = useQuote();
   const [open, setOpen] = useState(false);
 
+  // A link keeps focus after a client-side navigation, unlike a full page
+  // load. The first key a visitor then presses to scroll (space, arrows,
+  // Page Down) makes the browser draw the keyboard focus ring around the
+  // link they clicked, which reads as a stray box around the logo. Start
+  // the new page unfocused, as a full load would.
+  useEffect(() => {
+    const el = document.activeElement;
+    if (el instanceof HTMLElement && el.closest("header.site")) el.blur();
+  }, [path]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
