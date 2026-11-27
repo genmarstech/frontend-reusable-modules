@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +24,7 @@ import "./Register.css";
 import { useNavigate } from "react-router";
 import type { RegisterPayload } from "../types/register.auth";
 import { RegisterUser } from "../lib/api/auth";
+import { useAuth } from "../context/auth-context";
 
 // VALIDATION SCHEMA
 const registerSchema = z.object({
@@ -73,6 +74,7 @@ function Register() {
   const [serverError, setServerError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate()
+  const { login } = useAuth();
 
   const {
     register,
@@ -106,15 +108,19 @@ function Register() {
     try {
         const response = await RegisterUser(payload);
 
+        // The backend signs the new user in, so update the session state
+        // before moving on; otherwise the protected page bounces to /login.
+        login(response.user);
+
         setSuccessMessage(
-            `Hello ${response.full_name}, your account has been created successfully.`
+            `Hello ${response.user.name}, your account has been created successfully.`
         );
 
         reset();
 
         setTimeout(() => {
-            navigate("/businesses", { replace: true });
-        }, 1500);
+            navigate("/onboarding/business", { replace: true });
+        }, 1200);
 
     } catch (error: unknown) {
         const apiError = handleApiError(error);

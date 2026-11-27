@@ -5,7 +5,6 @@ import {
   Users,
   ChartNoAxesCombined,
   Clock3,
-  Scissors,
   Sparkles,
   ShieldCheck,
   Menu,
@@ -213,7 +212,7 @@ function Home() {
       {/* FEATURES */}
       <section className="features-section" id="features">
         <div className="section-heading">
-          <span className="section-eyebrow">THE VELO​RA EXPERIENCE</span>
+          <span className="section-eyebrow">THE VELORA EXPERIENCE</span>
           <h2>
             Everything your business needs.
             <br />

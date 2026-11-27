@@ -5,11 +5,27 @@ export interface RegisterPayload {
     password: string;
 }
 
-export interface RegisterResponse {
-    full_name: string;
+export interface LoginPayload {
     email: string;
-    phone_number: string;
-    created_at: string;
-    updated_at: string;
+    password: string;
 }
 
+export interface AuthUser {
+    id: number;
+    email: string;
+    name: string;
+    phone_number?: string;
+}
+
+export interface AuthResponse {
+    message: string;
+    authenticated: boolean;
+    user: AuthUser;
+    csrfToken?: string;
+}
+
+export interface SessionResponse {
+    authenticated: boolean;
+    user: AuthUser | null;
+    csrfToken?: string;
+}

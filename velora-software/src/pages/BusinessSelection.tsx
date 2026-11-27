@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import type { Business } from "../types/business";
+import { CATEGORY_LABELS, type Business } from "../types/business";
 import { getMyBusiness } from "../lib/api/auth";
 import "./BusinessSelection.css";
 
@@ -17,9 +17,7 @@ function BusinessSelection() {
             try {
                 const data = await getMyBusiness();
 
-                const results: Business[] = Array.isArray(data)
-                    ? data
-                    : data.results || [];
+                const results: Business[] = Array.isArray(data) ? data : [];
 
                 setBusinesses(results);
 
@@ -117,7 +115,7 @@ function BusinessSelection() {
 
                         <h3>{business.business_name}</h3>
 
-                        <p>{business.business_category}</p>
+                        <p>{CATEGORY_LABELS[business.business_category] || business.business_category_label || business.business_category}</p>
 
                         <span>Open dashboard →</span>
                     </button>
