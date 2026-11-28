@@ -97,18 +97,11 @@ function NotificationsPage() {
                                         </td>
                                         <td data-label="Channel">{CHANNEL_LABELS[n.channel]}</td>
                                         <td data-label="When">
-                                            {formatDateTime(n.status === "queued" ? n.scheduled_for : n.sent_at || n.created_at, timeZone)}
-                                            {n.attempts > 1 && <small>{n.attempts} attempts</small>}
-                                        </td>
-                                        <td data-label="Status"><StatusBadge status={n.status} /></td>
-                                        <td data-label="" className="v-num">
-                                        <td>{CHANNEL_LABELS[n.channel]}</td>
-                                        <td>
                                             {formatDateTime(n.status === "queued" ? n.next_attempt_at || n.scheduled_for : n.sent_at || n.created_at, timeZone)}
                                             {n.attempts > 1 && <small>{n.attempts} attempts</small>}
                                         </td>
-                                        <td><StatusBadge status={messageStatus(n)} /></td>
-                                        <td className="v-num">
+                                        <td data-label="Status"><StatusBadge status={messageStatus(n)} /></td>
+                                        <td data-label="" className="v-num">
                                             {n.status === "failed" && (
                                                 <button className="v-link" onClick={(e) => { e.stopPropagation(); retry(n); }}>Retry</button>
                                             )}
