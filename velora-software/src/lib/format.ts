@@ -135,6 +135,7 @@ export const CHANNEL_LABELS: Record<string, string> = {
     email: "Email",
     sms: "SMS",
     whatsapp: "WhatsApp",
+    telegram: "Telegram",
     push: "Push",
 };
 
@@ -144,6 +145,8 @@ export const BOOKING_CHANNEL_LABELS: Record<string, string> = {
     walk_in: "Walk-in",
     phone: "Phone",
     staff: "Added by staff",
+    whatsapp: "WhatsApp bot",
+    telegram: "Telegram bot",
     unknown: "Not recorded",
     "": "Not recorded",
 };

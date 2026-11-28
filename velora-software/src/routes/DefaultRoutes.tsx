@@ -26,6 +26,7 @@ const NotificationsPage = lazy(() => import("../pages/dashboard/NotificationsPag
 const AnalyticsPage = lazy(() => import("../pages/dashboard/AnalyticsPage"))
 const PaymentsPage = lazy(() => import("../pages/dashboard/PaymentsPage"))
 const SettingsPage = lazy(() => import("../pages/dashboard/SettingsPage"))
+const ChannelsPage = lazy(() => import("../pages/dashboard/ChannelsPage"))
 const BookingPage = lazy(() => import("../pages/public/BookingPage"))
 const ManageBooking = lazy(() => import("../pages/public/ManageBooking"))
 const CustomerBookings = lazy(() => import("../pages/public/CustomerBookings"))
@@ -64,6 +65,7 @@ function DefaultRoutes() {
           <Route path="services" element={<ServicesPage />} />
           <Route path="team" element={<TeamPage />} />
           <Route path="schedule" element={<SchedulePage />} />
+          <Route path="channels" element={<ChannelsPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />

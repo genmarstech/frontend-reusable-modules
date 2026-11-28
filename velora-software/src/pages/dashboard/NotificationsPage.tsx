@@ -42,8 +42,8 @@ function NotificationsPage() {
         <div className="dashboard-overview">
             <PageHeader title="Notifications" text="Every confirmation, reminder and alert, with its delivery status." />
             <Alert kind="info">
-                Messages are logged here but not delivered yet: email, SMS and WhatsApp providers are not connected.
-                Once they are, the same messages go out automatically.
+                Telegram and WhatsApp messages go to customers who chat with the Velora bots (turn them on under Channels).
+                SMS is not connected yet, so SMS messages are only logged here.
             </Alert>
             <div className="v-filters">
                 <Field label="Status">
@@ -63,6 +63,7 @@ function NotificationsPage() {
                         <option value="email">Email</option>
                         <option value="sms">SMS</option>
                         <option value="whatsapp">WhatsApp</option>
+                        <option value="telegram">Telegram</option>
                         <option value="push">Push</option>
                     </select>
                 </Field>
