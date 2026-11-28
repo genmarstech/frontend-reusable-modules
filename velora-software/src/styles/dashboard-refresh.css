@@ -1535,3 +1535,45 @@ button.ov-slot:hover {
 .share-action:hover { border-color: #bdcdbf; background: #fafbf7; }
 .share-whatsapp { border-color: #354b37; background: #354b37; color: #fff; }
 .share-whatsapp:hover { background: #2b3e2d; border-color: #2b3e2d; }
+
+/* Booking link readiness: what stops customers from booking online */
+.ov-ready {
+    margin-bottom: 20px;
+    padding: 18px 20px;
+    border: 1px solid #f0d3b0;
+    border-radius: 18px;
+    background: #fdf5ea;
+}
+
+.ov-ready.is-closed { border-color: #ecc2b5; background: #fcefea; }
+.ov-ready-head strong { display: block; color: #5e3a20; font-size: 15px; }
+.ov-ready-head small { color: #8a6a55; font-size: 12.5px; }
+.ov-ready ul { margin: 12px 0 0; padding: 0; list-style: none; }
+
+.ov-ready li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(94, 58, 32, 0.1);
+    color: #4b3a2e;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.ov-ready li span { flex: 1; min-width: 220px; }
+.ov-ready li .v-btn { text-decoration: none; }
+
+.ov-waitlist-note {
+    display: block;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: #f3f6f0;
+    color: #3e5948;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+}

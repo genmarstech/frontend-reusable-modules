@@ -494,3 +494,22 @@
     .bk-hero-inner { flex-wrap: wrap; }
     .bk-account { width: 100%; justify-content: flex-start; margin-left: 0; }
 }
+
+.bk-closed {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid #f1dfc0;
+    border-radius: 14px;
+    background: #fdf6ea;
+    color: #7a5a24;
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.bk-closed strong { color: #5e4316; font-size: 14.5px; }
+.bk-closed a { color: #3e5948; font-weight: 700; }
+.bk-option:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+.bk-option:disabled .bk-price { color: #a5aba4; }

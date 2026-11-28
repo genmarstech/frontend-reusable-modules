@@ -15,6 +15,7 @@ import {
 } from "../lib/api/auth";
 
 import "./BusinessOnboarding.css";
+import HoursEditor from "./dashboard/HoursEditor";
 
 interface BusinessFormData {
     business_name: string;
@@ -464,9 +465,12 @@ function BusinessOnboarding() {
             }
         }
 
-        navigate(`/dashboard/${business.id}/overview`, {
-            replace: true,
-        });
+        setStep(4);
+    };
+
+    const finishOnboarding = () => {
+        if (!business?.id) return;
+        navigate(`/dashboard/${business.id}/overview`, { replace: true });
     };
 
     // --------------------------------------------------
@@ -521,7 +525,9 @@ function BusinessOnboarding() {
                             ? "STEP 01 — BUSINESS PROFILE"
                             : step === 2
                             ? "STEP 02 — ADD SERVICES"
-                            : "STEP 03 — ADD STAFF"}
+                            : step === 3
+                            ? "STEP 03 — ADD STAFF"
+                            : "STEP 04 — OPENING HOURS"}
                     </span>
 
                     <h1>
@@ -535,10 +541,15 @@ function BusinessOnboarding() {
                                 Introduce your
                                 <span> services.</span>
                             </>
-                        ) : (
+                        ) : step === 3 ? (
                             <>
                                 Build your
                                 <span> team.</span>
+                            </>
+                        ) : (
+                            <>
+                                Set your
+                                <span> opening hours.</span>
                             </>
                         )}
                     </h1>
@@ -548,7 +559,9 @@ function BusinessOnboarding() {
                             ? `Welcome, ${displayName}. Tell us about your business so we can create your Velora workspace.`
                             : step === 2
                             ? `Add the services that ${business?.business_name} offers to its customers.`
-                            : `Add the people who will help run ${business?.business_name}. You can also add more staff later from your dashboard.`}
+                            : step === 3
+                            ? `Add the people who will help run ${business?.business_name}. You can also add more staff later from your dashboard.`
+                            : `Customers can only book when you are open. Check the days and times below and save them to open your booking link.`}
                     </p>
                 </div>
 
@@ -558,12 +571,12 @@ function BusinessOnboarding() {
                         <div
                             className="progress-fill"
                             style={{
-                                width: `${(step / 3) * 100}%`,
+                                width: `${(step / 4) * 100}%`,
                             }}
                         />
                     </div>
 
-                    <span>Step {step} of 3</span>
+                    <span>Step {step} of 4</span>
                 </div>
 
                 {/* ====================================== */}
@@ -1209,9 +1222,33 @@ function BusinessOnboarding() {
                                 onClick={handleFinishOnboarding}
                                 disabled={finishing}
                             >
-                                {finishing ? "Setting up..." : "Finish onboarding"} <span>→</span>
+                                {finishing ? "Setting up..." : "Continue to opening hours"} <span>→</span>
                             </button>
                         </div>
+                    </section>
+                )}
+
+                {/* ====================================== */}
+                {/* STEP 4: OPENING HOURS (required to take bookings) */}
+                {/* ====================================== */}
+
+                {step === 4 && business && (
+                    <section className="hours-onboarding">
+                        <div className="form-section-heading">
+                            <div>
+                                <h2>When are you open?</h2>
+                                <p>
+                                    We filled in Monday to Saturday, 9:00 to 18:00. Change anything that is different,
+                                    then save. Your booking link opens once your hours are saved.
+                                </p>
+                            </div>
+                        </div>
+                        <HoursEditor
+                            staffId={null}
+                            businessId={business.id}
+                            saveLabel="Save hours and open my booking link"
+                            onSaved={finishOnboarding}
+                        />
                     </section>
                 )}
             </section>
