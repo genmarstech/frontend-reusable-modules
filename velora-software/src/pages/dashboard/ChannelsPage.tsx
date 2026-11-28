@@ -11,6 +11,7 @@ import {
 import { handleApiError } from "../../lib/api/handleErrors";
 import { Alert, PageHeader, Section, Spinner } from "../../components/ui";
 import { useDashboard } from "./dashboard-context";
+import { QrCode } from "../../components/QrCode";
 
 import "../../styles/channels.css";
 
@@ -97,7 +98,7 @@ function ChannelsPage() {
                     onToggle={(on) => save("whatsapp", { whatsapp_enabled: on })}
                     shareText={`Book your next appointment at ${name} on WhatsApp: ${whatsapp.link}`}
                     pending="The Velora WhatsApp number is being set up. Your link will appear here as soon as it is ready."
-                    how="Customers tap the link and send the ready-made message. Their WhatsApp number is their account."
+                    how={`Customers tap the link and send the ready-made message. Anyone who messages ${whatsapp.number || "the Velora number"} can also find ${name} by name, so you are listed there unless you switch this off.`}
                 />
             </div>
 
@@ -237,6 +238,9 @@ function ChannelCard({
                         </a>
                     </div>
                     {!stats.enabled && <p className="v-hint">Turn it on so customers who open the link can book.</p>}
+                    {stats.enabled && (
+                        <QrCode value={stats.link} fileName={`${kind}-booking-qr.gif`} label={`Scan to book on ${title}`} />
+                    )}
                 </>
             )}
 

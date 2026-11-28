@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
-import { History, Loader2, RotateCcw, UserRound } from "lucide-react";
+import { History, Loader2, MessageCircle, RotateCcw, UserRound } from "lucide-react";
 
 import {
     createPublicBooking,
@@ -393,6 +393,11 @@ function BookingPage() {
                         <p>{business.business_description}</p>
                     </div>
                     <div className="bk-account">
+                        {business.chat_links?.whatsapp && (
+                            <a className="bk-account-link" href={business.chat_links.whatsapp} target="_blank" rel="noreferrer">
+                                <MessageCircle size={14} /> Book on WhatsApp
+                            </a>
+                        )}
                         {account ? (
                             <>
                                 <span className="bk-account-name"><UserRound size={14} /> Hi, {account.first_name}</span>

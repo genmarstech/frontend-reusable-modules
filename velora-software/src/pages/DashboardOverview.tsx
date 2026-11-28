@@ -632,6 +632,7 @@ function DashboardOverview() {
 
             {sharing && (
                 <ShareLinkModal
+                    businessId={business.id}
                     businessName={business.business_name}
                     slug={business.slug}
                     progress={shareStep?.progress}
