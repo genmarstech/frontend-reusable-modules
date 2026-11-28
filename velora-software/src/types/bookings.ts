@@ -7,7 +7,7 @@ export type BookingStatus =
     | "completed"
     | "no_show";
 
-export type BookingChannel = "online" | "walk_in" | "phone" | "staff" | "whatsapp" | "api";
+export type BookingChannel = "online" | "walk_in" | "phone" | "staff" | "whatsapp" | "telegram" | "api";
 
 export type NotifyChannel = "email" | "sms" | "whatsapp" | "push";
 
