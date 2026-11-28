@@ -16,7 +16,7 @@ import {
     type BookingAction,
 } from "../../lib/api/bookings";
 import { handleApiError, fieldErrorsFrom } from "../../lib/api/handleErrors";
-import { formatDateTime, formatMoney, formatTime, todayIn, CHANNEL_LABELS } from "../../lib/format";
+import { formatDateTime, formatMoney, formatTime, todayIn, messageStatus, CHANNEL_LABELS, RECIPIENT_LABELS } from "../../lib/format";
 import type { Booking, BookingEvent, Customer, NotificationLog, Slot } from "../../types/bookings";
 import { Alert, Field, Modal, StatusBadge, Spinner } from "../../components/ui";
 import { useDashboard } from "./dashboard-context";
@@ -712,13 +712,18 @@ export function BookingDetailModal({
                         <ul className="v-timeline">
                             {messages.slice(0, 12).map((m) => (
                                 <li key={m.id}>
-                                    {m.event_label} · {CHANNEL_LABELS[m.channel]} <StatusBadge status={m.status} />
+                                    {m.event_label} · {CHANNEL_LABELS[m.channel]} <StatusBadge status={messageStatus(m)} />
                                     <small>
-                                        {m.to_address} ·{" "}
-                                        {m.status === "queued"
-                                            ? `scheduled ${formatDateTime(m.scheduled_for, timeZone)}`
-                                            : formatDateTime(m.sent_at || m.created_at, timeZone)}
+                                        To {RECIPIENT_LABELS[m.recipient_type] || m.recipient_type} ({m.to_address}) ·{" "}
+                                        {messageStatus(m) === "retrying"
+                                            ? `couldn't send, trying again ${formatDateTime(m.next_attempt_at || m.scheduled_for, timeZone)}`
+                                            : m.status === "queued"
+                                              ? `scheduled for ${formatDateTime(m.scheduled_for, timeZone)}`
+                                              : m.status === "failed"
+                                                ? "couldn't send"
+                                                : `sent ${formatDateTime(m.sent_at || m.created_at, timeZone)}`}
                                     </small>
+                                    {m.error && ["queued", "failed"].includes(m.status) && <small style={{ color: "var(--v-danger)" }}>{m.error}</small>}
                                 </li>
                             ))}
                         </ul>
