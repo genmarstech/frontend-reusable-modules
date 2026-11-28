@@ -171,17 +171,17 @@ function AnalyticsPage() {
 
                     <Section title="Capacity & utilisation" text={`${r.capacity.booked_hours} of ${r.capacity.available_hours} working hours booked`}>
                         <div className="v-table-wrap">
-                            <table className="v-table">
+                            <table className="v-table v-table-stack">
                                 <thead><tr><th>Staff</th><th className="v-num">Bookings</th><th className="v-num">Booked h</th><th className="v-num">Available h</th><th className="v-num">Idle h</th><th>Occupancy</th></tr></thead>
                                 <tbody>
                                     {r.capacity.staff.map((s) => (
                                         <tr key={s.staff_id}>
-                                            <td>{s.staff_name}</td>
-                                            <td className="v-num">{s.bookings}</td>
-                                            <td className="v-num">{s.booked_hours}</td>
-                                            <td className="v-num">{s.available_hours}</td>
-                                            <td className="v-num">{s.idle_hours}</td>
-                                            <td style={{ minWidth: 140 }}>
+                                            <td data-label="Staff">{s.staff_name}</td>
+                                            <td data-label="Bookings" className="v-num">{s.bookings}</td>
+                                            <td data-label="Booked h" className="v-num">{s.booked_hours}</td>
+                                            <td data-label="Available h" className="v-num">{s.available_hours}</td>
+                                            <td data-label="Idle h" className="v-num">{s.idle_hours}</td>
+                                            <td data-label="Occupancy" style={{ minWidth: 140 }}>
                                                 <div className="v-bar-track"><div className="v-bar-fill" style={{ width: `${Math.min(s.occupancy_pct, 100)}%` }} /></div>
                                                 <small>{s.occupancy_pct}%</small>
                                             </td>

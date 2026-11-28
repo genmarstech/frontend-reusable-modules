@@ -80,21 +80,28 @@ function NotificationsPage() {
                     <EmptyState art={<MessagesArt />} title="No messages yet" text="Messages appear here when bookings are made or changed." />
                 ) : (
                     <div className="v-table-wrap">
-                        <table className="v-table">
+                        <table className="v-table v-table-stack">
                             <thead>
                                 <tr><th>Message</th><th>To</th><th>Channel</th><th>When</th><th>Status</th><th /></tr>
                             </thead>
                             <tbody>
                                 {items.map((n) => (
                                     <tr key={n.id} className="v-clickable" onClick={() => setOpen(n)}>
-                                        <td>
+                                        <td data-label="Message">
                                             {n.event_label}
                                             <small>{n.recipient_type === "customer" ? "Customer" : n.recipient_type === "staff" ? "Staff" : "Business"}</small>
                                         </td>
-                                        <td>
+                                        <td data-label="To">
                                             {n.recipient_name || "—"}
                                             <small>{n.to_address}</small>
                                         </td>
+                                        <td data-label="Channel">{CHANNEL_LABELS[n.channel]}</td>
+                                        <td data-label="When">
+                                            {formatDateTime(n.status === "queued" ? n.scheduled_for : n.sent_at || n.created_at, timeZone)}
+                                            {n.attempts > 1 && <small>{n.attempts} attempts</small>}
+                                        </td>
+                                        <td data-label="Status"><StatusBadge status={n.status} /></td>
+                                        <td data-label="" className="v-num">
                                         <td>{CHANNEL_LABELS[n.channel]}</td>
                                         <td>
                                             {formatDateTime(n.status === "queued" ? n.next_attempt_at || n.scheduled_for : n.sent_at || n.created_at, timeZone)}

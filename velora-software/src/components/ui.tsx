@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useOutletContext } from "react-router";
 import { X, Loader2 } from "lucide-react";
 import { STATUS_LABELS } from "../lib/format";
@@ -73,7 +74,8 @@ export function Modal({
         };
     }, []);
 
-    return (
+    // Render into <body> so no page wrapper (transforms, overflow, stacking) can clip or shift it.
+    return createPortal(
         <div className="v-modal-backdrop" onMouseDown={onClose}>
             <div
                 ref={dialogRef}
@@ -95,7 +97,8 @@ export function Modal({
                 </header>
                 <div className="v-modal-body">{children}</div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

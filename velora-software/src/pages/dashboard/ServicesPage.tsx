@@ -47,7 +47,7 @@ function ServicesPage() {
                     <EmptyState art={<ServicesArt />} title="No services yet" text="Add your first service to open bookings." />
                 ) : (
                     <div className="v-table-wrap">
-                        <table className="v-table">
+                        <table className="v-table v-table-stack">
                             <thead>
                                 <tr>
                                     <th>Service</th>
@@ -62,31 +62,31 @@ function ServicesPage() {
                             <tbody>
                                 {services.map((s) => (
                                     <tr key={s.id}>
-                                        <td>
+                                        <td data-label="Service">
                                             <strong>{s.service_name}</strong>
                                             {s.service_description && <small>{s.service_description}</small>}
                                         </td>
-                                        <td className="v-num">{s.duration_minutes} min</td>
-                                        <td className="v-num">
+                                        <td data-label="Duration" className="v-num">{s.duration_minutes} min</td>
+                                        <td data-label="Buffers" className="v-num">
                                             {s.buffer_before_minutes || s.buffer_after_minutes
                                                 ? `${s.buffer_before_minutes} / ${s.buffer_after_minutes} min`
                                                 : "—"}
                                         </td>
-                                        <td className="v-num">{formatMoney(s.price)}</td>
-                                        <td className="v-num">
+                                        <td data-label="Price" className="v-num">{formatMoney(s.price)}</td>
+                                        <td data-label="Deposit" className="v-num">
                                             {!policy.deposit_required
                                                 ? "—"
                                                 : s.deposit_amount !== null
                                                   ? formatMoney(s.deposit_amount)
                                                   : `${Number(policy.deposit_percentage)}%`}
                                         </td>
-                                        <td>
+                                        <td data-label="Bookable">
                                             <label className="v-check">
                                                 <input type="checkbox" checked={s.is_available} onChange={() => toggle(s)} />
                                                 {s.is_available ? "Yes" : "Hidden"}
                                             </label>
                                         </td>
-                                        <td className="v-num">
+                                        <td data-label="" className="v-num">
                                             <button className="v-link" onClick={() => setEditing(s)}>Edit</button>
                                         </td>
                                     </tr>

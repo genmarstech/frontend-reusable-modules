@@ -113,7 +113,7 @@ function PaymentsPage() {
                     />
                 ) : (
                     <div className="v-table-wrap">
-                        <table className="v-table">
+                        <table className="v-table v-table-stack">
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -128,18 +128,18 @@ function PaymentsPage() {
                             <tbody>
                                 {report.payments.map((p) => (
                                     <tr key={p.id} className="v-clickable" onClick={() => setOpenId(p.booking)}>
-                                        <td>{formatDateTime(p.created_at, timeZone)}</td>
-                                        <td>
+                                        <td data-label="Date">{formatDateTime(p.created_at, timeZone)}</td>
+                                        <td data-label="Client">
                                             <span className="ov-client">
                                                 <Avatar name={p.customer_name} size={26} />
                                                 {p.customer_name}
                                             </span>
                                         </td>
-                                        <td>{p.service_name}</td>
-                                        <td>{p.kind_label}</td>
-                                        <td>{p.method_label}</td>
-                                        <td>{p.reference || "–"}</td>
-                                        <td className="v-num">
+                                        <td data-label="Service">{p.service_name}</td>
+                                        <td data-label="Type">{p.kind_label}</td>
+                                        <td data-label="Method">{p.method_label}</td>
+                                        <td data-label="Reference">{p.reference || "–"}</td>
+                                        <td data-label="Amount" className="v-num">
                                             {p.kind === "refund" ? "−" : ""}
                                             {formatMoney(p.amount)}
                                         </td>
