@@ -23,6 +23,7 @@ import { PHOTOS, servicePhoto } from "../lib/photos";
 import type { Booking, Overview, Performance } from "../types/bookings";
 import { Avatar, EmptyState, StatusBadge } from "../components/ui";
 import { AreaChart, Sparkline } from "../components/charts";
+import { compactNumber } from "../lib/chartScale";
 import { LeafSpray, RelaxArt } from "../components/Decor";
 import { BookingArt, PhoneBookingArt } from "../components/Illustrations";
 import { BookingDetailModal, NewBookingModal } from "./dashboard/BookingModals";
@@ -573,6 +574,8 @@ function DashboardOverview() {
                     {chartPoints.length > 0 && (
                         <AreaChart
                             points={chartPoints}
+                            minScale={1000}
+                            formatTick={(v) => (v === 0 ? "0" : `KES ${compactNumber(v)}`)}
                             ariaLabel={`Booked revenue per ${performance?.bucket === "week" ? "week" : "day"}`}
                         />
                     )}
