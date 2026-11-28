@@ -106,6 +106,9 @@ export interface Customer {
     total_bookings: number;
     last_visit: string | null;
     no_shows: number;
+    /** Signed up on the booking link (has a Velora customer account). */
+    has_account?: boolean;
+    joined_at?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -393,6 +396,8 @@ export interface SetupStep {
     text: string;
     done: boolean;
     link: string;
+    /** "share" only: customers who joined or booked through the link. */
+    progress?: { value: number; target: number; reached: number };
 }
 
 export interface Overview {

@@ -277,3 +277,220 @@
     .bk-hero-inner { align-items: flex-start; }
     .bk-hero-logo { width: 52px; height: 52px; border-radius: 14px; }
 }
+
+/* ------------------------------------------------------------------
+   Customer accounts: sign in chip, join banner, "book again", history
+   ------------------------------------------------------------------ */
+
+.bk-account {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-left: auto;
+    align-self: flex-start;
+}
+
+.bk-account-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bk-account-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.bk-account-link:hover { background: rgba(255, 255, 255, 0.16); }
+
+.bk-join {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding: 16px 18px;
+    border: 1px solid #dfe7dc;
+    border-radius: 14px;
+    background: #f3f6f0;
+}
+
+.bk-join strong { display: block; color: #2b3a30; font-size: 14.5px; }
+.bk-join small { color: #6f776f; font-size: 12.5px; }
+.bk-join-actions { display: flex; align-items: center; gap: 14px; }
+
+.bk-again { margin-bottom: 26px; }
+
+.bk-again h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    color: #3e5948;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.bk-again-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+}
+
+.bk-again-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px 16px;
+    border: 1px solid #354b37;
+    border-radius: 14px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.bk-again-item:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(38, 51, 44, 0.08); }
+.bk-again-item strong { color: #2b3a30; font-size: 14.5px; }
+.bk-again-item small { color: #8b928a; font-size: 12px; }
+.bk-again-item span { margin-top: 6px; color: #627c69; font-size: 12.5px; font-weight: 700; }
+
+.bk-auth-tabs {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 4px;
+    border-radius: 999px;
+    background: #f1f3ed;
+}
+
+.bk-auth-tabs button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    background: none;
+    color: #6f776f;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.bk-auth-tabs button.active { background: #fff; color: #2b3a30; box-shadow: 0 2px 8px rgba(38, 51, 44, 0.08); }
+.bk-auth-help { margin-top: 16px; }
+
+.bk-password { position: relative; display: block; }
+.bk-password input { width: 100%; padding-right: 42px; }
+.bk-password button {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: none;
+    color: #8b928a;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.bk-booking-as {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #f5f7f2;
+    color: #4b5a50;
+    font-size: 13.5px;
+}
+
+.bk-booking-as span { flex: 1; min-width: 200px; }
+.bk-booking-as strong { color: #2b3a30; }
+
+.bk-save-account {
+    padding: 14px 16px;
+    border: 1px dashed #dfe1d6;
+    border-radius: 12px;
+    background: #fbfaf5;
+}
+
+.bk-save-account .v-field { margin-top: 12px; max-width: 320px; }
+.bk-save-account .v-hint { margin: 10px 0 0; }
+
+.bk-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.bk-check input { width: 18px; height: 18px; margin-top: 2px; accent-color: #354b37; }
+.bk-check strong { display: block; color: #2b3a30; font-size: 14px; }
+.bk-check small { color: #8b928a; font-size: 12.5px; }
+
+.bk-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #3e5948;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.bk-done-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+.bk-history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.bk-history-head h2, .bk-history-title { margin: 0 0 12px; }
+.bk-history-head h2 { margin: 0; }
+.bk-history-title { margin-top: 28px !important; }
+
+.bk-history { margin: 0; padding: 0; list-style: none; }
+
+.bk-history-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0ea;
+}
+
+.bk-history-item > div:first-child { flex: 1; min-width: 200px; }
+.bk-history-item strong { display: block; color: #2b3a30; font-size: 14.5px; }
+.bk-history-item small { color: #8b928a; font-size: 12.5px; }
+.bk-history-actions .v-btn { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+
+@media (max-width: 640px) {
+    .bk-hero-inner { flex-wrap: wrap; }
+    .bk-account { width: 100%; justify-content: flex-start; margin-left: 0; }
+}

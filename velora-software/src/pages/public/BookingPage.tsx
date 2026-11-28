@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
-import { Loader2 } from "lucide-react";
+import { History, Loader2, RotateCcw, UserRound } from "lucide-react";
 
 import {
     createPublicBooking,
@@ -11,9 +11,12 @@ import {
     mediaUrl,
     trackFunnel,
 } from "../../lib/api/bookings";
+import { getCustomerSession, getMyBookings, logoutCustomer, registerCustomer } from "../../lib/api/customers";
 import { fieldErrorsFrom, handleApiError } from "../../lib/api/handleErrors";
 import { formatDayLabel, formatDateTime, formatMoney, todayIn } from "../../lib/format";
 import type { PublicBooking, PublicBusiness, PublicService, Slot } from "../../types/bookings";
+import type { CustomerSession, FavouriteService } from "../../types/customers";
+import { CustomerAuthForm, type AuthMode } from "./CustomerAuth";
 import { Alert, Field, PageLoading } from "../../components/ui";
 import { LogoMark } from "../../components/Brand";
 import { LostArt, SuccessArt } from "../../components/Illustrations";
@@ -51,7 +54,7 @@ function detectSource(param: string | null): string {
     }
 }
 
-type Step = "service" | "staff" | "time" | "details" | "done";
+type Step = "service" | "staff" | "time" | "details" | "account" | "done";
 
 function BookingPage() {
     // The link is /book/<slug>; older /book/<id> links still load and are
@@ -87,6 +90,30 @@ function BookingPage() {
     );
     const [waitlisted, setWaitlisted] = useState(false);
 
+    // Customer account: signed-in customers skip the details form and can rebook in a tap.
+    const [session, setSession] = useState<CustomerSession | null>(null);
+    const [authMode, setAuthMode] = useState<AuthMode>("join");
+    const [returnStep, setReturnStep] = useState<Step>("service");
+    const [favourites, setFavourites] = useState<FavouriteService[]>([]);
+    const [saveAccount, setSaveAccount] = useState(false);
+    const [password, setPassword] = useState("");
+    const rebookApplied = useRef(false);
+    const account = session?.authenticated ? session.account : null;
+
+    /** Remember who is signed in, fill the waitlist fields, and load "book again" suggestions. */
+    function applySession(next: CustomerSession, slug: string) {
+        setSession(next);
+        const acc = next.authenticated ? next.account : null;
+        if (!acc) {
+            setFavourites([]);
+            return;
+        }
+        setForm((f) => ({ ...f, full_name: acc.full_name, email: acc.email, phone_number: acc.phone_number }));
+        getMyBookings(slug)
+            .then((res) => setFavourites(res.favourites))
+            .catch(() => setFavourites([]));
+    }
+
     useEffect(() => {
         if (!validRef) return;
         let active = true;
@@ -95,12 +122,35 @@ function BookingPage() {
                 if (!active) return;
                 setBusiness(b);
                 trackFunnel(b.id, "page_view", sessionKey, source);
+                // /book/<slug>?rebook=<service>&staff=<id> jumps straight to picking a time.
+                const params = new URLSearchParams(window.location.search);
+                const again = b.services.find((x) => x.id === Number(params.get("rebook")));
+                if (again && !rebookApplied.current) {
+                    rebookApplied.current = true;
+                    const member = b.staff.find(
+                        (m) => m.id === Number(params.get("staff")) && (!m.service_ids.length || m.service_ids.includes(again.id))
+                    );
+                    setService(again);
+                    setStaffId(member ? member.id : null);
+                    setStep("time");
+                }
             })
             .catch(() => active && setLoadError("This booking page could not be found."));
         return () => {
             active = false;
         };
     }, [ref, validRef, sessionKey, source]);
+
+    useEffect(() => {
+        if (!business) return;
+        let active = true;
+        getCustomerSession(business.slug)
+            .then((s) => active && applySession(s, business.slug))
+            .catch(() => active && setSession({ authenticated: false, account: null, joined: false }));
+        return () => {
+            active = false;
+        };
+    }, [business]);
 
     useEffect(() => {
         if (business?.slug && businessRef !== business.slug) {
@@ -181,6 +231,42 @@ function BookingPage() {
         }
     };
 
+    const rebook = (serviceId: number, staff: number | null) => {
+        const s = business.services.find((x) => x.id === serviceId);
+        if (!s) return;
+        const member = business.staff.find((m) => m.id === staff && (!m.service_ids.length || m.service_ids.includes(s.id)));
+        setService(s);
+        setStaffId(member ? member.id : null);
+        setSlot(null);
+        setSlots(null);
+        setDays(null);
+        setDate("");
+        setError("");
+        trackFunnel(business.id, "service_selected", sessionKey, source);
+        setStep("time");
+    };
+
+    const openAuth = (mode: AuthMode) => {
+        setAuthMode(mode);
+        setReturnStep(step === "account" ? returnStep : step);
+        setError("");
+        setStep("account");
+    };
+
+    const signedIn = (next: CustomerSession) => {
+        applySession(next, business.slug);
+        setStep(returnStep === "done" ? "service" : returnStep);
+    };
+
+    const signOut = async () => {
+        try {
+            setSession(await logoutCustomer());
+        } catch {
+            setSession({ authenticated: false, account: null, joined: false });
+        }
+        setForm({ full_name: "", email: "", phone_number: "", intake_notes: form.intake_notes, preferred_channel: "" });
+    };
+
     const chooseSlot = (s: Slot) => {
         setSlot(s);
         trackFunnel(business.id, "slot_selected", sessionKey, source);
@@ -201,23 +287,44 @@ function BookingPage() {
         setErrors({});
         setError("");
         const missing: Record<string, string> = {};
-        if (!form.full_name.trim()) missing.full_name = "Please enter your name.";
-        if (!form.phone_number.trim()) missing.phone_number = "Please enter your phone number.";
-        if (!form.email.trim()) missing.email = "Please enter your email so we can send your confirmation.";
+        if (!account) {
+            if (!form.full_name.trim()) missing.full_name = "Please enter your name.";
+            if (!form.phone_number.trim()) missing.phone_number = "Please enter your phone number.";
+            if (!form.email.trim()) missing.email = "Please enter your email so we can send your confirmation.";
+            if (saveAccount && password.length < 8) missing.password = "Use at least 8 characters.";
+        }
         if (Object.keys(missing).length) {
             setErrors(missing);
             return;
         }
         setSubmitting(true);
         trackFunnel(business.id, "details_submitted", sessionKey, source);
+        let signedInNow = Boolean(account);
         try {
+            if (!account && saveAccount) {
+                // Join first, so this booking is saved to their new account.
+                const next = await registerCustomer({
+                    business: business.slug,
+                    full_name: form.full_name.trim(),
+                    phone_number: form.phone_number.trim(),
+                    email: form.email.trim(),
+                    password,
+                });
+                applySession(next, business.slug);
+                setPassword("");
+                signedInNow = true;
+            }
             const created = await createPublicBooking(business.id, {
                 service: service.id,
                 staff: staffId,
                 start: slot.start,
-                full_name: form.full_name.trim(),
-                email: form.email.trim(),
-                phone_number: form.phone_number.trim(),
+                ...(signedInNow
+                    ? {}
+                    : {
+                          full_name: form.full_name.trim(),
+                          email: form.email.trim(),
+                          phone_number: form.phone_number.trim(),
+                      }),
                 intake_notes: form.intake_notes.trim(),
                 preferred_channel: form.preferred_channel,
                 session_key: sessionKey,
@@ -225,6 +332,9 @@ function BookingPage() {
             });
             setBooking(created);
             setStep("done");
+            if (signedInNow) {
+                getMyBookings(business.slug).then((res) => setFavourites(res.favourites)).catch(() => undefined);
+            }
         } catch (err) {
             const apiError = handleApiError(err);
             setErrors(fieldErrorsFrom(err));
@@ -262,7 +372,7 @@ function BookingPage() {
         }
     };
 
-    const stepIndex = { service: 0, staff: 1, time: 2, details: 3, done: 4 }[step];
+    const stepIndex = { service: 0, staff: 1, time: 2, details: 3, account: 3, done: 4 }[step];
     const logo = mediaUrl(business.business_logo);
     const staffName = staffId ? business.staff.find((m) => m.id === staffId)?.staff_name : null;
 
@@ -276,6 +386,21 @@ function BookingPage() {
                         <h1>{business.business_name}</h1>
                         <p>{business.business_description}</p>
                     </div>
+                    <div className="bk-account">
+                        {account ? (
+                            <>
+                                <span className="bk-account-name"><UserRound size={14} /> Hi, {account.first_name}</span>
+                                <Link to={`/book/${business.slug}/account`} className="bk-account-link"><History size={14} /> My bookings</Link>
+                                <button type="button" className="bk-account-link" onClick={signOut}>Sign out</button>
+                            </>
+                        ) : (
+                            session && step !== "account" && (
+                                <button type="button" className="bk-account-link" onClick={() => openAuth("signin")}>
+                                    <UserRound size={14} /> Sign in
+                                </button>
+                            )
+                        )}
+                    </div>
                 </div>
             </section>
 
@@ -287,8 +412,44 @@ function BookingPage() {
 
                     {step !== "done" && <Alert>{error}</Alert>}
 
+                    {step === "account" && (
+                        <CustomerAuthForm
+                            businessSlug={business.slug}
+                            businessName={business.business_name}
+                            initialMode={authMode}
+                            onDone={signedIn}
+                            onCancel={() => setStep(returnStep)}
+                        />
+                    )}
+
                     {step === "service" && (
                         <>
+                            {account && favourites.length > 0 && (
+                                <div className="bk-again">
+                                    <h3><RotateCcw size={15} /> Book again</h3>
+                                    <div className="bk-again-list">
+                                        {favourites.map((f) => (
+                                            <button key={`${f.service}-${f.staff}`} type="button" className="bk-again-item" onClick={() => rebook(f.service, f.staff)}>
+                                                <strong>{f.service_name}</strong>
+                                                <small>{f.staff_name ? `with ${f.staff_name} · ` : ""}{formatMoney(f.price)}</small>
+                                                <span>Pick a time →</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {session && !account && (
+                                <div className="bk-join">
+                                    <div>
+                                        <strong>Book faster as a {business.business_name} client</strong>
+                                        <small>Save your details once and rebook your favourite service in one tap.</small>
+                                    </div>
+                                    <div className="bk-join-actions">
+                                        <button type="button" className="v-btn v-btn-small" onClick={() => openAuth("join")}>Join</button>
+                                        <button type="button" className="bk-back" onClick={() => openAuth("signin")}>Sign in</button>
+                                    </div>
+                                </div>
+                            )}
                             <h2>Choose a service</h2>
                             <p>Pick what you would like to book.</p>
                             {business.services.length === 0 ? (
@@ -386,14 +547,29 @@ function BookingPage() {
 
                     {step === "details" && service && slot && (
                         <form onSubmit={submit} noValidate>
-                            <h2>Your details</h2>
-                            <p>We will send your confirmation and reminders here.</p>
+                            <h2>{account ? "Confirm your booking" : "Your details"}</h2>
+                            <p>{account ? `${business.business_name} will confirm it and you'll get a message.` : "We will send your confirmation and reminders here."}</p>
                             <dl className="bk-summary">
                                 <div><dt>Service</dt><dd>{service.service_name}</dd></div>
                                 <div><dt>When</dt><dd>{formatDateTime(slot.start, timeZone)}</dd></div>
                                 <div><dt>With</dt><dd>{staffName || "Any available team member"}</dd></div>
                                 <div><dt>Price</dt><dd>{formatMoney(service.price)}{deposit > 0 && ` · deposit ${formatMoney(deposit)}`}</dd></div>
                             </dl>
+                            {account ? (
+                                <div className="v-form-grid">
+                                    <div className="bk-booking-as v-field-full">
+                                        <UserRound size={16} />
+                                        <span>
+                                            Booking as <strong>{account.full_name}</strong> · {account.phone_number}
+                                            {account.email ? ` · ${account.email}` : ""}
+                                        </span>
+                                        <button type="button" className="bk-back" onClick={signOut}>Not you?</button>
+                                    </div>
+                                    <Field label="Anything we should know?" full error={errors.intake_notes}>
+                                        <textarea placeholder="Allergies, hair type, preferences..." value={form.intake_notes} onChange={(e) => setForm({ ...form, intake_notes: e.target.value })} />
+                                    </Field>
+                                </div>
+                            ) : (
                             <div className="v-form-grid">
                                 <Field label="Full name" error={errors.full_name}>
                                     <input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} autoComplete="name" required />
@@ -415,10 +591,28 @@ function BookingPage() {
                                 <Field label="Anything we should know?" full error={errors.intake_notes}>
                                     <textarea placeholder="Allergies, hair type, preferences..." value={form.intake_notes} onChange={(e) => setForm({ ...form, intake_notes: e.target.value })} />
                                 </Field>
+                                <div className="bk-save-account v-field-full">
+                                    <label className="bk-check">
+                                        <input type="checkbox" checked={saveAccount} onChange={(e) => setSaveAccount(e.target.checked)} />
+                                        <span>
+                                            <strong>Save my details and join {business.business_name}</strong>
+                                            <small>Next time, rebook in one tap. You sign in with your phone number.</small>
+                                        </span>
+                                    </label>
+                                    {saveAccount && (
+                                        <Field label="Choose a password" error={errors.password} hint="At least 8 characters.">
+                                            <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                        </Field>
+                                    )}
+                                    <p className="v-hint">
+                                        Already a client? <button type="button" className="bk-link" onClick={() => openAuth("signin")}>Sign in</button>
+                                    </p>
+                                </div>
                             </div>
+                            )}
                             <div className="bk-actions">
                                 <button type="button" className="bk-back" onClick={() => setStep("time")}>← Change time</button>
-                                <button type="submit" className="v-btn" disabled={submitting || !form.full_name.trim()}>
+                                <button type="submit" className="v-btn" disabled={submitting || (!account && !form.full_name.trim())}>
                                     {submitting ? "Booking..." : deposit > 0 ? "Reserve my slot" : "Confirm booking"}
                                 </button>
                             </div>
@@ -445,8 +639,17 @@ function BookingPage() {
                                 <div><dt>With</dt><dd>{booking.staff_name || "Our team"}</dd></div>
                                 <div><dt>Price</dt><dd>{formatMoney(booking.price)}</dd></div>
                             </dl>
-                            <Link className="v-btn" to={`/manage/${booking.manage_token}`}>View or change booking</Link>
-                            <p className="v-hint" style={{ marginTop: 12 }}>Save this link: you can reschedule or cancel from it.</p>
+                            <div className="bk-done-actions">
+                                <Link className="v-btn" to={`/manage/${booking.manage_token}`}>View or change booking</Link>
+                                {account && (
+                                    <Link className="v-btn v-btn-ghost" to={`/book/${business.slug}/account`}>All my bookings</Link>
+                                )}
+                            </div>
+                            <p className="v-hint" style={{ marginTop: 12 }}>
+                                {account
+                                    ? "Your bookings are saved to your account. Sign in any time to rebook in a tap."
+                                    : "Save this link: you can reschedule or cancel from it."}
+                            </p>
                         </div>
                     )}
                 </div>

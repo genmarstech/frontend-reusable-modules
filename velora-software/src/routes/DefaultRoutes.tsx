@@ -28,6 +28,7 @@ const PaymentsPage = lazy(() => import("../pages/dashboard/PaymentsPage"))
 const SettingsPage = lazy(() => import("../pages/dashboard/SettingsPage"))
 const BookingPage = lazy(() => import("../pages/public/BookingPage"))
 const ManageBooking = lazy(() => import("../pages/public/ManageBooking"))
+const CustomerBookings = lazy(() => import("../pages/public/CustomerBookings"))
 const NotFound = lazy(() => import("../pages/NotFound"))
 
 function DefaultRoutes() {
@@ -46,8 +47,9 @@ function DefaultRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Customer-facing, no account needed */}
+      {/* Customer-facing: guests can book; customers can join a business and rebook */}
       <Route path="/book/:businessRef" element={<BookingPage />} />
+      <Route path="/book/:businessRef/account" element={<CustomerBookings />} />
       <Route path="/manage/:token" element={<ManageBooking />} />
 
       <Route element={<ProtectedRoute />}>

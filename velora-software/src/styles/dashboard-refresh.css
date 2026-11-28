@@ -1464,3 +1464,74 @@ button.ov-slot:hover {
     background: linear-gradient(90deg, #3e5948 0%, rgba(62, 89, 72, 0.55) 22%, rgba(62, 89, 72, 0) 50%);
     pointer-events: none;
 }
+
+/* "Share your link with 5 customers" step and share dialog */
+.ov-step-progress {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.ov-step-progress i {
+    width: 18px;
+    height: 5px;
+    border-radius: 999px;
+    background: #e3e4db;
+}
+
+.ov-step-progress i.on { background: var(--v-primary); }
+
+.cust-joined { margin-left: 8px; padding: 2px 8px; font-size: 10.5px; vertical-align: middle; }
+
+.share-progress {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #f3f6f0;
+}
+
+.share-progress-head strong { display: block; color: #2b3a30; font-size: 14px; }
+.share-progress-head small { color: var(--v-muted); font-size: 12.5px; }
+.share-progress .ov-progress { margin: 12px 0 0; background: #e1e6dc; }
+
+.share-link {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.share-link input { flex: 1; min-width: 0; }
+.share-link .v-btn { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+.share-message { display: block; margin-bottom: 16px; }
+.share-message span { display: block; margin-bottom: 6px; color: #4b5a50; font-size: 12.5px; font-weight: 600; }
+.share-message textarea { width: 100%; resize: vertical; font: inherit; font-size: 13.5px; }
+
+.share-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.share-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #e4e5dc;
+    border-radius: 12px;
+    background: #fff;
+    color: #2b3a30;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.share-action:hover { border-color: #bdcdbf; background: #fafbf7; }
+.share-whatsapp { border-color: #354b37; background: #354b37; color: #fff; }
+.share-whatsapp:hover { background: #2b3e2d; border-color: #2b3e2d; }
