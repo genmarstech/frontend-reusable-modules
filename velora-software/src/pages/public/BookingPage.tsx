@@ -20,6 +20,8 @@ import { CustomerAuthForm, type AuthMode } from "./CustomerAuth";
 import { Alert, Field, PageLoading } from "../../components/ui";
 import { LogoMark } from "../../components/Brand";
 import { LostArt, SuccessArt } from "../../components/Illustrations";
+import { BookingHeroArt, BookingOrnament, BookingPatternArt } from "../../components/CategoryArt";
+import { artThemeFor } from "../../lib/artTheme";
 import StatusPage from "../../components/StatusPage";
 import { usePageMeta } from "../../lib/usePageMeta";
 import { CATEGORY_LABELS } from "../../types/business";
@@ -375,10 +377,14 @@ function BookingPage() {
     const stepIndex = { service: 0, staff: 1, time: 2, details: 3, account: 3, done: 4 }[step];
     const logo = mediaUrl(business.business_logo);
     const staffName = staffId ? business.staff.find((m) => m.id === staffId)?.staff_name : null;
+    const artTheme = artThemeFor(business.business_category);
 
     return (
         <main className="bk-page">
+            <BookingPatternArt theme={artTheme} className="bk-pattern" />
             <section className="bk-hero">
+                <BookingHeroArt theme={artTheme} className="bk-hero-art bk-hero-art-left" />
+                <BookingHeroArt theme={artTheme} className="bk-hero-art" />
                 <div className="bk-hero-inner">
                     <div className="bk-hero-logo">{logo ? <img src={logo} alt="" /> : business.business_name.charAt(0)}</div>
                     <div>
@@ -677,6 +683,8 @@ function BookingPage() {
                             </p>
                         </div>
                     )}
+
+                    {step !== "done" && step !== "account" && <BookingOrnament theme={artTheme} className="bk-ornament" />}
                 </div>
 
                 <div className="bk-footer">
