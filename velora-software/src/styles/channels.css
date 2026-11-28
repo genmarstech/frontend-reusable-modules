@@ -1,0 +1,180 @@
+/* Dashboard > Channels (Telegram and WhatsApp bots). Uses the cream/green tokens from dashboard-refresh.css. */
+
+.ch-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.ch-card { display: flex; flex-direction: column; margin: 0; }
+.ch-card.is-live { box-shadow: inset 0 0 0 1px var(--v-sage-line), var(--v-card-shadow); }
+
+.ch-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.ch-card-head > div { flex: 1; min-width: 0; }
+.ch-card-head h2 { margin: 0; font-size: 17px; color: var(--v-ink); }
+
+.ch-icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--v-sage-soft);
+    color: var(--v-primary);
+}
+
+.ch-alerts .ch-icon { width: 34px; height: 34px; }
+.ch-icon-telegram { background: #e8f0ec; }
+.ch-icon-whatsapp { background: #eaf0e1; }
+
+.ch-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    color: var(--v-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.ch-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c9c6ba;
+}
+
+.ch-status.on { color: var(--v-sage); }
+.ch-status.on::before { background: var(--v-sage); box-shadow: 0 0 0 3px var(--v-sage-soft); }
+
+.ch-how { margin: 0 0 14px; color: var(--v-ink-soft); font-size: 13.5px; line-height: 1.55; }
+
+.ch-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.ch-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: auto 0 0;
+    padding-top: 16px;
+}
+
+.ch-stats div { padding: 10px 12px; border-radius: 12px; background: var(--v-surface-soft); border: 1px solid var(--v-border-soft); }
+.ch-stats dt { color: var(--v-muted); font-size: 11.5px; font-weight: 600; }
+.ch-stats dd { margin: 2px 0 0; color: var(--v-ink); font-size: 20px; font-weight: 700; }
+
+/* On / off switch */
+.ch-switch {
+    position: relative;
+    flex: none;
+    width: 44px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #d8d6cc;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ch-switch span {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(31, 43, 36, 0.2);
+    transition: transform 0.15s;
+}
+
+.ch-switch.on { background: var(--v-primary); }
+.ch-switch.on span { transform: translateX(18px); }
+.ch-switch:disabled { opacity: 0.45; cursor: not-allowed; }
+.ch-switch:focus-visible { outline: 2px solid var(--v-sage); outline-offset: 2px; }
+
+/* Owner alerts */
+.ch-alerts { display: grid; gap: 10px; }
+
+.ch-alert-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--v-border);
+    border-radius: 14px;
+    background: var(--v-surface);
+}
+
+.ch-alert-text { flex: 1; min-width: 0; }
+.ch-alert-text strong { display: block; color: var(--v-ink); font-size: 14px; }
+.ch-alert-text small { color: var(--v-muted); font-size: 12.5px; }
+.ch-btn { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; text-decoration: none; }
+.ch-soon { color: var(--v-muted); font-size: 12.5px; }
+
+/* What customers can do */
+.ch-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+    counter-reset: ch-step;
+}
+
+.ch-steps li {
+    counter-increment: ch-step;
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--v-surface-soft);
+    border: 1px solid var(--v-border-soft);
+}
+
+.ch-steps li::before {
+    content: counter(ch-step);
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
+    border-radius: 50%;
+    background: var(--v-sage-soft);
+    color: var(--v-primary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ch-steps strong { display: block; margin-bottom: 4px; color: var(--v-ink); font-size: 14px; }
+.ch-steps span { color: var(--v-ink-soft); font-size: 13px; line-height: 1.5; }
+
+@media (max-width: 1100px) {
+    .ch-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 860px) {
+    .ch-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+    .ch-steps { grid-template-columns: 1fr; }
+    .ch-alert-row { flex-wrap: wrap; }
+    .ch-alert-text { flex-basis: calc(100% - 46px); }
+    .ch-alert-row .ch-btn, .ch-alert-row .ch-switch { margin-left: 46px; }
+    .ch-stats dd { font-size: 17px; }
+}
