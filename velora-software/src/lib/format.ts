@@ -121,6 +121,7 @@ export const STATUS_LABELS: Record<string, string> = {
     completed: "Completed",
     no_show: "No-show",
     queued: "Scheduled",
+    retrying: "Retrying",
     sent: "Sent",
     delivered: "Delivered",
     failed: "Failed",
@@ -129,6 +130,17 @@ export const STATUS_LABELS: Record<string, string> = {
     notified: "Notified",
     booked: "Booked",
     removed: "Removed",
+};
+
+/** A queued message that already failed once is waiting to retry, not scheduled. */
+export function messageStatus(n: { status: string; attempts: number }): string {
+    return n.status === "queued" && n.attempts > 0 ? "retrying" : n.status;
+}
+
+export const RECIPIENT_LABELS: Record<string, string> = {
+    customer: "Customer",
+    business: "Business",
+    staff: "Staff",
 };
 
 export const CHANNEL_LABELS: Record<string, string> = {
