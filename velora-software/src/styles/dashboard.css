@@ -523,6 +523,7 @@
 .v-status-delivered { background: var(--v-sage-soft); color: var(--v-sage); }
 .v-status-pending,
 .v-status-queued,
+.v-status-retrying,
 .v-status-waiting { background: var(--v-amber-soft); color: var(--v-amber); }
 .v-status-held,
 .v-status-notified { background: #f3ecf8; color: #6b4a86; }

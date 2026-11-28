@@ -258,10 +258,10 @@ function PolicySection() {
                     <Field label="Follow-up after visit (hours)">
                         <input type="number" min="0" value={form.follow_up_hours} onChange={num("follow_up_hours")} />
                     </Field>
-                    <Field label="Team alerts">
+                    <Field label="Team alerts" hint="Your business email and the customer always get an email about each booking.">
                         <label className="v-check" style={{ paddingTop: 10 }}>
                             <input type="checkbox" checked={form.notify_staff} onChange={(e) => set("notify_staff", e.target.checked)} />
-                            Email staff about new and changed bookings
+                            Also alert the staff member and your linked chats
                         </label>
                     </Field>
                     <Field label="Quiet hours start" hint="Follow-ups wait until quiet hours end">

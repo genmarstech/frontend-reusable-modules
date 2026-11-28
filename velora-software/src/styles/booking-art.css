@@ -1,0 +1,103 @@
+/* Category line art on the public booking page (see components/CategoryArt.tsx).
+   Warm gold, apricot, blush and clay on Velora's green and cream. */
+
+.bk-page { position: relative; overflow-x: clip; }
+
+.cat-art { stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.cat-art :is(path, circle, rect, ellipse) {
+    stroke: currentColor;
+    stroke-width: 1.6;
+    vector-effect: non-scaling-stroke;
+}
+.cat-art [fill="currentColor"] { fill-opacity: var(--cat-fill-opacity, .2); }
+.cat-art .cat-dot { fill: currentColor; stroke: none; }
+
+/* On the green header */
+.cat-hero-art .cat-tone-gold { color: #ecc785; }
+.cat-hero-art .cat-tone-apricot { color: #f2a97e; }
+.cat-hero-art .cat-tone-blush { color: #f4c6b0; }
+.cat-hero-art .cat-tone-clay { color: #e59c6f; }
+.cat-hero-art .cat-tone-sage { color: #a8bea9; }
+.cat-hero-art .cat-sun { fill: #ecc785; fill-opacity: .1; stroke: none; }
+.cat-hero-art .cat-arch { stroke: #ecc785; stroke-opacity: .32; }
+.cat-hero-art .cat-arch-dash { stroke-dasharray: 2 7; stroke-opacity: .28; }
+.cat-hero-art .cat-ground { stroke: #ecc785; stroke-opacity: .25; }
+
+/* On the cream page and inside the card */
+.cat-pattern-art .cat-tone-clay, .cat-ornament .cat-tone-clay { color: #c3764e; }
+.cat-pattern-art .cat-tone-apricot, .cat-ornament .cat-tone-apricot { color: #d98b5f; }
+.cat-pattern-art .cat-tone-gold, .cat-ornament .cat-tone-gold { color: #c99a45; }
+.cat-pattern-art .cat-tone-blush { color: #d69a85; }
+.cat-ornament .cat-rule { stroke: #e3d6c2; }
+.cat-ornament .cat-dot { color: #d9b98a; }
+
+.bk-hero-art {
+    position: absolute;
+    bottom: 0;
+    z-index: 0;
+    width: 340px;
+    height: auto;
+    right: -40px;
+    opacity: .32;
+}
+.bk-hero-art-left { display: none; }
+
+@media (min-width: 1440px) {
+    .bk-hero-art {
+        right: auto;
+        left: calc(50% + 470px);
+        width: min(380px, calc(50% - 490px));
+        opacity: 1;
+    }
+    .bk-hero-art-left {
+        display: block;
+        left: auto;
+        right: calc(50% + 470px);
+        width: min(320px, calc(50% - 500px));
+        transform: scaleX(-1);
+        opacity: .55;
+    }
+}
+
+@media (max-width: 640px) {
+    .bk-hero-art { width: 230px; right: -56px; opacity: .24; }
+}
+
+/* Wallpaper behind the card, strongest at the sides */
+.bk-pattern {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .5;
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .55) 28%, rgba(0, 0, 0, .18) 42%, rgba(0, 0, 0, .18) 58%, rgba(0, 0, 0, .55) 72%, #000 100%);
+    mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .55) 28%, rgba(0, 0, 0, .18) 42%, rgba(0, 0, 0, .18) 58%, rgba(0, 0, 0, .55) 72%, #000 100%);
+}
+
+/* Soft warm glow under the card so the cream doesn't feel flat */
+.bk-container::before {
+    content: "";
+    position: absolute;
+    inset: 40px -60px -20px;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(233, 178, 120, .16), rgba(233, 178, 120, 0));
+    pointer-events: none;
+}
+
+.bk-ornament {
+    display: block;
+    width: min(280px, 80%);
+    height: auto;
+    margin: 30px auto 0;
+}
+
+.bk-footer { position: relative; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .bk-hero-art { animation: cat-rise .9s ease-out both; }
+    @keyframes cat-rise { from { transform: translateY(12px); opacity: 0; } }
+    .bk-hero-art-left { animation-name: cat-rise-left; }
+    @keyframes cat-rise-left { from { transform: scaleX(-1) translateY(12px); opacity: 0; } }
+}

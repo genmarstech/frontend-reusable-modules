@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { getNotifications, retryNotification } from "../../lib/api/bookings";
 import { handleApiError } from "../../lib/api/handleErrors";
-import { CHANNEL_LABELS, formatDateTime } from "../../lib/format";
+import { CHANNEL_LABELS, formatDateTime, messageStatus } from "../../lib/format";
 import type { NotificationLog } from "../../types/bookings";
 import { Alert, EmptyState, Field, Modal, PageHeader, Section, Spinner, StatusBadge } from "../../components/ui";
 import { useDashboard } from "./dashboard-context";
@@ -102,6 +102,13 @@ function NotificationsPage() {
                                         </td>
                                         <td data-label="Status"><StatusBadge status={n.status} /></td>
                                         <td data-label="" className="v-num">
+                                        <td>{CHANNEL_LABELS[n.channel]}</td>
+                                        <td>
+                                            {formatDateTime(n.status === "queued" ? n.next_attempt_at || n.scheduled_for : n.sent_at || n.created_at, timeZone)}
+                                            {n.attempts > 1 && <small>{n.attempts} attempts</small>}
+                                        </td>
+                                        <td><StatusBadge status={messageStatus(n)} /></td>
+                                        <td className="v-num">
                                             {n.status === "failed" && (
                                                 <button className="v-link" onClick={(e) => { e.stopPropagation(); retry(n); }}>Retry</button>
                                             )}

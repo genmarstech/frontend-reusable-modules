@@ -18,6 +18,7 @@ import "./styles/booking.css";
 import "./styles/auth-refresh.css";
 import "./styles/brand.css";
 import "./styles/responsive.css";
+import "./styles/booking-art.css";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import DefaultRoutes from "./routes/DefaultRoutes";
 import { PageLoading } from "./components/ui";

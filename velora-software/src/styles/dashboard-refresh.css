@@ -270,6 +270,7 @@
 .v-status-delivered { background: #e7efe3; color: #3e6a49; }
 .v-status-pending,
 .v-status-queued,
+.v-status-retrying,
 .v-status-waiting { background: #fcecd6; color: #b66b12; }
 
 /* Tables */
