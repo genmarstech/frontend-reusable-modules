@@ -68,7 +68,7 @@ function CustomersPage() {
                     <EmptyState art={<ClientsArt />} title="No customers yet" text="Customers appear here once they book." />
                 ) : (
                     <div className="v-table-wrap">
-                        <table className="v-table">
+                        <table className="v-table v-table-stack">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -82,18 +82,18 @@ function CustomersPage() {
                             <tbody>
                                 {customers.map((c) => (
                                     <tr key={c.id} className="v-clickable" onClick={() => setEditing(c)}>
-                                        <td>
+                                        <td data-label="Name">
                                             <strong>{c.full_name}</strong>
                                             {c.has_account && <span className="v-status v-status-confirmed cust-joined" title="Signed up on your booking link">Joined</span>}
                                         </td>
-                                        <td>
+                                        <td data-label="Contact">
                                             {c.phone_number}
                                             <small>{c.email}</small>
                                         </td>
-                                        <td className="v-num">{c.total_bookings}</td>
-                                        <td className="v-num">{c.no_shows}</td>
-                                        <td>{c.last_visit ? formatDate(c.last_visit, timeZone) : "—"}</td>
-                                        <td>{c.first_channel || "—"}</td>
+                                        <td data-label="Bookings" className="v-num">{c.total_bookings}</td>
+                                        <td data-label="No-shows" className="v-num">{c.no_shows}</td>
+                                        <td data-label="Last visit">{c.last_visit ? formatDate(c.last_visit, timeZone) : "—"}</td>
+                                        <td data-label="First booked via">{c.first_channel || "—"}</td>
                                     </tr>
                                 ))}
                             </tbody>

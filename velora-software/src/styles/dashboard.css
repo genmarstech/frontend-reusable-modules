@@ -732,18 +732,21 @@
 .v-modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 50;
+    z-index: 60;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 6vh 16px;
+    padding: clamp(12px, 5vh, 56px) 16px;
     background: rgba(32, 43, 38, 0.38);
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .v-modal {
     width: 100%;
     max-width: 560px;
+    /* Centred when it fits, top-aligned (and scrollable) when it is taller than the screen. */
+    margin-block: auto;
     border-radius: 18px;
     background: var(--v-surface);
     box-shadow: 0 24px 60px rgba(32, 43, 38, 0.18);
@@ -756,6 +759,13 @@
 }
 
 .v-modal-header {
+    /* Keeps the title and close button in reach while a long modal scrolls. */
+    position: sticky;
+    /* Sticky offsets start inside the backdrop's padding, so pull it up to the screen edge. */
+    top: calc(-1 * clamp(12px, 5vh, 56px));
+    z-index: 2;
+    border-radius: 18px 18px 0 0;
+    background: var(--v-surface);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -1199,8 +1209,7 @@
     .v-mobile-bar .v-sidebar-logo { margin: 0; font-size: 22px; }
 
     .v-form-grid,
-    .v-form-grid-3,
-    .v-detail-grid { grid-template-columns: 1fr; }
+    .v-form-grid-3 { grid-template-columns: 1fr; }
 
     .v-booking-row { grid-template-columns: 70px minmax(0, 1fr); }
     .v-booking-row .v-row-meta { grid-column: 1 / -1; }
@@ -1217,6 +1226,35 @@
 
 @media (max-width: 360px) {
     .v-kpis { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 340px) {
+    .v-detail-grid { grid-template-columns: 1fr; }
+}
+
+/* Phones: modals rise from the bottom edge as a full-width sheet. */
+@media (max-width: 560px) {
+    .v-modal-backdrop {
+        align-items: flex-end;
+        padding: 24px 0 0;
+    }
+
+    .v-modal {
+        max-width: none;
+        margin-block: auto 0;
+        border-radius: 20px 20px 0 0;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .v-modal-header {
+        top: -24px;
+        padding: 18px 18px 14px;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .v-modal-header h2 { font-size: 20px; }
+
+    .v-modal-body { padding: 16px 18px 22px; }
 }
 
 /* ---------- Accessibility ---------- */

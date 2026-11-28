@@ -306,16 +306,20 @@ function DashboardLayout() {
                     <Link to="/" className="v-sidebar-logo" aria-label="Velora home">
                         <Logo />
                     </Link>
-                    <button
-                        type="button"
-                        className="v-icon-button"
-                        onClick={() => setNavOpen(!navOpen)}
-                        aria-label={navOpen ? "Close menu" : "Open menu"}
-                        aria-expanded={navOpen}
-                        aria-controls="v-sidebar"
-                    >
-                        <Menu size={18} />
-                    </button>
+                    <div className="v-mobile-bar-actions">
+                        {/* On phones and tablets the bell and profile live up here, not under each page title. */}
+                        {accountActions}
+                        <button
+                            type="button"
+                            className="v-icon-button"
+                            onClick={() => setNavOpen(!navOpen)}
+                            aria-label={navOpen ? "Close menu" : "Open menu"}
+                            aria-expanded={navOpen}
+                            aria-controls="v-sidebar"
+                        >
+                            <Menu size={18} />
+                        </button>
+                    </div>
                 </div>
                 <main className="v-content">
                     <Suspense fallback={<Spinner label="Loading..." />}>

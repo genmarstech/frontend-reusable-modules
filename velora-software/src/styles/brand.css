@@ -95,7 +95,10 @@
 /* PAGE TRANSITIONS: each new page settles in softly */
 
 .page-transition {
-  animation: v-page-in .38s cubic-bezier(.22, .61, .36, 1) both;
+  /* "backwards", not "both": a transform left on after the animation would turn this
+     wrapper into the containing block for position: fixed children (modals, popovers),
+     pinning them to the page instead of the screen. */
+  animation: v-page-in .38s cubic-bezier(.22, .61, .36, 1) backwards;
 }
 
 @keyframes v-page-in {

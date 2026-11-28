@@ -1,0 +1,391 @@
+/* Responsive fixes (2026-11). Loaded last, so these rules win over the page and
+   refresh stylesheets. Breakpoints follow the dashboard shell: the sidebar folds
+   away at 860px, phones are 560px and below. */
+
+/* ---------- Page headers ---------- */
+
+/* Title on the left, actions on the right; actions drop below the title when they don't fit. */
+.dashboard-overview-header {
+    flex-wrap: wrap;
+    gap: 16px 24px;
+}
+
+.dashboard-overview-header > div:first-child {
+    flex: 1 1 280px;
+    min-width: 0;
+}
+
+.dashboard-overview-header .v-header-actions {
+    justify-content: flex-end;
+}
+
+/* The bell and profile sit in the top bar on phones and tablets (see DashboardLayout). */
+.v-mobile-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.v-mobile-bar .v-account {
+    gap: 8px;
+}
+
+.v-mobile-bar .v-round-button,
+.v-mobile-bar .v-profile-button {
+    width: 36px;
+    height: 36px;
+}
+
+@media (max-width: 860px) {
+    .v-content .v-account {
+        display: none;
+    }
+
+    /* Don't leave an empty actions row behind once the account buttons move up. */
+    .v-content .v-header-actions:not(:has(> :not(.v-account))) {
+        display: none;
+    }
+
+    .v-mobile-bar .v-popover {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        left: auto;
+        width: min(320px, calc(100vw - 24px));
+        max-height: calc(100dvh - 80px);
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 560px) {
+    .dashboard-overview-header {
+        margin-bottom: 22px;
+    }
+
+    /* The header stacks in a column here, so a flex-basis would turn into height. */
+    .dashboard-overview-header > div:first-child {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .dashboard-overview-header h1 {
+        font-size: 30px;
+    }
+
+    .dashboard-overview-header .v-header-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    /* Main page buttons fill the row on phones so they are easy to tap. */
+    .dashboard-overview-header .v-header-actions > .v-btn {
+        flex: 1 1 auto;
+    }
+}
+
+/* ---------- Filters ---------- */
+
+.v-filters {
+    align-items: flex-start;
+}
+
+.v-filters .v-field {
+    flex: 1 1 160px;
+    max-width: 240px;
+}
+
+.v-filters > .v-chips {
+    align-self: flex-end;
+    padding-bottom: 4px;
+}
+
+@media (max-width: 560px) {
+    .v-filters {
+        gap: 12px 10px;
+    }
+
+    .v-filters .v-field {
+        flex: 1 1 calc(50% - 5px);
+        min-width: 0;
+        max-width: none;
+    }
+
+    .v-filters .v-field :is(input, select) {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .v-filters > .v-chips {
+        flex: 1 1 100%;
+        align-self: auto;
+        padding-bottom: 0;
+    }
+}
+
+/* ---------- Tables become cards on phones ---------- */
+
+@media (max-width: 640px) {
+    .v-table-stack,
+    .v-table-stack tbody,
+    .v-table-stack tr,
+    .v-table-stack td {
+        display: block;
+    }
+
+    .v-table-stack thead {
+        display: none;
+    }
+
+    .v-table-stack tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 14px;
+        padding: 14px 4px;
+        border-bottom: 1px solid var(--v-border-soft);
+    }
+
+    .v-table-stack tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .v-table-stack td {
+        min-width: 0;
+        padding: 0;
+        border: none;
+        text-align: left !important;
+        overflow-wrap: anywhere;
+    }
+
+    .v-table-stack tr.v-clickable:hover td {
+        background: none;
+    }
+
+    .v-table-stack td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 2px;
+        color: var(--v-muted);
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    /* The first cell is the row's title: full width, no label. */
+    .v-table-stack td:first-child {
+        grid-column: 1 / -1;
+        font-size: 14px;
+    }
+
+    .v-table-stack td:first-child::before,
+    .v-table-stack td[data-label=""]::before {
+        display: none;
+    }
+
+    .v-table-stack td[data-label=""]:empty {
+        display: none;
+    }
+
+    .v-table-stack td[style] {
+        min-width: 0 !important;
+    }
+}
+
+/* ---------- Overview ---------- */
+
+/* Stat cards: the sparkline gives way to the text instead of running over it. */
+.ov-stat {
+    container-type: inline-size;
+}
+
+.ov-stat-row > div {
+    flex: 1 1 auto;
+}
+
+.ov-stat .v-spark {
+    flex: 0 1 110px;
+    min-width: 48px;
+}
+
+.ov-stat-text small {
+    white-space: normal;
+}
+
+@container (max-width: 250px) {
+    .ov-icon-tile {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+
+    .ov-stat .v-spark {
+        flex-basis: 64px;
+        height: 36px;
+    }
+}
+
+/* With the sidebar showing, two cards side by side get too narrow below ~1180px. */
+@media (max-width: 1180px) {
+    .ov-row-main,
+    .ov-row-bottom {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (min-width: 861px) and (max-width: 1180px) {
+    .ov-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Latest bookings: drop the less important columns as the card narrows. */
+.ov-table-wrap {
+    container-type: inline-size;
+}
+
+@container (max-width: 600px) {
+    .ov-table th:nth-child(4),
+    .ov-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+@container (max-width: 440px) {
+    .ov-table th:nth-child(3),
+    .ov-table td:nth-child(3) {
+        display: none;
+    }
+}
+
+/* ---------- Opening hours editor ---------- */
+
+.v-hours-cell {
+    display: block;
+    min-width: 0;
+}
+
+.v-hours-cell .v-input {
+    width: 100%;
+    min-width: 0;
+}
+
+.v-hours-cap {
+    display: none;
+}
+
+@media (max-width: 1100px) {
+    .v-hours-row:not(.v-hours-head) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 12px;
+        padding: 14px 0;
+    }
+
+    .v-hours-cap {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--v-muted);
+        font-size: 11.5px;
+        font-weight: 500;
+    }
+
+    .v-hours-row > .v-check {
+        justify-self: end;
+    }
+
+    .v-hours-row > .v-link {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+}
+
+/* ---------- Short laptop screens ---------- */
+
+/* Let the sidebar scroll on its own instead of hiding the help card and lower links. */
+@media (min-width: 861px) and (max-height: 760px) {
+    .v-sidebar {
+        padding-top: 18px;
+    }
+
+    .v-sidebar-logo {
+        margin-bottom: 16px;
+    }
+
+    .v-business-switch {
+        margin-bottom: 14px;
+    }
+
+    .v-nav a {
+        padding-block: 8px;
+    }
+
+    .v-nav-label {
+        margin-top: 12px;
+    }
+}
+
+/* ---------- Public site ---------- */
+
+/* The headline's second line always sits on its own line, as in the mockup. */
+.hero2-accent {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+}
+
+.velora-nav a,
+.velora-nav button {
+    white-space: nowrap;
+}
+
+/* Small laptops: tighten the top navigation so its links don't wrap onto two lines. */
+@media (min-width: 961px) and (max-width: 1180px) {
+    .velora-nav {
+        gap: 14px;
+        padding-inline: 4%;
+    }
+
+    .nav-links {
+        gap: 0;
+    }
+
+    .nav-links a,
+    .nav-links button {
+        padding-inline: 9px;
+        font-size: 13.5px;
+    }
+
+    .velora-nav .velora-logo {
+        font-size: 30px;
+    }
+}
+
+/* ---------- Log in and sign up on phones ---------- */
+
+/* The green panel shrinks to a logo strip so the form is on the first screen. */
+@media (max-width: 700px) {
+    .login-brand,
+    .register-brand {
+        padding-block: 18px;
+    }
+
+    .login-brand-message {
+        display: none;
+    }
+
+    .register-brand .brand-message {
+        padding: 22px 0 6px;
+    }
+
+    .register-brand .brand-tag,
+    .register-brand .brand-message p {
+        display: none;
+    }
+
+    .register-brand .brand-message h1 {
+        margin: 0;
+        font-size: 30px;
+    }
+
+    .login-form-container,
+    .register-form-container {
+        padding-top: 12px;
+    }
+}

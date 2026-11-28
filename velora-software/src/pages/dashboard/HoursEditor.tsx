@@ -159,10 +159,22 @@ function HoursEditor({
                         <input type="checkbox" checked={!row.is_closed} onChange={(e) => update(row.weekday, { is_closed: !e.target.checked })} />
                         {row.is_closed ? "Closed" : "Open"}
                     </label>
-                    <input className="v-input" type="time" aria-label="Opens" disabled={row.is_closed} value={row.start_time} onChange={(e) => update(row.weekday, { start_time: e.target.value })} />
-                    <input className="v-input" type="time" aria-label="Closes" disabled={row.is_closed} value={row.end_time} onChange={(e) => update(row.weekday, { end_time: e.target.value })} />
-                    <input className="v-input" type="time" aria-label="Break starts" title="Break starts" disabled={row.is_closed} value={row.break_start} onChange={(e) => update(row.weekday, { break_start: e.target.value })} />
-                    <input className="v-input" type="time" aria-label="Break ends" title="Break ends" disabled={row.is_closed} value={row.break_end} onChange={(e) => update(row.weekday, { break_end: e.target.value })} />
+                    <label className="v-hours-cell">
+                        <span className="v-hours-cap" aria-hidden="true">Opens</span>
+                        <input className="v-input" type="time" aria-label="Opens" disabled={row.is_closed} value={row.start_time} onChange={(e) => update(row.weekday, { start_time: e.target.value })} />
+                    </label>
+                    <label className="v-hours-cell">
+                        <span className="v-hours-cap" aria-hidden="true">Closes</span>
+                        <input className="v-input" type="time" aria-label="Closes" disabled={row.is_closed} value={row.end_time} onChange={(e) => update(row.weekday, { end_time: e.target.value })} />
+                    </label>
+                    <label className="v-hours-cell">
+                        <span className="v-hours-cap" aria-hidden="true">Break starts</span>
+                        <input className="v-input" type="time" aria-label="Break starts" title="Break starts" disabled={row.is_closed} value={row.break_start} onChange={(e) => update(row.weekday, { break_start: e.target.value })} />
+                    </label>
+                    <label className="v-hours-cell">
+                        <span className="v-hours-cap" aria-hidden="true">Break ends</span>
+                        <input className="v-input" type="time" aria-label="Break ends" title="Break ends" disabled={row.is_closed} value={row.break_end} onChange={(e) => update(row.weekday, { break_end: e.target.value })} />
+                    </label>
                     <button
                         type="button"
                         className="v-link"
