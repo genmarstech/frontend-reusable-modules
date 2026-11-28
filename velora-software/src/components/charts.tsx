@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { compactNumber, niceTicks } from "../lib/chartScale";
 
 /**
  * Small hand-drawn SVG charts for the dashboard. No chart library: they only
@@ -54,21 +55,6 @@ export function Sparkline({ values, width = 96, height = 40 }: { values: number[
     );
 }
 
-function niceMax(value: number): number {
-    if (value <= 0) return 4;
-    const magnitude = 10 ** Math.floor(Math.log10(value));
-    for (const step of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) {
-        if (step * magnitude >= value) return step * magnitude;
-    }
-    return 10 * magnitude;
-}
-
-function compact(n: number): string {
-    if (n >= 1_000_000) return `${+(n / 1_000_000).toFixed(1)}m`;
-    if (n >= 1000) return `${+(n / 1000).toFixed(1)}k`;
-    return String(n);
-}
-
 export interface AreaPoint {
     label: string;
     /** Shown in the hover tip. */
@@ -77,11 +63,27 @@ export interface AreaPoint {
 }
 
 /** Revenue over time: soft area, dots on each point, a hover tip. */
-export function AreaChart({ points, height = 180, ariaLabel }: { points: AreaPoint[]; height?: number; ariaLabel: string }) {
+export function AreaChart({
+    points,
+    height = 180,
+    ariaLabel,
+    formatTick = compactNumber,
+    minScale = 1,
+}: {
+    points: AreaPoint[];
+    height?: number;
+    ariaLabel: string;
+    /** How a y-axis value reads, such as "KES 1.5k". */
+    formatTick?: (value: number) => string;
+    /** The axis reaches at least this high, so an empty chart still shows a sensible scale. */
+    minScale?: number;
+}) {
     const id = useId();
     const [active, setActive] = useState<number | null>(null);
     const box = useRef<HTMLDivElement>(null);
+    const tip = useRef<HTMLDivElement>(null);
     const [width, setWidth] = useState(720);
+    const [tipWidth, setTipWidth] = useState(0);
     // Draw at the real width so text and dots keep their shape.
     useEffect(() => {
         const el = box.current;
@@ -92,36 +94,74 @@ export function AreaChart({ points, height = 180, ariaLabel }: { points: AreaPoi
         observer.observe(el);
         return () => observer.disconnect();
     }, []);
-    const left = 38;
+    useLayoutEffect(() => {
+        if (active !== null && tip.current) setTipWidth(tip.current.offsetWidth);
+    }, [active, points]);
+
+    const ticks = niceTicks(Math.max(...points.map((p) => p.value), minScale));
+    const max = ticks[ticks.length - 1];
+    const tickLabels = ticks.map(formatTick);
+    // Room for the widest y label (about 6.6px a character at 11.5px DM Sans), so it never spills out of the card.
+    const left = Math.max(24, Math.ceil(Math.max(...tickLabels.map((t) => t.length)) * 6.6) + 12);
     const right = 14;
     const top = 12;
     const bottom = 28;
-    const max = niceMax(Math.max(...points.map((p) => p.value), 0));
     const plotW = width - left - right;
     const plotH = height - top - bottom;
     const x = (i: number) => left + (points.length === 1 ? plotW / 2 : (i / (points.length - 1)) * plotW);
     const y = (v: number) => top + (1 - v / max) * plotH;
     const coords: Point[] = points.map((p, i) => [Math.round(x(i) * 10) / 10, Math.round(y(p.value) * 10) / 10]);
     const line = smoothPath(coords);
-    const ticks = [0, 1, 2, 3].map((i) => (max / 3) * i);
     // Too many points to label each: label about seven of them.
     const labelEvery = Math.max(1, Math.ceil(points.length / 7));
     const showDots = points.length <= 31;
 
+    // The nearest point to the pointer, so the tip follows the mouse or a finger.
+    const pick = (clientX: number) => {
+        const el = box.current;
+        if (!el || points.length === 0) return;
+        const rect = el.getBoundingClientRect();
+        const px = ((clientX - rect.left) / rect.width) * width;
+        const i = points.length === 1 ? 0 : Math.round(((px - left) / plotW) * (points.length - 1));
+        setActive(Math.min(points.length - 1, Math.max(0, i)));
+    };
+
+    // Keep the tip inside the chart: clamp it sideways, and drop it below the point near the top.
+    let tipStyle: CSSProperties | undefined;
+    if (active !== null) {
+        const half = tipWidth / 2;
+        const cx = Math.min(Math.max(x(active), half), width - half);
+        const cy = y(points[active].value);
+        tipStyle = {
+            left: `${cx}px`,
+            top: `${cy}px`,
+            transform: cy < 44 ? "translate(-50%, 14px)" : "translate(-50%, calc(-100% - 12px))",
+            visibility: tipWidth ? "visible" : "hidden",
+        };
+    }
+
     return (
         <div className="v-area-chart" ref={box}>
-            <svg viewBox={`0 0 ${width} ${height}`} height={height} role="img" aria-label={ariaLabel}>
+            <svg
+                viewBox={`0 0 ${width} ${height}`}
+                height={height}
+                role="img"
+                aria-label={ariaLabel}
+                onPointerMove={(e) => pick(e.clientX)}
+                onPointerDown={(e) => pick(e.clientX)}
+                onPointerLeave={() => setActive(null)}
+            >
                 <defs>
                     <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
                         <stop offset="0%" stopColor="var(--v-chart)" stopOpacity="0.22" />
                         <stop offset="100%" stopColor="var(--v-chart)" stopOpacity="0.01" />
                     </linearGradient>
                 </defs>
-                {ticks.map((t) => (
+                {ticks.map((t, i) => (
                     <g key={t}>
                         <line x1={left} x2={width - right} y1={y(t)} y2={y(t)} className="v-area-grid" />
                         <text x={left - 8} y={y(t) + 4} textAnchor="end" className="v-area-tick">
-                            {compact(t)}
+                            {tickLabels[i]}
                         </text>
                     </g>
                 ))}
@@ -148,26 +188,11 @@ export function AreaChart({ points, height = 180, ariaLabel }: { points: AreaPoi
                         />
                     ) : null
                 )}
-                {points.map((p, i) => (
-                    <rect
-                        key={i}
-                        x={x(i) - plotW / Math.max(points.length - 1, 1) / 2}
-                        y={top}
-                        width={plotW / Math.max(points.length - 1, 1)}
-                        height={plotH}
-                        fill="transparent"
-                        onMouseEnter={() => setActive(i)}
-                        onMouseLeave={() => setActive(null)}
-                    >
-                        <title>{p.detail}</title>
-                    </rect>
-                ))}
+                {/* Catches the pointer over the whole plot. No <title>: the browser would draw its own grey tip too. */}
+                <rect x={left} y={top} width={plotW} height={plotH} fill="transparent" />
             </svg>
             {active !== null && (
-                <div
-                    className="v-area-tip"
-                    style={{ left: `${(x(active) / width) * 100}%`, top: `${(y(points[active].value) / height) * 100}%` }}
-                >
+                <div className="v-area-tip" ref={tip} style={tipStyle} role="status">
                     {points[active].detail}
                 </div>
             )}
