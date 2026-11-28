@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Copy, Mail, MessageCircle, MessageSquare, Share2 } from "lucide-react";
 
 import { publicBookingUrl } from "../../lib/api/bookings";
+import { getChannelSettings } from "../../lib/api/channels";
 import { Modal } from "../../components/ui";
 
 export interface ShareProgress {
@@ -16,11 +17,13 @@ export interface ShareProgress {
  * through the link count towards the "share with 5 customers" setup step.
  */
 export function ShareLinkModal({
+    businessId,
     businessName,
     slug,
     progress,
     onClose,
 }: {
+    businessId?: number;
     businessName: string;
     slug: string;
     progress?: ShareProgress;
@@ -30,18 +33,31 @@ export function ShareLinkModal({
     const [message, setMessage] = useState(
         `Hi! You can now book your next appointment at ${businessName} online. Join once and rebook your favourite service in one tap: ${url}`
     );
-    const [copied, setCopied] = useState<"" | "link" | "message">("");
+    const [copied, setCopied] = useState<"" | "link" | "message" | "chat">("");
+    // The business's WhatsApp booking link, when the Velora number is live and it is on.
+    const [chatLink, setChatLink] = useState("");
+    useEffect(() => {
+        if (!businessId) return;
+        let active = true;
+        getChannelSettings(businessId)
+            .then((d) => active && setChatLink(d.whatsapp.configured && d.whatsapp.enabled ? d.whatsapp.link : ""))
+            .catch(() => undefined);
+        return () => {
+            active = false;
+        };
+    }, [businessId]);
     const text = message.includes(url) ? message : `${message} ${url}`;
     const encoded = encodeURIComponent(text);
     const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
-    const copy = async (what: "link" | "message") => {
+    const copy = async (what: "link" | "message" | "chat") => {
+        const value = what === "link" ? url : what === "chat" ? chatLink : text;
         try {
-            await navigator.clipboard.writeText(what === "link" ? url : text);
+            await navigator.clipboard.writeText(value);
             setCopied(what);
             setTimeout(() => setCopied(""), 2000);
         } catch {
-            window.prompt("Copy this", what === "link" ? url : text);
+            window.prompt("Copy this", value);
         }
     };
 
@@ -83,6 +99,18 @@ export function ShareLinkModal({
                     {copied === "link" ? <Check size={14} /> : <Copy size={14} />} {copied === "link" ? "Copied" : "Copy link"}
                 </button>
             </div>
+
+            {chatLink && (
+                <div className="share-chat">
+                    <span>Or let them book in WhatsApp</span>
+                    <div className="share-link">
+                        <input className="v-input" readOnly value={chatLink} onFocus={(e) => e.target.select()} aria-label="WhatsApp booking link" />
+                        <button type="button" className="v-btn v-btn-small" onClick={() => copy("chat")}>
+                            {copied === "chat" ? <Check size={14} /> : <Copy size={14} />} {copied === "chat" ? "Copied" : "Copy"}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <label className="share-message">
                 <span>Message</span>

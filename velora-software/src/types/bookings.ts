@@ -324,6 +324,8 @@ export interface PublicBusiness {
     staff: PublicStaff[];
     /** False until the business has a team with open times for at least one service. */
     accepting_bookings?: boolean;
+    /** Book in a chat app instead: {"whatsapp": "https://wa.me/..."} when the business is on it. */
+    chat_links?: { whatsapp?: string };
     policy: {
         timezone: string;
         max_advance_days: number;

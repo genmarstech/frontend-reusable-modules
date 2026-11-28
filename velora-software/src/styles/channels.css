@@ -178,3 +178,24 @@
     .ch-alert-row .ch-btn, .ch-alert-row .ch-switch { margin-left: 46px; }
     .ch-stats dd { font-size: 17px; }
 }
+
+/* QR code (components/QrCode.tsx) */
+.v-qr {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--v-border-soft);
+    border-radius: 14px;
+    background: var(--v-surface-soft);
+}
+
+.v-qr img { flex: none; border-radius: 8px; background: #fff; image-rendering: pixelated; }
+.v-qr strong { display: block; color: var(--v-ink); font-size: 14px; }
+.v-qr small { display: block; margin: 2px 0 10px; color: var(--v-muted); font-size: 12.5px; line-height: 1.45; }
+.v-qr-download { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+
+@media (max-width: 420px) {
+    .v-qr { flex-direction: column; align-items: flex-start; }
+}
