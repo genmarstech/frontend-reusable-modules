@@ -452,15 +452,27 @@ function BookingPage() {
                             )}
                             <h2>Choose a service</h2>
                             <p>Pick what you would like to book.</p>
-                            {business.services.length === 0 ? (
-                                <p className="v-muted">This business has not opened online booking yet.</p>
+                            {business.services.length === 0 || business.accepting_bookings === false ? (
+                                <div className="bk-closed">
+                                    <strong>{business.business_name} is not taking online bookings yet.</strong>
+                                    <span>
+                                        They are still setting up their booking page.
+                                        {business.whatsapp_number && (
+                                            <> Message them on <a href={`https://wa.me/${business.whatsapp_number.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a> to book.</>
+                                        )}
+                                    </span>
+                                </div>
                             ) : (
                                 <div className="bk-options">
                                     {business.services.map((s) => (
-                                        <button key={s.id} type="button" className={`bk-option ${service?.id === s.id ? "active" : ""}`} onClick={() => chooseService(s)}>
+                                        <button key={s.id} type="button" className={`bk-option ${service?.id === s.id ? "active" : ""}`} onClick={() => chooseService(s)} disabled={s.bookable === false}>
                                             <div>
                                                 <strong>{s.service_name}</strong>
-                                                <small>{s.duration_minutes} min{s.service_description ? ` · ${s.service_description}` : ""}</small>
+                                                <small>
+                                                    {s.bookable === false
+                                                        ? "Not bookable online yet"
+                                                        : `${s.duration_minutes} min${s.service_description ? ` · ${s.service_description}` : ""}`}
+                                                </small>
                                             </div>
                                             <span className="bk-price">{formatMoney(s.price)}</span>
                                         </button>
@@ -500,13 +512,24 @@ function BookingPage() {
                                         const [y, m, dd] = d.date.split("-").map(Number);
                                         const dt = new Date(Date.UTC(y, m - 1, dd));
                                         return (
-                                            <button key={d.date} type="button" className={`bk-day ${date === d.date ? "active" : ""}`} onClick={() => { if (d.date !== date) { setDate(d.date); setSlots(null); } }}>
+                                            <button key={d.date} type="button" className={`bk-day ${date === d.date ? "active" : ""}`} onClick={() => { if (d.date !== date) { setDate(d.date); setSlots(null); setWaitlisted(false); } }}>
                                                 <small>{dt.toLocaleDateString("en-GB", { weekday: "short", timeZone: "UTC" })}</small>
                                                 <strong>{dd}</strong>
-                                                <em>{d.available ? `${d.available} open` : "None"}</em>
+                                                <em>{d.available ? `${d.available} open` : "Full"}</em>
                                             </button>
                                         );
                                     })}
+                                </div>
+                            )}
+                            {days && days.length > 0 && days.every((d) => d.available === 0) && (
+                                <div className="bk-closed">
+                                    <strong>No open times in the next {days.length} days.</strong>
+                                    <span>
+                                        {business.business_name} has no free times for {service.service_name} right now.
+                                        {business.whatsapp_number && (
+                                            <> Message them on <a href={`https://wa.me/${business.whatsapp_number.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a>, or join the waitlist below.</>
+                                        )}
+                                    </span>
                                 </div>
                             )}
                             {date && (
@@ -516,16 +539,18 @@ function BookingPage() {
                                         <div className="v-loading"><Loader2 size={18} className="v-spin" /> Loading times...</div>
                                     ) : slots.length === 0 ? (
                                         waitlisted ? (
-                                            <Alert kind="success">You are on the waitlist. We will message you if a slot opens on this day.</Alert>
+                                            <Alert kind="success">You are on the waitlist for {formatDayLabel(date)}. We will message you if a slot opens. This is not a booking yet.</Alert>
                                         ) : (
                                             <div className="bk-policy">
-                                                No open times on this day. Pick another day, or join the waitlist and we will message you if something opens up.
-                                                <div className="v-form-grid v-form-grid-3" style={{ marginTop: 12 }}>
-                                                    <input className="v-input" placeholder="Your name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
-                                                    <input className="v-input" type="tel" placeholder="Phone" value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} />
-                                                    <input className="v-input" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                                                </div>
-                                                <button className="v-btn v-btn-small" style={{ marginTop: 10 }} onClick={addToWaitlist}>Join the waitlist</button>
+                                                No open times on this day. Pick another day, or join the waitlist and we will message you if something opens up. The waitlist is not a booking.
+                                                {!account && (
+                                                    <div className="v-form-grid v-form-grid-3" style={{ marginTop: 12 }}>
+                                                        <input className="v-input" placeholder="Your name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+                                                        <input className="v-input" type="tel" placeholder="Phone" value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} />
+                                                        <input className="v-input" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                                                    </div>
+                                                )}
+                                                <button className="v-btn v-btn-small" style={{ marginTop: 10 }} onClick={addToWaitlist}>Join the waitlist for {formatDayLabel(date)}</button>
                                             </div>
                                         )
                                     ) : (

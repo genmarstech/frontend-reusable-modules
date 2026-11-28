@@ -32,9 +32,23 @@ function toRows(hours: WorkingHours[]): Row[] {
     });
 }
 
-/** Weekly hours for the business (staffId null) or one staff member. */
-function HoursEditor({ staffId }: { staffId: number | null }) {
-    const { business } = useDashboard();
+/**
+ * Weekly hours for the business (staffId null) or one staff member.
+ * Outside the dashboard (onboarding), pass `businessId`.
+ */
+function HoursEditor({
+    staffId,
+    businessId,
+    onSaved,
+    saveLabel = "Save hours",
+}: {
+    staffId: number | null;
+    businessId?: number;
+    onSaved?: () => void;
+    saveLabel?: string;
+}) {
+    const dashboard = useDashboard() as ReturnType<typeof useDashboard> | undefined;
+    const business = { id: businessId ?? dashboard!.business.id };
     const [rows, setRows] = useState<Row[] | null>(null);
     const [custom, setCustom] = useState(staffId === null);
     const [saving, setSaving] = useState(false);
@@ -65,9 +79,13 @@ function HoursEditor({ staffId }: { staffId: number | null }) {
 
     const save = async () => {
         if (!rows) return;
-        setSaving(true);
         setError("");
         setMessage("");
+        if (staffId === null && rows.every((r) => r.is_closed)) {
+            setError("Open at least one day. Customers can only book when you are open.");
+            return;
+        }
+        setSaving(true);
         try {
             for (const row of rows) {
                 const payload = {
@@ -85,6 +103,7 @@ function HoursEditor({ staffId }: { staffId: number | null }) {
             }
             setMessage("Hours saved. Open slots now follow these hours.");
             setReload((n) => n + 1);
+            onSaved?.();
         } catch (err) {
             const apiError = handleApiError(err);
             setError(apiError.message);
@@ -161,7 +180,7 @@ function HoursEditor({ staffId }: { staffId: number | null }) {
                     </button>
                 )}
                 <button className="v-btn" disabled={saving} onClick={save}>
-                    {saving ? "Saving..." : "Save hours"}
+                    {saving ? "Saving..." : saveLabel}
                 </button>
             </div>
         </div>

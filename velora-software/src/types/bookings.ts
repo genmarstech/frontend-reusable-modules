@@ -7,7 +7,7 @@ export type BookingStatus =
     | "completed"
     | "no_show";
 
-export type BookingChannel = "online" | "walk_in" | "phone" | "staff" | "whatsapp" | "api";
+export type BookingChannel = "online" | "walk_in" | "phone" | "staff" | "whatsapp" | "telegram" | "api";
 
 export type NotifyChannel = "email" | "sms" | "whatsapp" | "push";
 
@@ -300,6 +300,8 @@ export interface PublicService {
     price: string;
     duration_minutes: number;
     deposit_amount: string | null;
+    /** False when nobody can do it yet (no team member, skill or working hours). */
+    bookable?: boolean;
 }
 
 export interface PublicStaff {
@@ -320,6 +322,8 @@ export interface PublicBusiness {
     business_email: string;
     services: PublicService[];
     staff: PublicStaff[];
+    /** False until the business has a team with open times for at least one service. */
+    accepting_bookings?: boolean;
     policy: {
         timezone: string;
         max_advance_days: number;
@@ -414,6 +418,16 @@ export interface Overview {
     top_services: { service_id: number; name: string; bookings: number; spark: number[] }[];
     attention: number;
     failed_messages: number;
+    readiness?: BookingReadiness;
+    /** People waiting for a slot from the shown day on. */
+    waitlist?: number;
+}
+
+export interface BookingReadiness {
+    ready: boolean;
+    all_ready: boolean;
+    issues: { key: string; text: string; link: string; services?: string[] }[];
+    unbookable_service_ids: number[];
 }
 
 // GET bk/overview/performance/

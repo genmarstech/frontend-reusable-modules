@@ -237,6 +237,35 @@ function DashboardOverview() {
 
             {error && <div className="v-alert v-alert-error">{error}</div>}
 
+            {overview?.readiness && overview.readiness.issues.length > 0 && (
+                <section className={`ov-ready ${overview.readiness.ready ? "is-partial" : "is-closed"}`} role="alert">
+                    <div className="ov-ready-head">
+                        <strong>
+                            {overview.readiness.ready
+                                ? "Some services can't be booked online yet"
+                                : "Your booking link is closed: customers can't book yet"}
+                        </strong>
+                        <small>Online times come from your team's working hours. Fix these to open your link:</small>
+                    </div>
+                    <ul>
+                        {overview.readiness.issues.map((issue) => (
+                            <li key={issue.key}>
+                                <span>{issue.text}</span>
+                                <Link to={`../${issue.link}`} className="v-btn v-btn-small">
+                                    {issue.link === "team" ? "Open Team" : issue.link === "schedule" ? "Open Schedule" : "Open Services"}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
+
+            {overview && (overview.waitlist || 0) > 0 && (
+                <Link to="../schedule" className="ov-waitlist-note">
+                    {overview.waitlist} {overview.waitlist === 1 ? "person is" : "people are"} on the waitlist for a slot. See who →
+                </Link>
+            )}
+
             <section className="ov-stats" aria-label="Key numbers">
                 <StatCard
                     icon={<CalendarDays />}
